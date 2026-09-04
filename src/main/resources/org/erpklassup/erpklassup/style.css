@@ -1,0 +1,125 @@
+/* Style principal de l'AppBar */
+.app-bar {
+    -fx-background-color: linear-gradient(to bottom, #1a1a2e, #16213e);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 8);
+    -fx-padding: 12px 20px;
+    -fx-spacing: 10px;
+}
+
+/* Première rangée */
+.app-bar-top {
+    -fx-alignment: center-left;
+}
+
+/* Logo */
+.logo {
+    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.5), 10, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.logo:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.8), 15, 0, 0, 6);
+}
+
+/* Titre de l'application */
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.subtitle {
+    -fx-text-fill: rgba(255,255,255,0.7);
+    -fx-font-size: 11px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+/* Barre de recherche */
+.search-box {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 15px;
+    -fx-min-width: 250px;
+}
+
+.search-box:hover {
+    -fx-background-color: rgba(255,255,255,0.2);
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255,255,255,0.6);
+    -fx-border: none;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Boutons d'icônes */
+.icon-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-font-size: 16px;
+    -fx-transition: all 0.3s;
+}
+
+.icon-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.notification-btn:hover {
+    -fx-background-color: rgba(255,193,7,0.3);
+}
+
+.settings-btn:hover {
+    -fx-background-color: rgba(76,175,80,0.3);
+}
+
+.profile-btn:hover {
+    -fx-background-color: rgba(33,150,243,0.3);
+}
+
+/* Barre de navigation */
+.nav-row {
+    -fx-padding: 5px 0 0 0;
+    -fx-border-color: rgba(255,255,255,0.1);
+    -fx-border-width: 1px 0 0 0;
+}
+
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.7);
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-transition: all 0.3s;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: white;
+}
+
+.nav-btn.active {
+    -fx-background-color: rgba(102,126,234,0.3);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: #667eea;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.nav-btn.active:hover {
+    -fx-background-color: rgba(102,126,234,0.4);
+}
