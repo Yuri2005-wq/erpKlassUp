@@ -19,4 +19,12 @@ public class TentativeConnexionDAO {
             stmt.setString(3, tentative.getAdresseIp());
             stmt.setString(4, tentative.getUserAgent());
             stmt.setBoolean(5, tentative.isSucces());
-            stmt
+            stmt.setString(6, tentative.getMotifEchec());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur enregistrer TentativeConnexion : " + e.getMessage());
+            return false;
+        }
+    }
+}

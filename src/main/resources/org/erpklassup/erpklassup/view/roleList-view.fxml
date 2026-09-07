@@ -1,14 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox spacing="15" styleClass="content-area" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.RoleListController">
 
-</AnchorPane>
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="3">
+            <Label styleClass="page-title" text="Gestion des Rôles" />
+            <Label styleClass="page-subtitle" text="Créez et gérez les rôles et leurs permissions" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnNouveauRole" onAction="#handleNouveauRole" styleClass="button-primary" text="Nouveau rôle">
+            <graphic>
+                <FontIcon iconLiteral="fth-plus-circle" iconSize="16" />
+            </graphic>
+        </Button>
+    </HBox>
+
+    <!-- ===== TABLEAU ===== -->
+    <TableView fx:id="roleTable" styleClass="custom-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIcon" prefWidth="50" resizable="false" text="" />
+            <TableColumn fx:id="colNomRole" prefWidth="200" text="NOM DU RÔLE" />
+            <TableColumn fx:id="colDescription" prefWidth="300" text="DESCRIPTION" />
+            <TableColumn fx:id="colNbPermissions" prefWidth="120" text="PERMISSIONS" />
+            <TableColumn fx:id="colStatut" prefWidth="100" text="STATUT" />
+            <TableColumn fx:id="colActions" prefWidth="60" resizable="false" text="" />
+        </columns>
+        <placeholder>
+            <Label styleClass="table-placeholder" text="Aucun rôle trouvé" />
+        </placeholder>
+    </TableView>
+</VBox>

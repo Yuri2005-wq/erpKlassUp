@@ -10,7 +10,19 @@ module org.erpklassup.erpklassup {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
-
-    opens org.erpklassup.erpklassup to javafx.fxml;
+    requires com.sun.jna.platform;
+    requires com.sun.jna;
+    requires atlantafx.base;
+    requires java.prefs;
+    requires HikariCP.java7;
+    requires java.sql;
+    requires bcrypt;
     exports org.erpklassup.erpklassup;
+    opens org.erpklassup.erpklassup.controllers to javafx.fxml;
+    opens org.erpklassup.erpklassup to javafx.fxml;
+    opens org.erpklassup.erpklassup.controllers.actionPage to javafx.fxml;
+    opens org.erpklassup.erpklassup.controllers.renduView to javafx.fxml;
+    exports org.erpklassup.erpklassup.util;
+    opens org.erpklassup.erpklassup.util to javafx.fxml;
+
 }

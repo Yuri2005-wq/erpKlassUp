@@ -1,14 +1,253 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controller.UserFormController"
+      spacing="20"
+      styleClass="content-area"
+      prefWidth="650"
+      prefHeight="700">
 
-</AnchorPane>
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Button fx:id="btnRetour"
+                onAction="#handleRetour"
+                styleClass="btn-icon-light">
+            <graphic>
+                <FontIcon iconLiteral="fth-arrow-left" iconSize="16"/>
+            </graphic>
+            <tooltip><Tooltip text="Retour à la liste"/></tooltip>
+        </Button>
+        <VBox spacing="3">
+            <Label fx:id="titreLabel" text="Nouvel Utilisateur" styleClass="page-title"/>
+            <Label fx:id="sousTitreLabel" text="Créez un compte utilisateur avec ses rôles et permissions" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="badgeEcoleLabel" text="" styleClass="event-tag, tag-blue"/>
+    </HBox>
+
+    <!-- ===== FORMULAIRE ===== -->
+    <ScrollPane fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="20" maxWidth="700">
+
+                <!-- ===== SECTION 1 : INFORMATIONS DE BASE ===== -->
+                <VBox styleClass="card" spacing="15">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon"/>
+                        <Label text="Informations de base" styleClass="card-title"/>
+                    </HBox>
+
+                    <!-- Nom + Prénom -->
+                    <HBox spacing="15">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Nom *" styleClass="field-label"/>
+                            <TextField fx:id="nomField"
+                                       promptText="Ex: Kamdem"
+                                       styleClass="input"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Prénom" styleClass="field-label"/>
+                            <TextField fx:id="prenomField"
+                                       promptText="Ex: Marie"
+                                       styleClass="input"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Username + Email -->
+                    <HBox spacing="15">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Username *" styleClass="field-label"/>
+                            <TextField fx:id="usernameField"
+                                       promptText="Ex: mkamdem"
+                                       styleClass="input"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Email *" styleClass="field-label"/>
+                            <TextField fx:id="emailField"
+                                       promptText="Ex: marie.kamdem@ecole.com"
+                                       styleClass="input"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Téléphone + Type utilisateur -->
+                    <HBox spacing="15">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Téléphone" styleClass="field-label"/>
+                            <TextField fx:id="telephoneField"
+                                       promptText="Ex: 677123456"
+                                       styleClass="input"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Type d'utilisateur *" styleClass="field-label"/>
+                            <ComboBox fx:id="typeUserCombo"
+                                      promptText="Sélectionner un type"
+                                      maxWidth="Infinity"
+                                      styleClass="input"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- École -->
+                    <VBox spacing="6">
+                        <Label text="École *" styleClass="field-label"/>
+                        <ComboBox fx:id="ecoleCombo"
+                                  promptText="Sélectionner une école"
+                                  maxWidth="Infinity"
+                                  styleClass="input"/>
+                    </VBox>
+                </VBox>
+
+                <!-- ===== SECTION 2 : SÉCURITÉ ===== -->
+                <VBox styleClass="card" spacing="15">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon"/>
+                        <Label text="Sécurité" styleClass="card-title"/>
+                    </HBox>
+
+                    <!-- Mot de passe -->
+                    <VBox spacing="6">
+                        <Label text="Mot de passe *" styleClass="field-label"/>
+                        <HBox styleClass="input-container" spacing="10" alignment="CENTER_LEFT">
+                            <FontIcon iconLiteral="fth-lock" iconSize="14" styleClass="input-icon"/>
+                            <PasswordField fx:id="passwordField"
+                                           promptText="Minimum 8 caractères"
+                                           HBox.hgrow="ALWAYS"
+                                           styleClass="login-input"/>
+                            <Button fx:id="togglePasswordBtn" styleClass="toggle-password-btn">
+                                <graphic>
+                                    <FontIcon iconLiteral="fth-eye" iconSize="14"/>
+                                </graphic>
+                            </Button>
+                        </HBox>
+
+                        <!-- Indicateur de force -->
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <Label text="Force :" styleClass="footer-info"/>
+                            <Label fx:id="forceMdpLabel" text="—" style="-fx-font-weight: bold;"/>
+                            <ProgressBar fx:id="forceMdpProgress" prefWidth="150" prefHeight="6"
+                                         styleClass="kpi-progress" visible="false"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Confirmation -->
+                    <VBox spacing="6">
+                        <Label text="Confirmer le mot de passe *" styleClass="field-label"/>
+                        <HBox styleClass="input-container" spacing="10" alignment="CENTER_LEFT">
+                            <FontIcon iconLiteral="fth-lock" iconSize="14" styleClass="input-icon"/>
+                            <PasswordField fx:id="confirmPasswordField"
+                                           promptText="Retapez le mot de passe"
+                                           HBox.hgrow="ALWAYS"
+                                           styleClass="login-input"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Options -->
+                    <CheckBox fx:id="changerMdpCheckBox"
+                              text="L'utilisateur doit changer son mot de passe à la première connexion"
+                              styleClass="remember-checkbox"/>
+
+                    <CheckBox fx:id="activer2FACheckBox"
+                              text="Activer la double authentification (2FA)"
+                              styleClass="remember-checkbox"/>
+                </VBox>
+
+                <!-- ===== SECTION 3 : RÔLES ===== -->
+                <VBox styleClass="card" spacing="15">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon"/>
+                        <Label text="Rôles de l'utilisateur" styleClass="card-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="roleCountLabel" text="0 sélectionné(s)" styleClass="footer-info"/>
+                    </HBox>
+
+                    <Label text="Sélectionnez un ou plusieurs rôles :" styleClass="field-label"/>
+
+                    <!-- Recherche de rôle -->
+                    <HBox styleClass="search-box-light" spacing="8" alignment="CENTER_LEFT">
+                        <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light"/>
+                        <TextField fx:id="searchRoleField"
+                                   promptText="Rechercher un rôle..."
+                                   HBox.hgrow="ALWAYS"
+                                   styleClass="search-field-inner"/>
+                    </HBox>
+
+                    <!-- Checkboxes de rôles -->
+                    <ScrollPane fitToWidth="true" prefHeight="150" styleClass="page-scroll">
+                        <content>
+                            <FlowPane fx:id="rolesFlowPane"
+                                      hgap="10"
+                                      vgap="10"
+                                      prefWrapLength="600"/>
+                        </content>
+                    </ScrollPane>
+
+                    <!-- Rôle principal -->
+                    <VBox spacing="6">
+                        <Label text="Rôle principal (pour l'affichage par défaut)" styleClass="field-label"/>
+                        <ComboBox fx:id="rolePrincipalCombo"
+                                  promptText="Sélectionner le rôle principal"
+                                  maxWidth="Infinity"
+                                  styleClass="input"/>
+                    </VBox>
+                </VBox>
+
+                <!-- ===== SECTION 4 : PERMISSIONS D'EXCEPTION ===== -->
+                <VBox styleClass="card" spacing="15">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon"/>
+                        <Label text="Permissions d'exception (optionnel)" styleClass="card-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="permCountLabel" text="0 sélectionnée(s)" styleClass="footer-info"/>
+                    </HBox>
+
+                    <Label text="Permissions supplémentaires au-delà des rôles :" styleClass="field-label" wrapText="true"/>
+
+                    <CheckBox fx:id="showExceptionsCheckBox"
+                              text="Afficher les permissions d'exception"
+                              styleClass="remember-checkbox"/>
+
+                    <VBox fx:id="permissionsContainer" spacing="5" visible="false" managed="false">
+                        <!-- Checkboxes de permissions dynamiques -->
+                    </VBox>
+                </VBox>
+
+                <!-- ===== MESSAGE D'ERREUR ===== -->
+                <Label fx:id="errorLabel"
+                       visible="false"
+                       managed="false"
+                       wrapText="true"
+                       styleClass="error-label"/>
+
+                <!-- ===== BOUTONS ===== -->
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnAnnuler"
+                            onAction="#handleAnnuler"
+                            text="Annuler"
+                            styleClass="btn-icon-light">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-x" iconSize="14"/>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnEnregistrer"
+                            onAction="#handleEnregistrer"
+                            text="Enregistrer l'utilisateur"
+                            defaultButton="true"
+                            styleClass="button-primary">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-save" iconSize="16"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

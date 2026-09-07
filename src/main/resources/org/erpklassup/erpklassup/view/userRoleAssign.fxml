@@ -1,14 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox spacing="20" styleClass="content-area" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.UserRoleAssignController">
 
-</AnchorPane>
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Button fx:id="btnRetour" onAction="#handleRetour" styleClass="btn-icon-light">
+            <graphic>
+                <FontIcon iconLiteral="fth-arrow-left" iconSize="16" />
+            </graphic>
+        </Button>
+        <VBox spacing="3">
+            <Label styleClass="page-title" text="Assigner des Rôles" />
+            <Label fx:id="userInfoLabel" styleClass="page-subtitle" text="Utilisateur :" />
+        </VBox>
+    </HBox>
+
+    <!-- ===== SÉLECTEUR D'UTILISATEUR ===== -->
+    <VBox spacing="10" styleClass="card">
+        <Label styleClass="field-label" text="Sélectionner un utilisateur" />
+        <ComboBox fx:id="userCombo" maxWidth="400" promptText="Choisir un utilisateur..." styleClass="input" />
+    </VBox>
+
+    <!-- ===== ZONE D'ASSIGNATION ===== -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- Rôles disponibles -->
+        <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <FontIcon iconLiteral="fth-list" iconSize="16" styleClass="tile-icon" />
+                <Label styleClass="card-title" text="Rôles disponibles" />
+            </HBox>
+
+            <ListView fx:id="rolesDisponiblesList" styleClass="custom-table" VBox.vgrow="ALWAYS" />
+        </VBox>
+
+        <!-- Boutons de transfert -->
+        <VBox alignment="CENTER" spacing="10">
+            <Button fx:id="btnAjouter" onAction="#handleAjouter" styleClass="btn-icon-light">
+                <graphic>
+                    <FontIcon iconLiteral="fth-arrow-right" iconSize="16" />
+                </graphic>
+            </Button>
+            <Button fx:id="btnRetirer" onAction="#handleRetirer" styleClass="btn-icon-light">
+                <graphic>
+                    <FontIcon iconLiteral="fth-arrow-left" iconSize="16" />
+                </graphic>
+            </Button>
+        </VBox>
+
+        <!-- Rôles assignés -->
+        <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <FontIcon iconLiteral="fth-check-circle" iconSize="16" styleClass="tile-icon" />
+                <Label styleClass="card-title" text="Rôles assignés" />
+            </HBox>
+
+            <ListView fx:id="rolesAssignesList" styleClass="custom-table" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </HBox>
+
+    <!-- Bouton enregistrer -->
+    <HBox alignment="CENTER_RIGHT">
+        <Button fx:id="btnEnregistrer" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer les assignations">
+            <graphic>
+                <FontIcon iconLiteral="fth-save" iconSize="16" />
+            </graphic>
+        </Button>
+    </HBox>
+</VBox>

@@ -1,14 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<?import java.net.URL?>
+<StackPane styleClass="content-area" xmlns="http://javafx.com/javafx/26"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.erpklassup.erpklassup.controllers.UtilisateursController">
+    <stylesheets>
+        <URL value="@../style.css" />
+    </stylesheets>
 
-</AnchorPane>
+    <VBox spacing="20">
+        <padding>
+            <Insets top="28" right="32" bottom="0" left="32" />
+        </padding>
+
+        <!-- En-tête -->
+        <VBox spacing="4">
+            <Label styleClass="page-title" text="Utilisateurs &amp; Droits" />
+            <Label styleClass="page-subtitle" text="Gérez les comptes, les rôles et les permissions d'accès" />
+        </VBox>
+
+        <!-- Toolbar CORRIGÉE -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <!-- Bouton Nouvel utilisateur -->
+            <Button fx:id="btnNouvelUtilisateur" onAction="#onNouvelUtilisateur"
+                    styleClass="button-primary" text="Nouvel utilisateur">
+                <graphic>
+                    <FontIcon iconLiteral="fth-user-plus" iconSize="16" />
+                </graphic>
+            </Button>
+
+            <!-- Champ de recherche avec loupe bien positionnée -->
+            <HBox styleClass="search-box-light" HBox.hgrow="ALWAYS"
+                  alignment="CENTER_LEFT" spacing="10">
+                <FontIcon iconLiteral="fth-search" iconSize="16" styleClass="search-icon-light" />
+                <TextField fx:id="searchField"
+                           promptText="Rechercher par nom, email, rôle..."
+                           styleClass="search-field-inner"
+                           HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnClearSearch" visible="false"
+                        styleClass="btn-clear-search" onAction="#onClearSearch">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-x-circle" iconSize="16" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <!-- Filtres -->
+            <ComboBox fx:id="cbRole" prefWidth="150" styleClass="input"
+                      promptText="Tous les rôles" />
+            <ComboBox fx:id="cbStatut" prefWidth="130" styleClass="input"
+                      promptText="Tous les statuts" />
+        </HBox>
+
+        <HBox spacing="16">
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="stat-label" text="Total utilisateurs" HBox.hgrow="ALWAYS" />
+                    <StackPane styleClass="stat-icon, icon-sm, icon-blue">
+                        <FontIcon iconLiteral="fth-users" iconSize="16" />
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblTotalUtilisateurs" styleClass="stat-value" text="128" />
+            </VBox>
+
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="stat-label" text="Actifs aujourd'hui" HBox.hgrow="ALWAYS" />
+                    <StackPane styleClass="stat-icon, icon-sm, icon-green">
+                        <FontIcon iconLiteral="fth-user-check" iconSize="16" />
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblActifs" styleClass="stat-value, stat-value-success" text="96" />
+            </VBox>
+
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="stat-label" text="Comptes bloqués" HBox.hgrow="ALWAYS" />
+                    <StackPane styleClass="stat-icon, icon-sm, icon-red">
+                        <FontIcon iconLiteral="fth-lock" iconSize="16" />
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblBloques" styleClass="stat-value, stat-value-danger" text="8" />
+            </VBox>
+
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="stat-label" text="Connexions récentes" HBox.hgrow="ALWAYS" />
+                    <StackPane styleClass="stat-icon, icon-sm, icon-orange">
+                        <FontIcon iconLiteral="fth-activity" iconSize="16" />
+                    </StackPane>
+                </HBox>
+                <Label fx:id="lblConnexions" styleClass="stat-value" text="45" />
+            </VBox>
+        </HBox>
+
+
+        <!-- Reste du contenu... -->
+        <TableView fx:id="tableUtilisateurs" styleClass="custom-table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colUtilisateur" prefWidth="250" text="Utilisateur" />
+                <TableColumn fx:id="colEmail" prefWidth="200" text="Email" />
+                <TableColumn fx:id="colRole" prefWidth="150" text="Rôle" />
+                <TableColumn fx:id="colDerniereConnexion" prefWidth="150" text="Dernière connexion" />
+                <TableColumn fx:id="colStatut" prefWidth="80" text="Statut" />
+                <TableColumn fx:id="colActions" prefWidth="100" sortable="false" text="Actions" />
+            </columns>
+        </TableView>
+    </VBox>
+</StackPane>

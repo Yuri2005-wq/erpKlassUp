@@ -1,14 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<!--
+    Conteneur racine de la page "Gestion des Utilisateurs, Rôles et Permissions".
+    Se charge dans #contentArea (StackPane) du HelloController, au même titre
+    que les autres écrans du sidebar.
+-->
 
-</AnchorPane>
+<BorderPane fx:id="rootPane" styleClass="root-pane" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.GestionUtilisateursController">
+
+    <!-- ===== En-tête de page (titre + fil d'ariane) ===== -->
+    <top>
+        <VBox spacing="4.0" styleClass="page-header">
+            <padding>
+                <Insets bottom="0.0" left="24.0" right="24.0" top="20.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <FontIcon iconLiteral="fth-shield" iconSize="22" styleClass="page-header-icon" />
+                    <Label styleClass="page-title" text="Utilisateurs, Rôles &amp; Permissions" />
+                </HBox>
+                <Label styleClass="page-subtitle" text="Gérez les comptes, les niveaux d'accès et consultez la traçabilité des actions sensibles." />
+            </children>
+        </VBox>
+    </top>
+
+    <!-- ===== Onglets principaux + calque pour le tiroir coulissant ===== -->
+    <center>
+        <StackPane fx:id="overlayStack" styleClass="content-area">
+            <BorderPane.margin>
+                <Insets bottom="20.0" left="24.0" right="24.0" top="12.0" />
+            </BorderPane.margin>
+            <children>
+
+                <TabPane fx:id="tabPane" styleClass="rbac-tabs" tabClosingPolicy="UNAVAILABLE" tabDragPolicy="FIXED">
+                    <tabs>
+
+                        <Tab text="Utilisateurs">
+                            <graphic>
+                                <FontIcon iconLiteral="fth-users" iconSize="14" styleClass="tab-icon" />
+                            </graphic>
+                            <content>
+                                <fx:include fx:id="utilisateursTab" source="UtilisateursTab.fxml" />
+                            </content>
+                        </Tab>
+
+                        <Tab text="Rôles &amp; Permissions">
+                            <graphic>
+                                <FontIcon iconLiteral="fth-key" iconSize="14" styleClass="tab-icon" />
+                            </graphic>
+                            <content>
+                                <fx:include fx:id="rolesPermissionsTab" source="RolesPermissionsTab.fxml" />
+                            </content>
+                        </Tab>
+
+                        <Tab text="Journal d'Audit">
+                            <graphic>
+                                <FontIcon iconLiteral="fth-activity" iconSize="14" styleClass="tab-icon" />
+                            </graphic>
+                            <content>
+                                <fx:include fx:id="journalAuditTab" source="JournalAuditTab.fxml" />
+                            </content>
+                        </Tab>
+
+                    </tabs>
+                </TabPane>
+
+                <Region fx:id="drawerScrim" managed="false" mouseTransparent="true" opacity="0.0" styleClass="drawer-scrim" visible="false" />
+
+            </children>
+        </StackPane>
+    </center>
+
+</BorderPane>

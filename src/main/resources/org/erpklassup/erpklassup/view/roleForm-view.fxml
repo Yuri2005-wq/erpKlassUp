@@ -1,14 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controller.RoleFormController"
+      spacing="20"
+      styleClass="content-area">
 
-</AnchorPane>
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Button fx:id="btnRetour"
+                onAction="#handleRetour"
+                styleClass="btn-icon-light">
+            <graphic>
+                <FontIcon iconLiteral="fth-arrow-left" iconSize="16"/>
+            </graphic>
+        </Button>
+        <VBox spacing="3">
+            <Label fx:id="titreLabel" text="Nouveau Rôle" styleClass="page-title"/>
+            <Label text="Définissez les permissions du rôle" styleClass="page-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ===== FORMULAIRE ===== -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- ===== COLONNE GAUCHE : Informations ===== -->
+        <VBox spacing="15" prefWidth="350">
+            <VBox styleClass="card" spacing="15">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <FontIcon iconLiteral="fth-info-circle" iconSize="18" styleClass="tile-icon"/>
+                    <Label text="Informations du rôle" styleClass="card-title"/>
+                </HBox>
+
+                <VBox spacing="6">
+                    <Label text="Nom du rôle *" styleClass="field-label"/>
+                    <TextField fx:id="nomRoleField"
+                               promptText="Ex: Professeur Principal"
+                               styleClass="input"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="Description" styleClass="field-label"/>
+                    <TextArea fx:id="descriptionField"
+                              promptText="Description du rôle..."
+                              prefRowCount="4"
+                              wrapText="true"
+                              styleClass="input"/>
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="École (optionnel)" styleClass="field-label"/>
+                    <ComboBox fx:id="ecoleCombo"
+                              promptText="Rôle global (toutes les écoles)"
+                              maxWidth="Infinity"
+                              styleClass="input"/>
+                </VBox>
+            </VBox>
+
+            <!-- Boutons -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="btnAnnuler"
+                        onAction="#handleAnnuler"
+                        text="Annuler"
+                        styleClass="btn-icon-light"/>
+                <Button fx:id="btnEnregistrer"
+                        onAction="#handleEnregistrer"
+                        text="Enregistrer le rôle"
+                        defaultButton="true"
+                        styleClass="button-primary">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-save" iconSize="16"/>
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <!-- ===== COLONNE DROITE : Permissions ===== -->
+        <VBox styleClass="card" spacing="15" HBox.hgrow="ALWAYS">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon"/>
+                <Label text="Permissions du rôle" styleClass="card-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="permissionCountLabel"
+                       text="0 sélectionnée(s)"
+                       styleClass="footer-info"/>
+            </HBox>
+
+            <!-- Barre de recherche des permissions -->
+            <HBox styleClass="search-box-light" spacing="8" alignment="CENTER_LEFT">
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light"/>
+                <TextField fx:id="searchPermissionField"
+                           promptText="Rechercher une permission..."
+                           HBox.hgrow="ALWAYS"
+                           styleClass="search-field-inner"/>
+            </HBox>
+
+            <!-- Groupement des permissions par module -->
+            <ScrollPane fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="permissionsContainer" spacing="10"/>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </HBox>
+</VBox>

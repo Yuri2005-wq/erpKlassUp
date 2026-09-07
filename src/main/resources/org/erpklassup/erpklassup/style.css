@@ -1,125 +1,1460 @@
-/* Style principal de l'AppBar */
-.app-bar {
-    -fx-background-color: linear-gradient(to bottom, #1a1a2e, #16213e);
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 15, 0, 0, 8);
-    -fx-padding: 12px 20px;
-    -fx-spacing: 10px;
+/* ==========================================================================
+   EduGestion / DigitalPrimarySchool — Thème custom sur base AtlantaFX (PrimerLight)
+   Palette : navy #16213A (sombre) + orange accent #F5A524 (marque/actif)
+   Fichier unique — inclut désormais l'écran "Élèves & Inscriptions".
+   ========================================================================== */
+
+/* ============================== 1. GLOBAL ============================== */
+
+.root-pane {
+    -color-bg-default: #F4F6FA;
+    -fx-background-color: #F4F6FA;
 }
 
-/* Première rangée */
-.app-bar-top {
-    -fx-alignment: center-left;
+.content-area {
+    -fx-background-color: #F4F6FA;
 }
 
-/* Logo */
-.logo {
-    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -fx-background-radius: 12px;
-    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.5), 10, 0, 0, 4);
+.page-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.page-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.page-title {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+}
+
+.page-subtitle {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 13px;
+}
+
+.page-toolbar {
+    -fx-padding: 0 0 4 0;
+}
+
+/* ==================== 2. TOP BAR & ONGLETS SUPÉRIEURS =================== */
+
+.top-bar {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.02), 8, 0, 0, 1);
+}
+
+.top-tab-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 14 24 14 24;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
     -fx-cursor: hand;
 }
 
-.logo:hover {
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(three-pass-box, rgba(102,126,234,0.8), 15, 0, 0, 6);
+.top-tab-btn .ikonli-font-icon {
+    -fx-icon-color: #64748B;
 }
 
-/* Titre de l'application */
-.app-title {
-    -fx-text-fill: white;
-    -fx-font-size: 20px;
+.top-tab-btn:hover {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: rgba(245, 165, 36, 0.3);
+}
+
+.top-tab-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+/* État actif : !important nécessaire, AtlantaFX a une spécificité plus forte
+   que les classes simples sur .button / .toggle-button */
+.top-tab-btn.active-top-tab {
+    -fx-text-fill: #F5A524 !important;
     -fx-font-weight: bold;
-    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-border-color: #F5A524 !important;
+    -fx-background-color: rgba(245, 165, 36, 0.08) !important;
 }
 
-.subtitle {
-    -fx-text-fill: rgba(255,255,255,0.7);
-    -fx-font-size: 11px;
-    -fx-font-family: "Segoe UI", sans-serif;
+.top-tab-btn.active-top-tab .ikonli-font-icon {
+    -fx-icon-color: #F5A524 !important;
 }
 
-/* Barre de recherche */
-.search-box {
-    -fx-background-color: rgba(255,255,255,0.1);
-    -fx-background-radius: 20px;
-    -fx-padding: 8px 15px;
-    -fx-min-width: 250px;
+/* ================ 3. FORMULAIRES (INPUTS, COMBOBOX, ETC.) =============== */
+
+.input {
+    -fx-background-color: white !important;
+    -fx-border-color: #E2E8F0 !important;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 8 14;
 }
 
-.search-box:hover {
-    -fx-background-color: rgba(255,255,255,0.2);
+.input:focused {
+    -fx-border-color: #F5A524 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 165, 36, 0.2), 6, 0, 0, 0);
 }
 
-.search-field {
+.combo-box .list-cell {
+    -fx-text-fill: #1E293B !important;
+    -fx-background-color: #FFFFFF !important;
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #F1F5F9 !important;
+    -fx-text-fill: #1E293B !important;
+}
+
+.combo-box .list-cell:selected {
+    -fx-text-fill: #000000 !important;
+    -fx-border-color: #E2E8F0;
+    -fx-background-color: #F6F6F6 !important;
+}
+
+.date-picker-custom {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 3 6 3 6;
+}
+
+.date-picker-custom:hover {
+    -fx-border-color: #CBD5E1;
+}
+
+.date-picker-custom:focused {
+    -fx-border-color: #F5A524;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 165, 36, 0.2), 6, 0, 0, 0);
+}
+
+.date-picker-custom .text-field {
     -fx-background-color: transparent;
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: rgba(255,255,255,0.6);
-    -fx-border: none;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 4 0 4 5;
+    -fx-text-fill: #1E293B;
+    -fx-font-size: 13px;
 }
 
-/* Boutons d'icônes */
-.icon-btn {
+.date-picker-custom .text-field:focused {
     -fx-background-color: transparent;
-    -fx-background-radius: 20px;
+    -fx-border-color: transparent;
+}
+
+.date-picker-custom .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 8 8 0;
     -fx-cursor: hand;
-    -fx-font-size: 16px;
-    -fx-transition: all 0.3s;
 }
 
-.icon-btn:hover {
-    -fx-background-color: rgba(255,255,255,0.2);
+.date-picker-custom .arrow-button:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.date-picker-custom .arrow-button .arrow {
+    -fx-shape: "M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 3H7v2h5v-2zm4 0h-3v2h3v-2zm-4 4H7v2h5v-2zm4 0h-3v2h3v-2z";
+    -fx-background-color: #64748B;
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
 }
 
-.notification-btn:hover {
-    -fx-background-color: rgba(255,193,7,0.3);
+.date-picker-custom:focused .arrow-button .arrow {
+    -fx-background-color: #F5A524;
 }
 
-.settings-btn:hover {
-    -fx-background-color: rgba(76,175,80,0.3);
+/* Champ de recherche autonome (toolbar Élèves & Inscriptions, etc.) :
+   conteneur + icône + champ transparent à l'intérieur, plus robuste qu'un
+   overlay avec translate. */
+.search-box-light {
+    -fx-background-color: white;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 0 14 0 12;
+    -fx-min-width: 320;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 8;
 }
 
-.profile-btn:hover {
-    -fx-background-color: rgba(33,150,243,0.3);
+.search-box-light:focused-within {
+    -fx-border-color: #F5A524;
 }
 
-/* Barre de navigation */
-.nav-row {
-    -fx-padding: 5px 0 0 0;
-    -fx-border-color: rgba(255,255,255,0.1);
-    -fx-border-width: 1px 0 0 0;
+.search-icon-light {
+    -fx-icon-color: #94A3B8;
 }
 
-.nav-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: rgba(255,255,255,0.7);
-    -fx-background-radius: 8px;
-    -fx-padding: 8px 16px;
-    -fx-cursor: hand;
+.search-field-inner {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-padding: 8 0 8 0;
     -fx-font-size: 13px;
-    -fx-font-weight: normal;
-    -fx-transition: all 0.3s;
+}
+
+.search-field-inner:focused {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-effect: none !important;
+}
+
+/* Commutateur à bascule custom */
+.custom-toggle-button {
+    -fx-background-color: #F87171;
+    -fx-background-radius: 30;
+    -fx-min-width: 55;
+    -fx-max-width: 55;
+    -fx-min-height: 26;
+    -fx-max-height: 26;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 5 0 5;
+    -fx-cursor: hand;
+}
+
+.custom-toggle-button .switch-bille {
+    -fx-fill: #F6F6F6;
+}
+
+.custom-toggle-button:selected {
+    -fx-background-color: #10B981;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+/* =============== 4. APP BAR, SIDEBAR & CONTRÔLES DE FENÊTRE ============= */
+
+.app-bar {
+    -fx-background-color: #16213A;
     -fx-border-color: transparent;
-    -fx-border-width: 0 0 2px 0;
 }
 
-.nav-btn:hover {
-    -fx-background-color: rgba(255,255,255,0.1);
-    -fx-text-fill: white;
+.app-bar-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-text-fill: #C8D2E4;
+    -fx-padding: 6 8 6 8;
 }
 
-.nav-btn.active {
-    -fx-background-color: rgba(102,126,234,0.3);
+.app-bar-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+}
+
+.app-bar-btn .ikonli-font-icon {
+    -fx-icon-color: #C8D2E4;
+}
+
+.sidebar {
+    -fx-background-color: #16213A;
+}
+
+.sidebar-header {
+    -fx-border-color: transparent transparent rgba(255, 255, 255, 0.06) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.logo-badge {
+    -fx-background-color: #F5A524;
+    -fx-background-radius: 10;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-max-width: 36;
+    -fx-max-height: 36;
+}
+
+.logo-badge .ikonli-font-icon {
+    -fx-icon-color: #16213A;
+}
+
+.brand-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.brand-subtitle {
+    -fx-text-fill: #7E8CAE;
+    -fx-font-size: 11px;
+}
+
+.nav-section-label {
+    -fx-text-fill: #5C6A8C;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 14 10 6 10;
+    -fx-letter-spacing: 0.06em;
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-text-fill: #B7C2DC;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 12;
+    -fx-padding: 10 12 10 12;
+    -fx-cursor: hand;
+}
+
+.nav-item .ikonli-font-icon {
+    -fx-icon-color: #8593B8;
+}
+
+.nav-item:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+    -fx-text-fill: #FFFFFF;
+}
+
+.nav-item:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.nav-item:selected, .nav-item.active {
+    -fx-background-color: #F5A524 !important;
+    -fx-text-fill: #16213A !important;
+    -fx-font-weight: 700;
+}
+
+.nav-item:selected .ikonli-font-icon, .nav-item.active .ikonli-font-icon {
+    -fx-icon-color: #16213A !important;
+}
+
+.nav-item:selected:hover {
+    -fx-background-color: #F5A524;
+}
+
+.logout-item {
+    -fx-text-fill: #B7C2DC;
+}
+
+.logout-item .ikonli-font-icon {
+    -fx-icon-color: #8593B8;
+}
+
+.logout-item:hover {
+    -fx-background-color: rgba(229, 72, 77, 0.15);
+    -fx-text-fill: #FF8C8F;
+}
+
+.logout-item:hover .ikonli-font-icon {
+    -fx-icon-color: #FF8C8F;
+}
+
+.sidebar-resize-handle {
+    -fx-background-color: transparent;
+    -fx-cursor: h-resize;
+}
+
+.sidebar-resize-handle:hover {
+    -fx-background-color: rgba(245, 165, 36, 0.4);
+}
+
+.window-controls {
+    -fx-padding: 0;
+}
+
+.window-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-min-width: 34;
+    -fx-min-height: 30;
+    -fx-max-width: 34;
+    -fx-max-height: 30;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.window-btn .ikonli-font-icon {
+    -fx-icon-color: #C8D2E4;
+}
+
+.window-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+}
+
+.window-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.close-btn:hover {
+    -fx-background-color: #E5484D;
+}
+
+.close-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+/* Extension app bar : statut réseau, langue, profil */
+.app-bar-brand {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-opacity: 0.85;
+}
+
+.bar-divider {
+    -fx-min-width: 1px;
+    -fx-pref-width: 1px;
+    -fx-max-width: 1px;
+    -fx-min-height: 16px;
+    -fx-pref-height: 16px;
+    -fx-max-height: 16px;
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+}
+
+.status-badge {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 10px;
+}
+
+.status-dot {
+    -fx-fill: #10B981;
+}
+
+.status-text {
+    -fx-text-fill: #E2E8F0;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+.status-offline .status-dot {
+    -fx-fill: #F5A524;
+}
+
+.info-badge {
+    -fx-padding: 2px 4px;
+}
+
+.app-bar-icon {
+    -fx-icon-color: #8593B8;
+}
+
+.app-bar-text {
+    -fx-text-fill: #CBD5E1;
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+}
+
+.lang-selector {
+    -fx-background-color: rgba(0, 0, 0, 0.25);
+    -fx-background-radius: 8px;
+    -fx-padding: 2px;
+}
+
+.lang-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8593B8;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 3px 8px;
+    -fx-cursor: hand;
+}
+
+.lang-btn-left {
+    -fx-background-radius: 6px 0 0 6px;
+}
+
+.lang-btn-right {
+    -fx-background-radius: 0 6px 6px 0;
+}
+
+.lang-btn:hover {
+    -fx-text-fill: #FFFFFF;
+}
+
+.lang-btn:selected {
+    -fx-background-color: #F5A524;
+    -fx-text-fill: #16213A;
+}
+
+.user-profile-box {
+    -fx-padding: 2px 4px;
+    -fx-cursor: hand;
+}
+
+.user-name {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.user-role {
+    -fx-text-fill: #8593B8;
+    -fx-font-size: 10px;
+    -fx-font-weight: 500;
+}
+
+/* ========================= 5. BOUTONS D'ACTION =========================== */
+
+.button-validate {
+    -fx-background-color: #3B82F6;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-border-color: #667eea;
-    -fx-border-width: 0 0 2px 0;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 10px;
 }
 
-.nav-btn.active:hover {
-    -fx-background-color: rgba(102,126,234,0.4);
+/* Action primaire sur l'accent marque (ex: "+ Nouvelle inscription").
+   !important : même contournement de spécificité AtlantaFX que .active-top-tab. */
+.button-primary {
+    -fx-background-color: #F5A524 !important;
+    -fx-text-fill: #16213A !important;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8px;
+    -fx-graphic-text-gap: 8;
 }
+
+.button-primary .ikonli-font-icon {
+    -fx-icon-color: #16213A !important;
+}
+
+.button-primary:hover {
+    -fx-background-color: derive(#F5A524, -8%) !important;
+}
+
+.button-primary:pressed {
+    -fx-background-color: derive(#F5A524, -16%) !important;
+}
+
+/* Bouton icône ghost pour toolbar claire (filtres avancés, etc.) */
+.btn-icon-light {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-icon-color: #64748B;
+    -fx-cursor: hand;
+}
+
+.btn-icon-light:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+/* Menu kebab par ligne de tableau */
+.btn-kebab-light {
+    -fx-background-color: transparent;
+    -fx-icon-color: #64748B;
+    -fx-cursor: hand;
+    -fx-padding: 6;
+    -fx-background-radius: 6;
+}
+
+.btn-kebab-light:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-icon-color: #16213A;
+}
+
+/* ==================== 6. CARTES, STATISTIQUES & KPI ====================== */
+
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.06), 14, 0, 0, 4);
+}
+
+.card-title {
+    -fx-text-fill: #1E293B;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.card-title-icon .ikonli-font-icon {
+    -fx-icon-color: #F5A524;
+}
+
+/* Affordance "cliquable" sur une carte (KPI filtrant, etc.) */
+.card-clickable {
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+}
+
+.card-clickable:hover {
+    -fx-border-color: #F5A524;
+    -fx-border-width: 1.5;
+}
+
+.card-clickable-active {
+    -fx-border-color: #F5A524;
+    -fx-border-width: 1.5;
+    -fx-background-color: #FEF9F0;
+}
+
+.settings-tile {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s;
+}
+
+.settings-tile:hover {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #F5A524;
+    -fx-translate-y: -5;
+}
+
+.tile-icon {
+    -fx-icon-color: #16213A;
+}
+
+.settings-tile:hover .tile-icon {
+    -fx-icon-color: #F5A524;
+}
+
+.tile-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #16213A;
+}
+
+.avatar-badge {
+    -fx-background-color: #2A3B61;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-background-radius: 100;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+    -fx-max-width: 30;
+    -fx-max-height: 30;
+    -fx-alignment: center;
+}
+
+/* Variante circulaire pour une vraie photo (même gabarit que .avatar-badge) */
+.avatar-photo-clip {
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+    -fx-max-width: 30;
+    -fx-max-height: 30;
+}
+
+.stat-label {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.stat-value {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 30px;
+    -fx-font-weight: 800;
+}
+
+.stat-value-success { -fx-text-fill: #16A34A; }
+.stat-value-danger  { -fx-text-fill: #E5484D; }
+
+.stat-trend {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.trend-up {
+    -fx-text-fill: #16A34A;
+}
+
+.trend-neutral {
+    -fx-text-fill: #94A3B8;
+}
+
+.stat-icon {
+    -fx-background-radius: 10;
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-max-width: 38;
+    -fx-max-height: 38;
+}
+
+.stat-icon.icon-sm {
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-max-width: 32;
+    -fx-max-height: 32;
+}
+
+/* Fonds d'icônes colorés, réutilisés partout (KPI, listes, badges) */
+.icon-gray { -fx-background-color: #F1F5F9; }
+.icon-gray .ikonli-font-icon { -fx-icon-color: #64748B; }
+
+.icon-orange { -fx-background-color: #FEF3E2; }
+.icon-orange .ikonli-font-icon { -fx-icon-color: #F5A524; }
+
+.icon-blue { -fx-background-color: #EAF2FF; }
+.icon-blue .ikonli-font-icon { -fx-icon-color: #3B82F6; }
+
+.icon-green { -fx-background-color: #DCFCE7; }
+.icon-green .ikonli-font-icon { -fx-icon-color: #16A34A; }
+
+.icon-red { -fx-background-color: #FEE2E2; }
+.icon-red .ikonli-font-icon { -fx-icon-color: #E5484D; }
+
+/* Barre de progression légère (répartition garçons/filles, etc.) */
+.kpi-progress {
+    -fx-accent: #F5A524 !important;
+    -fx-pref-height: 6;
+}
+
+.kpi-progress .track {
+    -fx-background-color: #EEF2F6 !important;
+    -fx-background-radius: 6;
+}
+
+.kpi-progress .bar {
+    -fx-background-color: #F5A524 !important;
+    -fx-background-radius: 6;
+    -fx-background-insets: 0;
+}
+
+/* Blocs d'activités & événements */
+.activity-title { -fx-text-fill: #1E293B; -fx-font-size: 13px; -fx-font-weight: 600; }
+.activity-time { -fx-text-fill: #94A3B8; -fx-font-size: 11px; }
+
+.event-row { -fx-padding: 4 0 4 0; }
+.event-date { -fx-text-fill: #64748B; -fx-font-size: 12px; -fx-font-weight: 700; -fx-min-width: 50; }
+.event-title { -fx-text-fill: #1E293B; -fx-font-size: 13px; -fx-font-weight: 600; }
+
+/* Étiquettes pilules — combiner .event-tag + une couleur */
+.event-tag { -fx-font-size: 11px; -fx-font-weight: 700; -fx-padding: 4 10 4 10; -fx-background-radius: 999; }
+.tag-blue   { -fx-background-color: #EAF2FF; -fx-text-fill: #3B82F6; }
+.tag-orange { -fx-background-color: #FEF3E2; -fx-text-fill: #F5A524; }
+.tag-green  { -fx-background-color: #DCFCE7; -fx-text-fill: #16A34A; }
+.tag-red    { -fx-background-color: #FEE2E2; -fx-text-fill: #E5484D; }
+
+/* Badge neutre (autonome, sans .event-tag) — ex: code de classe "Tle D" */
+.tag-neutral {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #334155;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 700;
+    -fx-padding: 3 10;
+    -fx-background-radius: 6;
+}
+
+/* Lien discret dans une cellule (ex: téléphone parent cliquable) */
+.cell-link {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: #3B82F6;
+    -fx-cursor: hand;
+}
+
+.cell-link:hover {
+    -fx-underline: true;
+}
+
+/* Pastille de statut (ligne de tableau) */
+.row-status-dot {
+    -fx-min-width: 9; -fx-min-height: 9; -fx-max-width: 9; -fx-max-height: 9;
+    -fx-background-radius: 50%;
+}
+.row-status-actif   { -fx-background-color: #16A34A; }
+.row-status-attente { -fx-background-color: #F5A524; }
+.row-status-radie    { -fx-background-color: #E5484D; }
+
+/* ============================ 7. GRAPHIQUES ============================== */
+
+.chart-card { -fx-padding: 20 16 12 8; }
+.dashboard-chart { -fx-background-color: transparent; }
+.dashboard-chart .chart-plot-background { -fx-background-color: transparent; }
+.dashboard-chart .axis { -fx-tick-label-fill: #94A3B8; -fx-font-size: 10px; }
+.dashboard-chart .axis-tick-mark, .dashboard-chart .axis-minor-tick-mark { -fx-stroke: transparent; }
+.dashboard-chart .chart-vertical-grid-lines, .dashboard-chart .chart-horizontal-grid-lines { -fx-stroke: #EEF1F6; }
+.dashboard-chart .default-color0.chart-bar { -fx-bar-fill: #16213A; }
+.dashboard-chart .default-color1.chart-bar { -fx-bar-fill: #F5A524; }
+.dashboard-chart .default-color0.chart-series-line { -fx-stroke: #F5A524; -fx-stroke-width: 3px; }
+.dashboard-chart .default-color0.chart-line-symbol { -fx-background-color: #F5A524, white; -fx-background-insets: 0, 2; -fx-background-radius: 6px; -fx-padding: 5px; }
+
+/* ==================== 8. TABLEAUX & PAGINATION =========================== */
+
+.custom-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.custom-table .column-header-background {
+    -fx-background-color: #16213A;
+    -fx-background-radius: 7 7 0 0;
+}
+
+.custom-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+}
+
+.custom-table .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.custom-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.custom-table .table-row-cell:odd {
+    -fx-background-color: #F8FAFC;
+}
+
+.custom-table .table-row-cell:filled:hover {
+    -fx-background-color: #FEF3E2;
+}
+
+.custom-table .table-row-cell:filled:selected {
+    -fx-background-color: #FEF3E2;
+    -fx-border-color: transparent transparent #F5A524 transparent;
+}
+
+.custom-table .table-row-cell:filled:selected .label {
+    -fx-font-weight: bold;
+}
+
+.custom-table .table-cell {
+    -fx-padding: 10 12;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+}
+
+.table-placeholder {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 13px;
+}
+
+.table-footer {
+    -fx-padding: 4 4 0 4;
+}
+
+.footer-info {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 600;
+}
+
+/* Pagination : convention "actif = orange" cohérente avec .nav-item:selected
+   et .top-tab-btn.active-top-tab */
+.page-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-min-width: 30;
+    -fx-pref-height: 30;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #334155;
+    -fx-cursor: hand;
+}
+
+.page-btn:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.page-btn-active {
+    -fx-background-color: #F5A524 !important;
+    -fx-text-fill: #16213A !important;
+    -fx-font-weight: 800;
+}
+
+/* Barre flottante de sélection groupée — même famille que la top bar (navy),
+   boutons internes en .app-bar-btn / fermeture en .window-btn.close-btn */
+.bulk-action-bar {
+    -fx-background-color: #16213A;
+    -fx-background-radius: 14;
+    -fx-padding: 14 20;
+    -fx-translate-y: -22;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.35), 24, 0, 0, 8);
+}
+
+.bulk-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+}
+
+/* ========================= 9. SCROLLBAR DISCRÈTE ========================= */
+
+.scroll-pane > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+    -fx-padding: 0 2 0 0;
+}
+
+.scroll-pane > .scroll-bar:vertical > .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .scroll-bar:vertical > .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 10px;
+}
+
+.scroll-pane > .scroll-bar:vertical > .thumb:hover {
+    -fx-background-color: #F5A524;
+}
+
+.scroll-pane > .scroll-bar:vertical > .increment-button,
+.scroll-pane > .scroll-bar:vertical > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-height: 0px;
+    -fx-min-height: 0px;
+    -fx-max-height: 0px;
+}
+
+.scroll-pane > .scroll-bar:vertical > .increment-button > .increment-arrow,
+.scroll-pane > .scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: null;
+}
+
+/* ========================= 10. PAGE DE CONNEXION ========================= */
+
+.login-root {
+    -fx-background-color: #16213A;
+}
+
+.login-background {
+    -fx-background-color: linear-gradient(to bottom right, #16213A 0%, #1a2745 50%, #0F172A 100%);
+    -fx-padding: 40;
+}
+
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 30, 0, 0, 10);
+}
+
+.login-header {
+    -fx-background-color: linear-gradient(to bottom, #F8FAFC, white);
+    -fx-background-radius: 20 20 0 0;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.logo-circle {
+    -fx-fill: #16213A;
+    -fx-stroke: #F5A524;
+    -fx-stroke-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(245, 165, 36, 0.4), 10, 0, 0, 3);
+}
+
+.logo-icon {
+    -fx-icon-color: #F5A524;
+}
+
+.login-title {
+    -fx-text-fill: #16213A;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.login-subtitle {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 13px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.login-form {
+    -fx-background-color: white;
+}
+
+.field-label {
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.input-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10;
+    -fx-padding: 12 15 12 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.04), 4, 0, 0, 1);
+}
+
+.input-container:hover {
+    -fx-border-color: #CBD5E1;
+}
+
+.input-container:focused-within {
+    -fx-border-color: #F5A524;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 165, 36, 0.15), 6, 0, 0, 0);
+}
+
+.input-icon {
+    -fx-icon-color: #8593B8;
+}
+
+.input-container:focused-within .input-icon {
+    -fx-icon-color: #F5A524;
+}
+
+.login-input {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #1E293B;
+    -fx-prompt-text-fill: #94A3B8;
+    -fx-font-size: 14px;
+}
+
+.login-input:focused {
+    -fx-border-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.toggle-password-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-padding: 4;
+    -fx-cursor: hand;
+}
+
+.toggle-password-btn:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.toggle-password-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #F5A524;
+}
+
+.remember-checkbox {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+}
+
+.remember-checkbox .box {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.remember-checkbox:selected .box {
+    -fx-background-color: #F5A524;
+    -fx-border-color: #F5A524;
+}
+
+.remember-checkbox:selected .mark {
+    -fx-background-color: white;
+}
+
+.forgot-password-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #F5A524;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.forgot-password-btn:hover {
+    -fx-text-fill: #16213A;
+    -fx-underline: true;
+}
+
+.login-button {
+    -fx-padding: 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(22, 33, 58, 0.3), 10, 0, 0, 3);
+    -fx-transition: all 0.3s;
+}
+
+.login-button .button-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.login-button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(245, 165, 36, 0.5), 15, 0, 0, 5);
+    -fx-translate-y: -1px;
+}
+
+.login-button:pressed {
+    -fx-translate-y: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(22, 33, 58, 0.2), 5, 0, 0, 2);
+}
+
+.error-label {
+    -fx-text-fill: #EF4444;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-background-color: #FEE2E2;
+    -fx-background-radius: 8;
+    -fx-padding: 10 15 10 15;
+    -fx-border-color: #FCA5A5;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.login-footer {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 0 0 20 20;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.footer-text {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 11px;
+}
+
+.footer-version {
+    -fx-text-fill: #CBD5E1;
+    -fx-font-size: 10px;
+}
+
+
+/* ========================= 11. SOUS-MENUS SIDEBAR ========================= */
+
+.sous-menu {
+    -fx-padding: 0 0 4 24;
+}
+
+.sous-item {
+    -fx-font-size: 12px;
+    -fx-padding: 8 12 8 12;
+    -fx-graphic-text-gap: 10;
+}
+
+.sous-item .ikonli-font-icon {
+    -fx-icon-size: 14px;
+}
+
+/* Animation des chevrons */
+.sous-menu {
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+/* Lien actif dans le sous-menu */
+.sous-item.active {
+    -fx-background-color: #F5A524 !important;
+    -fx-text-fill: #16213A !important;
+    -fx-font-weight: 700;
+}
+.special-container{
+    -fx-background-color :  #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color:  #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-padding: 18;
+}
+.special-combo{
+    -fx-background-color:  #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color:  #e2e8f0;
+}
+
+/* ================= 12. GESTION DES RÔLES & PERMISSIONS (RBAC) ============= */
+
+.rbac-split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.rbac-split-pane > .split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4px;
+}
+
+/* Panneau de liste des rôles */
+.roles-list-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.04), 10, 0, 0, 2);
+}
+
+.roles-list {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.roles-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 12;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.roles-list .list-cell:hover {
+    -fx-background-color: #F8FAFC;
+    -fx-text-fill: #16213A;
+}
+
+.roles-list .list-cell:selected {
+    -fx-background-color: #FEF3E2 !important;
+    -fx-text-fill: #16213A !important;
+    -fx-font-weight: 800;
+    -fx-border-color: transparent transparent transparent #F5A524;
+    -fx-border-width: 0 0 0 4;
+}
+
+/* Panneau des permissions */
+.permissions-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.04), 10, 0, 0, 2);
+}
+
+/* Accordéon et TitledPane */
+.permissions-accordion {
+    -fx-background-color: transparent;
+}
+
+.permission-titled-pane {
+    -fx-text-fill: #16213A;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+}
+
+.permission-titled-pane > .title {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+}
+
+.permission-titled-pane:expanded > .title {
+    -fx-background-color: #16213A;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #16213A;
+}
+
+.permission-titled-pane > .title > .arrow-button .arrow {
+    -fx-background-color: #64748B;
+}
+
+.permission-titled-pane:expanded > .title > .arrow-button .arrow {
+    -fx-background-color: #F5A524;
+}
+
+.permissions-module-body {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 0 1px 1px 1px;
+    -fx-border-radius: 0 0 8 8;
+    -fx-background-radius: 0 0 8 8;
+    -fx-padding: 14;
+}
+
+/* Case "Tout sélectionner" */
+.check-select-all {
+    -fx-text-fill: #16213A;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 6 0;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.check-select-all .box {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.check-select-all:selected .box {
+    -fx-background-color: #16213A;
+    -fx-border-color: #16213A;
+}
+
+.check-select-all:selected .mark {
+    -fx-background-color: white;
+}
+
+/* Variations de permissions spécialisées */
+.permission-check {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+}
+
+.permission-check .box {
+    -fx-background-color: white;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.permission-check:selected .box {
+    -fx-background-color: #F5A524;
+    -fx-border-color: #F5A524;
+}
+
+.permission-check:selected .mark {
+    -fx-background-color: #16213A;
+}
+
+.permission-danger {
+    -fx-text-fill: #E5484D;
+}
+
+.permission-danger:selected .box {
+    -fx-background-color: #E5484D;
+    -fx-border-color: #E5484D;
+}
+
+.permission-danger:selected .mark {
+    -fx-background-color: white;
+}
+
+.permission-warning {
+    -fx-text-fill: #D97706;
+}
+
+.permissions-save-bar {
+    -fx-padding: 12 0 0 0;
+    -fx-border-color: #F1F5F9 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+
+
+
+
+
+/* ================= 13. CONTENEUR ET ONGLETS (TABPANE) ================= */
+
+.page-header {
+    -fx-padding: 20 24 0 24;
+}
+
+.page-header-icon {
+    -fx-icon-color: #F5A524;
+}
+
+/* TabPane principal stylisé selon la charte top-bar */
+.rbac-tabs {
+    -fx-background-color: transparent;
+}
+
+.rbac-tabs > .tab-header-area {
+    -fx-padding: 0 0 12 0;
+    -fx-background-color: transparent;
+}
+
+.rbac-tabs > .tab-header-area > .headers-region {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.02), 8, 0, 0, 1);
+}
+
+.rbac-tabs .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.rbac-tabs .tab .tab-label {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.rbac-tabs .tab .tab-icon {
+    -fx-icon-color: #64748B;
+}
+
+.rbac-tabs .tab:hover {
+    -fx-background-color: rgba(245, 165, 36, 0.05);
+    -fx-border-color: transparent transparent #CBD5E1 transparent;
+}
+
+.rbac-tabs .tab:hover .tab-label {
+    -fx-text-fill: #16213A;
+}
+
+.rbac-tabs .tab:hover .tab-icon {
+    -fx-icon-color: #16213A;
+}
+
+.rbac-tabs .tab:selected {
+    -fx-background-color: rgba(245, 165, 36, 0.08);
+    -fx-border-color: transparent transparent #F5A524 transparent;
+    -fx-border-width: 0 0 3 0;
+}
+
+.rbac-tabs .tab:selected .tab-label {
+    -fx-text-fill: #F5A524;
+    -fx-font-weight: 800;
+}
+
+.rbac-tabs .tab:selected .tab-icon {
+    -fx-icon-color: #F5A524;
+}
+
+.rbac-tabs > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 12 0 0 0;
+}
+
+/* Drawer & Overlay pour les tiroirs coulissants */
+.drawer-scrim {
+    -fx-background-color: rgba(22, 33, 58, 0.4);
+}
+
+/*pour les bouton de chargement*/
+.bouton-spinner {
+    -fx-progress-color: white;
+}
+.bouton-spinner .percentage {
+    -fx-fill: transparent; /* masque le "%" que ProgressIndicator affiche parfois par défaut */
+}
+
+/* ========================= 11. STATISTIQUES COMPACTES ========================= */
+
+/* Mini-card statistique ultra compacte */
+.stat-card-compact {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 8px;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.04), 4, 0, 0, 1);
+    -fx-alignment: CENTER;
+    -fx-spacing: 0;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+}
+/* Label des mini-cards */
+.stat-card-label {
+    -fx-font-size: 8px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #94A3B8;
+}
+
+/* Valeur numérique */
+.stat-number {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16213A;
+}
+
+/* Couleurs des valeurs */
+.stat-success { -fx-text-fill: #16A34A; }
+.stat-danger { -fx-text-fill: #E5484D; }
+.stat-warning { -fx-text-fill: #F5A524; }
+.stat-info { -fx-text-fill: #3B82F6; }

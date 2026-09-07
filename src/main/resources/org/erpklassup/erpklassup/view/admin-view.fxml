@@ -1,14 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controller.UserAdminController"
+      spacing="15"
+      styleClass="content-area">
 
-</AnchorPane>
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="3">
+            <Label text="Administration des Utilisateurs" styleClass="page-title"/>
+            <Label text="Gestion des rôles, permissions et sécurité des comptes" styleClass="page-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Bouton Import (CORRIGÉ) -->
+        <Button fx:id="btnImport" onAction="#handleImport" styleClass="btn-icon-light">
+            <graphic><FontIcon iconLiteral="fth-upload" iconSize="16"/></graphic>
+            <tooltip><Tooltip text="Importer des utilisateurs (CSV/Excel)"/></tooltip>
+        </Button>
+
+        <!-- Bouton Export (CORRIGÉ) -->
+        <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-icon-light">
+            <graphic><FontIcon iconLiteral="fth-download" iconSize="16"/></graphic>
+            <tooltip><Tooltip text="Exporter la liste pour audit"/></tooltip>
+        </Button>
+
+        <!-- Bouton Nouvel utilisateur -->
+        <Button fx:id="btnNouvelUtilisateur" onAction="#handleNouvelUtilisateur"
+                text="Nouvel utilisateur" styleClass="button-primary">
+            <graphic><FontIcon iconLiteral="fth-user-plus" iconSize="16"/></graphic>
+        </Button>
+    </HBox>
+
+    <!-- ===== BARRE DE FILTRES ===== -->
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="page-toolbar">
+        <!-- Recherche -->
+        <HBox styleClass="search-box-light" spacing="8" alignment="CENTER_LEFT">
+            <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light"/>
+            <TextField fx:id="searchField" promptText="Rechercher un utilisateur..."
+                       HBox.hgrow="ALWAYS" styleClass="search-field-inner"/>
+        </HBox>
+
+        <!-- Filtre par rôle -->
+        <ComboBox fx:id="roleFilterCombo" promptText="Tous les rôles" prefWidth="160" styleClass="input"/>
+
+        <!-- Filtre par statut -->
+        <ComboBox fx:id="statutFilterCombo" promptText="Tous les statuts" prefWidth="150" styleClass="input"/>
+
+        <!-- Filtre par école -->
+        <ComboBox fx:id="ecoleFilterCombo" promptText="Toutes les écoles" prefWidth="160" styleClass="input"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Bouton rafraîchir (CORRIGÉ : fth-refresh-cw) -->
+        <Button fx:id="btnRafraichir" onAction="#handleRafraichir" styleClass="btn-icon-light">
+            <graphic><FontIcon iconLiteral="fth-refresh-cw" iconSize="16"/></graphic>
+        </Button>
+    </HBox>
+
+    <!-- ===== TABLEAU DES UTILISATEURS ===== -->
+    <TableView fx:id="userTable" VBox.vgrow="ALWAYS" styleClass="custom-table">
+        <columns>
+            <TableColumn fx:id="colCheckbox" prefWidth="40" resizable="false"/>
+            <TableColumn fx:id="colAvatar" text="" prefWidth="50" resizable="false"/>
+            <TableColumn fx:id="colNom" text="NOM COMPLET" prefWidth="180"/>
+            <TableColumn fx:id="colUsername" text="USERNAME" prefWidth="120"/>
+            <TableColumn fx:id="colEmail" text="EMAIL" prefWidth="180"/>
+            <TableColumn fx:id="colRole" text="RÔLE" prefWidth="120"/>
+            <TableColumn fx:id="colType" text="TYPE" prefWidth="110"/>
+            <TableColumn fx:id="colStatut" text="STATUT" prefWidth="110"/>
+            <TableColumn fx:id="col2FA" text="2FA" prefWidth="60"/>
+            <TableColumn fx:id="colDerniereConnexion" text="DERNIÈRE CONNEXION" prefWidth="140"/>
+            <TableColumn fx:id="colActions" text="" prefWidth="120" resizable="false"/>
+        </columns>
+        <placeholder>
+            <Label text="Aucun utilisateur trouvé" styleClass="table-placeholder"/>
+        </placeholder>
+    </TableView>
+
+    <!-- ===== BARRE D'ACTIONS PAR LOT ===== -->
+    <HBox fx:id="bulkActionBar" spacing="10" alignment="CENTER_LEFT"
+          visible="false" managed="false" styleClass="bulk-action-bar">
+        <Label fx:id="bulkLabel" text="0 sélectionné(s)" styleClass="bulk-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnBulkRole" onAction="#handleBulkRole" styleClass="app-bar-btn">
+            <graphic><FontIcon iconLiteral="fth-user-check" iconSize="14"/></graphic>
+        </Button>
+
+        <Button fx:id="btnBulkActiver" onAction="#handleBulkActiver" styleClass="app-bar-btn">
+            <graphic><FontIcon iconLiteral="fth-check-circle" iconSize="14"/></graphic>
+        </Button>
+
+        <Button fx:id="btnBulkDesactiver" onAction="#handleBulkDesactiver" styleClass="app-bar-btn">
+            <graphic><FontIcon iconLiteral="fth-ban" iconSize="14"/></graphic>
+        </Button>
+
+        <Button fx:id="btnBulkReset" onAction="#handleBulkReset" styleClass="app-bar-btn">
+            <graphic><FontIcon iconLiteral="fth-key" iconSize="14"/></graphic>
+        </Button>
+
+        <Button fx:id="btnBulkDelete" onAction="#handleBulkDelete" styleClass="window-btn, close-btn">
+            <graphic><FontIcon iconLiteral="fth-trash-2" iconSize="14"/></graphic>
+        </Button>
+
+        <Button fx:id="btnBulkClose" onAction="#handleBulkClose" styleClass="window-btn">
+            <graphic><FontIcon iconLiteral="fth-x" iconSize="14"/></graphic>
+        </Button>
+    </HBox>
+
+    <!-- ===== PIED DE PAGE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="table-footer">
+        <Label fx:id="footerInfoLabel" text="0 utilisateur(s)" styleClass="footer-info"/>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnPagePrec" styleClass="page-btn">
+            <graphic><FontIcon iconLiteral="fth-chevron-left" iconSize="12"/></graphic>
+        </Button>
+        <Button fx:id="btnPage1" text="1" styleClass="page-btn, page-btn-active"/>
+        <Button fx:id="btnPage2" text="2" styleClass="page-btn"/>
+        <Button fx:id="btnPage3" text="3" styleClass="page-btn"/>
+        <Button fx:id="btnPageSuiv" styleClass="page-btn">
+            <graphic><FontIcon iconLiteral="fth-chevron-right" iconSize="12"/></graphic>
+        </Button>
+    </HBox>
+</VBox>

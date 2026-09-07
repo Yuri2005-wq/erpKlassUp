@@ -3,114 +3,64 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<SplitPane fx:id="rolesSplitPane" dividerPositions="0.28" styleClass="rbac-split-pane"
-           xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="org.erpklassup.erpklassup.controller.RolesPermissionsTabController">
+<SplitPane fx:id="rolesSplitPane" dividerPositions="0.28" styleClass="rbac-split-pane" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.RolesPermissionsTabController">
 
     <items>
 
-        <!-- ===== Panneau gauche : liste des rôles ===== -->
-        <VBox spacing="10.0" styleClass="roles-list-panel">
+        <VBox alignment="CENTER" spacing="10.0" styleClass="roles-list-panel">
             <padding>
-                <Insets top="4.0" right="10.0" bottom="4.0" left="4.0" />
+                <Insets bottom="4.0" left="4.0" right="10.0" top="4.0" />
             </padding>
             <children>
                 <Label styleClass="panel-title" text="Rôles" />
-
-                <ListView fx:id="listRoles" styleClass="roles-list" VBox.vgrow="ALWAYS" />
-
-                <Button fx:id="btnNouveauRole" maxWidth="Infinity" onAction="#handleNouveauRole" styleClass="btn-secondary" text="Créer un nouveau rôle">
-                    <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" /></graphic>
+                <ListView fx:id="listRoles" styleClass="special-container" VBox.vgrow="ALWAYS" />
+                <Button fx:id="btnNouveauRole" styleClass="button-primary" text="Créer un nouveau rôle">
+                    <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" styleClass="btn-icon" /></graphic>
                 </Button>
             </children>
         </VBox>
 
-        <!-- ===== Panneau droit : matrice des permissions du rôle sélectionné ===== -->
         <VBox spacing="12.0" styleClass="permissions-panel">
             <padding>
-                <Insets top="4.0" right="4.0" bottom="4.0" left="14.0" />
+                <Insets bottom="4.0" left="14.0" right="4.0" top="4.0" />
             </padding>
             <children>
 
-                <!-- En-tête du rôle sélectionné -->
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <Label fx:id="labelRoleSelectionne" styleClass="panel-title" text="Sélectionnez un rôle" />
                         <Label fx:id="labelRoleDescription" styleClass="muted-text" text="Les droits ci-dessous s'appliquent à tous les utilisateurs de ce rôle." />
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnRenommerRole" styleClass="btn-icon" onAction="#handleRenommerRole">
-                        <graphic><FontIcon iconLiteral="fth-edit-2" iconSize="14" /></graphic>
+                    <Button fx:id="btnRenommerRole" styleClass="btn-icon-light">
+                        <graphic><FontIcon iconLiteral="fth-edit-2" iconSize="14" styleClass="btn-icon" /></graphic>
                     </Button>
-                    <Button fx:id="btnSupprimerRole" styleClass="btn-icon, btn-danger-icon" onAction="#handleSupprimerRole">
-                        <graphic><FontIcon iconLiteral="fth-trash-2" iconSize="14" /></graphic>
+                    <Button fx:id="btnSupprimerRole" styleClass="btn-icon-light, btn-danger-icon">
+                        <graphic><FontIcon iconLiteral="fth-trash-2" iconSize="14" styleClass="btn-icon" /></graphic>
                     </Button>
                 </HBox>
 
-                <!-- Matrice de permissions par module (accordéon) -->
+                <!-- Généré dynamiquement depuis la table Permission -->
                 <ScrollPane fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
                     <content>
-                        <Accordion fx:id="accordionModules">
-                            <panes>
-
-                                <TitledPane text="Élèves &amp; Inscriptions">
-                                    <content>
-                                        <VBox spacing="6.0" styleClass="permissions-module-body">
-                                            <padding><Insets top="8.0" right="4.0" bottom="8.0" left="4.0" /></padding>
-                                            <CheckBox fx:id="checkAllEleves" styleClass="check-select-all" text="Tout sélectionner" />
-                                            <CheckBox fx:id="checkEleveAfficher" text="Afficher la liste" />
-                                            <CheckBox fx:id="checkEleveInscrire" text="Inscrire un élève" />
-                                            <CheckBox fx:id="checkEleveModifier" text="Modifier un dossier" />
-                                            <CheckBox fx:id="checkEleveSupprimer" text="Supprimer un élève" />
-                                        </VBox>
-                                    </content>
-                                </TitledPane>
-
-                                <TitledPane text="Finances">
-                                    <content>
-                                        <VBox spacing="6.0" styleClass="permissions-module-body">
-                                            <padding><Insets top="8.0" right="4.0" bottom="8.0" left="4.0" /></padding>
-                                            <CheckBox fx:id="checkAllFinances" styleClass="check-select-all" text="Tout sélectionner" />
-                                            <CheckBox fx:id="checkFinanceEnregistrerPaiement" text="Enregistrer un paiement" />
-                                            <CheckBox fx:id="checkFinanceRapports" text="Voir les rapports financiers globaux" />
-                                            <CheckBox fx:id="checkFinanceRemises" text="Accorder des remises" />
-                                        </VBox>
-                                    </content>
-                                </TitledPane>
-
-                                <TitledPane text="Notes &amp; Pédagogie">
-                                    <content>
-                                        <VBox spacing="6.0" styleClass="permissions-module-body">
-                                            <padding><Insets top="8.0" right="4.0" bottom="8.0" left="4.0" /></padding>
-                                            <CheckBox fx:id="checkAllNotes" styleClass="check-select-all" text="Tout sélectionner" />
-                                            <CheckBox fx:id="checkNotesSaisir" text="Saisir des notes" />
-                                            <CheckBox fx:id="checkNotesValiderBulletins" text="Valider les bulletins" />
-                                        </VBox>
-                                    </content>
-                                </TitledPane>
-
-                            </panes>
-                        </Accordion>
+                        <Accordion fx:id="accordionModules" styleClass="permissions-accordion" />
                     </content>
                 </ScrollPane>
 
-                <!-- Barre d'enregistrement -->
                 <HBox alignment="CENTER_RIGHT" spacing="10.0" styleClass="permissions-save-bar">
                     <Label fx:id="labelModificationsNonEnregistrees" styleClass="warning-text" text="" />
-                    <Button fx:id="btnAnnulerPermissions" onAction="#handleAnnulerPermissions" styleClass="btn-secondary" text="Annuler" />
-                    <Button fx:id="btnEnregistrerPermissions" onAction="#handleEnregistrerPermissions" styleClass="btn-primary" text="Enregistrer les droits">
-                        <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+                    <Button fx:id="btnAnnulerPermissions" styleClass="btn-icon-light" text="Annuler" />
+                    <Button fx:id="btnEnregistrerPermissions" prefHeight="3.0" prefWidth="183.0" styleClass="button-primary" text="Enregistrer les droits">
+                        <graphic><FontIcon iconLiteral="fth-save" iconSize="14" styleClass="btn-icon" /></graphic>
                     </Button>
                 </HBox>
 

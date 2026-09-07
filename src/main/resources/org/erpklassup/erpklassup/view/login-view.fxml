@@ -1,14 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.LoginController">
+    <children>
 
-</AnchorPane>
+        <!-- ===== Contenu principal du Login ===== -->
+        <HBox prefHeight="606.0" prefWidth="1000.0" style="-fx-background-color: #FFFFFF;">
+            <children>
+
+                <StackPane prefWidth="480.0" style="-fx-background-color: #16213A;">
+                    <children>
+                        <Pane mouseTransparent="true">
+                            <children>
+                                <Circle fill="#f5a524" layoutX="120.0" layoutY="160.0" opacity="0.1" radius="110.0" />
+                                <Circle fill="#232f4c" layoutX="380.0" layoutY="480.0" opacity="0.3" radius="85.0" />
+                                <Circle fill="#f5a524" layoutX="224.0" layoutY="555.0" opacity="0.1" radius="45.0" />
+                            </children>
+                        </Pane>
+
+                        <VBox alignment="CENTER" spacing="30.0">
+                            <padding>
+                                <Insets left="40.0" right="40.0" />
+                            </padding>
+                            <children>
+                                <!-- Logo agrandi -->
+                                <VBox alignment="CENTER" maxHeight="174.0" maxWidth="219.0" prefHeight="174.0" prefWidth="219.0" style="-fx-min-width: 140; -fx-min-height: 140;">
+                                    <children>
+                                        <ImageView fitHeight="171.0" fitWidth="240.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../logo.png" />
+                                            </image>
+                                        </ImageView>
+                                    </children>
+                                </VBox>
+
+                                <VBox alignment="CENTER" spacing="10.0">
+                                    <children>
+                                        <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: 800;" text="KlassUp" />
+                                    </children>
+                                </VBox>
+
+                                <HBox alignment="CENTER" spacing="35.0">
+                                    <padding>
+                                        <Insets top="20.0" />
+                                    </padding>
+                                    <children>
+                                        <VBox alignment="CENTER" spacing="5.0">
+                                            <children>
+                                                <Label fx:id="nbEleves" style="-fx-text-fill: #F5A524; -fx-font-size: 20px; -fx-font-weight: 800;" text="0" />
+                                                <Label style="-fx-text-fill: #64748B; -fx-font-size: 12px;" text="Élèves" />
+                                            </children>
+                                        </VBox>
+                                        <VBox alignment="CENTER" spacing="5.0">
+                                            <children>
+                                                <Label fx:id="nbClasses" style="-fx-text-fill: #F5A524; -fx-font-size: 20px; -fx-font-weight: 800;" text="0" />
+                                                <Label style="-fx-text-fill: #64748B; -fx-font-size: 12px;" text="Classes" />
+                                            </children>
+                                        </VBox>
+                                        <VBox alignment="CENTER" spacing="5.0">
+                                            <children>
+                                                <Label fx:id="nbEnseignants" style="-fx-text-fill: #F5A524; -fx-font-size: 20px; -fx-font-weight: 800;" text="0" />
+                                                <Label style="-fx-text-fill: #64748B; -fx-font-size: 12px;" text="Enseignants" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
+                <VBox alignment="CENTER_LEFT" spacing="24.0" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets left="75.0" right="75.0" />
+                    </padding>
+                    <children>
+                        <VBox spacing="6.0">
+                            <children>
+                                <Label style="-fx-font-size: 26px; -fx-font-weight: 800; -fx-text-fill: #16213A;" text="Connexion Sécurisée" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #64748B;" text="Accédez à votre espace de gestion" />
+                            </children>
+                        </VBox>
+
+                        <!-- Champ Email -->
+                        <VBox spacing="6.0">
+                            <children>
+                                <Label style="-fx-font-weight: 600; -fx-text-fill: #16213A; -fx-font-size: 13px;" text="Username" />
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 14;">
+                                    <children>
+                                        <Group>
+                                            <SVGPath content="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="TRANSPARENT" stroke="#94A3B8" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0" />
+                                            <SVGPath content="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="TRANSPARENT" stroke="#94A3B8" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0" />
+                                        </Group>
+                                        <TextField fx:id="champEmail" promptText="username" style="-fx-background-color: transparent; -fx-padding: 0; -fx-text-fill: #16213A;" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Champ Mot de passe avec bouton œil fonctionnel -->
+                        <VBox spacing="6.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label style="-fx-font-weight: 600; -fx-text-fill: #16213A; -fx-font-size: 13px;" text="Mot de passe" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 14;">
+                                    <children>
+                                        <SVGPath content="M19 11H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2z M7 11V7a5 5 0 0 1 10 0v4" fill="transparent" stroke="#94A3B8" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2" />
+
+                                        <PasswordField fx:id="champMotDePasse" managed="true" promptText="••••••••" style="-fx-background-color: transparent; -fx-padding: 0; -fx-text-fill: #16213A;" visible="true" HBox.hgrow="ALWAYS" />
+                                        <TextField fx:id="champMotDePasseVisible" managed="false" promptText="••••••••" style="-fx-background-color: transparent; -fx-padding: 0; -fx-text-fill: #16213A;" visible="false" HBox.hgrow="ALWAYS" />
+
+                                        <SVGPath fx:id="iconeOeil" content="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="transparent" onMouseClicked="#toggleMotDePasse" stroke="#94A3B8" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2" style="-fx-cursor: hand;" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Message d'erreur (masqué par défaut) -->
+                        <Label fx:id="labelErreur" managed="false" style="-fx-text-fill: #DC2626; -fx-font-size: 12px; -fx-font-weight: 600;" text="Email ou mot de passe incorrect." visible="false" />
+
+                        <Button fx:id="btnConnecter"  defaultButton="true" maxWidth="1.7976931348623157E308" onAction="#handleLogin" style="-fx-background-color: #16213A; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-cursor: hand;" text="Se connecter" />
+
+                    </children>
+                </VBox>
+
+            </children>
+        </HBox>
+
+    </children>
+</VBox>

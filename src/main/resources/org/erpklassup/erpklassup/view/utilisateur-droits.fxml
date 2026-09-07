@@ -1,14 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<?import javafx.scene.control.Separator?>
+<ScrollPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.erpklassup.erpklassup.controller.UtilisateurFormController"
+            stylesheets="@../style.css"
+            styleClass="page-scroll"
+            fitToWidth="true"
+            prefWidth="600" prefHeight="800">
 
-</AnchorPane>
+    <VBox spacing="20" styleClass="content-area">
+        <padding>
+            <Insets top="30" right="30" bottom="30" left="30" />
+        </padding>
+
+        <!-- En-tête -->
+        <VBox spacing="4">
+            <Label fx:id="lblTitre" styleClass="page-title" text="Nouvel Utilisateur" />
+            <Label styleClass="page-subtitle" text="Créez un compte et attribuez les permissions appropriées" />
+        </VBox>
+
+        <!-- Section 1 : Informations personnelles -->
+        <VBox spacing="15" styleClass="card">
+            <Label styleClass="card-title" text="INFORMATIONS PERSONNELLES" />
+
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Prénom *" />
+                    <TextField fx:id="txtPrenom" styleClass="input" promptText="Prénom" />
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Nom *" />
+                    <TextField fx:id="txtNom" styleClass="input" promptText="Nom" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="8">
+                <Label styleClass="field-label" text="Email professionnel *" />
+                <TextField fx:id="txtEmail" styleClass="input" promptText="exemple@ecole.com" />
+            </VBox>
+
+            <VBox spacing="8">
+                <Label styleClass="field-label" text="Téléphone" />
+                <TextField fx:id="txtTelephone" styleClass="input" promptText="+237 6XX XX XX XX" />
+            </VBox>
+        </VBox>
+
+        <!-- Section 2 : Identifiants de connexion -->
+        <VBox spacing="15" styleClass="card">
+            <Label styleClass="card-title" text="IDENTIFIANTS DE CONNEXION" />
+
+            <VBox spacing="8">
+                <Label styleClass="field-label" text="Nom d'utilisateur *" />
+                <TextField fx:id="txtUsername" styleClass="input" promptText="Nom d'utilisateur unique" />
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Mot de passe *" />
+                    <PasswordField fx:id="txtPassword" styleClass="input" promptText="Minimum 8 caractères" />
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Confirmer le mot de passe *" />
+                    <PasswordField fx:id="txtConfirmPassword" styleClass="input" promptText="Répéter le mot de passe" />
+                </VBox>
+            </HBox>
+
+            <CheckBox fx:id="chkGenererPassword" text="Générer automatiquement un mot de passe fort" styleClass="remember-checkbox" />
+        </VBox>
+
+        <!-- Section 3 : Rôle et permissions -->
+        <VBox spacing="15" styleClass="card">
+            <Label styleClass="card-title" text="RÔLE &amp; PERMISSIONS" />
+
+            <VBox spacing="8">
+                <Label styleClass="field-label" text="Rôle principal *" />
+                <ComboBox fx:id="cbRole" styleClass="input" prefWidth="Infinity" />
+            </VBox>
+
+            <Separator />
+
+            <Label styleClass="field-label" text="Permissions spécifiques" />
+
+            <!-- Permissions groupées -->
+            <VBox spacing="10">
+                <Label styleClass="nav-section-label" text="VIE SCOLAIRE" />
+                <HBox spacing="20">
+                    <CheckBox fx:id="permInscriptions" text="Gérer les inscriptions" styleClass="remember-checkbox" />
+                    <CheckBox fx:id="permPresences" text="Gérer les présences" styleClass="remember-checkbox" />
+                </HBox>
+
+                <Label styleClass="nav-section-label" text="FINANCES" />
+                <HBox spacing="20">
+                    <CheckBox fx:id="permPaiements" text="Encaisser les paiements" styleClass="remember-checkbox" />
+                    <CheckBox fx:id="permRapportsFinanciers" text="Voir les rapports financiers" styleClass="remember-checkbox" />
+                </HBox>
+
+                <Label styleClass="nav-section-label" text="PÉDAGOGIE" />
+                <HBox spacing="20">
+                    <CheckBox fx:id="permNotes" text="Saisir les notes" styleClass="remember-checkbox" />
+                    <CheckBox fx:id="permBulletins" text="Générer les bulletins" styleClass="remember-checkbox" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Section 4 : Statut -->
+        <VBox spacing="15" styleClass="card">
+            <Label styleClass="card-title" text="STATUT DU COMPTE" />
+
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <CheckBox fx:id="chkActif" text="Compte actif" styleClass="remember-checkbox" selected="true" />
+                <CheckBox fx:id="chkEnvoyerEmail" text="Envoyer les identifiants par email" styleClass="remember-checkbox" selected="true" />
+            </HBox>
+        </VBox>
+
+        <!-- Boutons d'action -->
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button styleClass="app-bar-btn" text="Annuler" onAction="#onAnnuler" />
+            <Button fx:id="btnEnregistrer" styleClass="button-validate" text="Créer l'utilisateur" onAction="#onEnregistrer">
+                <graphic>
+                    <FontIcon iconLiteral="fth-check" iconSize="16" />
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</ScrollPane>

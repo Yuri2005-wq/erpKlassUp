@@ -1,133 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.digitalprimaryschool.eleves.EleveListController"
-           styleClass="content-area">
+<StackPane styleClass="content-area" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.digitalprimaryschool.eleves.EleveListController">
 
     <!-- ===================== CONTENU PRINCIPAL ===================== -->
     <VBox spacing="20">
-        <padding><Insets top="28" right="32" bottom="0" left="32"/></padding>
+        <padding><Insets bottom="0" left="32" right="32" top="28" /></padding>
 
         <!-- En-tête (classes existantes) -->
         <VBox spacing="4">
-            <Label text="Élèves &amp; Inscriptions" styleClass="page-title"/>
-            <Label text="Gérez les inscriptions, les classes et le suivi des paiements" styleClass="page-subtitle"/>
+            <Label styleClass="page-title" text="Élèves &amp; Inscriptions" />
+            <Label styleClass="page-subtitle" text="Gérez les inscriptions, les classes et le suivi des paiements" />
         </VBox>
 
         <!-- ===== Toolbar ===== -->
-        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="page-toolbar">
-            <Button fx:id="btnNouvelleInscription" text="Nouvelle inscription" styleClass="button-primary" onAction="#onNouvelleInscription">
-                <graphic><FontIcon iconLiteral="fth-plus" iconSize="16"/></graphic>
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+            <Button fx:id="btnNouvelleInscription" onAction="#onNouvelleInscription" styleClass="button-primary" text="Nouvelle inscription">
+                <graphic><FontIcon iconLiteral="fth-plus" iconSize="16" /></graphic>
             </Button>
 
-            <StackPane HBox.hgrow="ALWAYS">
-                <TextField fx:id="searchField" promptText="Rechercher par nom, matricule, téléphone parent..." styleClass="input, search-field-light"/>
-                <FontIcon iconLiteral="fth-search" iconSize="15" styleClass="search-icon-light" StackPane.alignment="CENTER_LEFT"/>
-            </StackPane>
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light" HBox.hgrow="ALWAYS">
+                <FontIcon iconLiteral="fth-search" iconSize="15" styleClass="search-icon-light" />
+                <TextField fx:id="searchField" promptText="Rechercher par nom, matricule, téléphone parent..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
 
-            <ComboBox fx:id="cbAnneeScolaire" styleClass="input" prefWidth="140"/>
-            <ComboBox fx:id="cbClasse" styleClass="input" prefWidth="170"/>
-            <ComboBox fx:id="cbStatut" styleClass="input" prefWidth="130"/>
+            <ComboBox fx:id="cbAnneeScolaire" prefWidth="140" styleClass="input" />
+            <ComboBox fx:id="cbClasse" prefWidth="170" styleClass="input" />
+            <ComboBox fx:id="cbStatut" prefWidth="130" styleClass="input" />
 
-            <Button fx:id="btnFiltresAvances" styleClass="btn-icon-light" onAction="#onFiltresAvances">
-                <graphic><FontIcon iconLiteral="fth-sliders" iconSize="16"/></graphic>
+            <Button fx:id="btnFiltresAvances" onAction="#onFiltresAvances" styleClass="btn-icon-light">
+                <graphic><FontIcon iconLiteral="fth-sliders" iconSize="16" /></graphic>
             </Button>
         </HBox>
 
         <!-- ===== KPI tiles (structure .card + .stat-* + .icon-* déjà existants) ===== -->
         <HBox spacing="16">
-            <VBox fx:id="tileTotalActifs" styleClass="card, card-clickable" spacing="10" HBox.hgrow="ALWAYS" onMouseClicked="#onTileTotalActifs">
+            <VBox fx:id="tileTotalActifs" onMouseClicked="#onTileTotalActifs" spacing="10" styleClass="card, card-clickable" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label text="Total élèves actifs" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="stat-label" text="Total élèves actifs" HBox.hgrow="ALWAYS" />
                     <StackPane styleClass="stat-icon, icon-sm, icon-blue">
-                        <FontIcon iconLiteral="fth-users" iconSize="16"/>
+                        <FontIcon iconLiteral="fth-users" iconSize="16" />
                     </StackPane>
                 </HBox>
-                <Label fx:id="lblTotalActifs" text="1,250" styleClass="stat-value"/>
+                <Label fx:id="lblTotalActifs" styleClass="stat-value" text="1,250" />
             </VBox>
 
-            <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS">
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label text="Nouveaux aujourd'hui" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="stat-label" text="Nouveaux aujourd'hui" HBox.hgrow="ALWAYS" />
                     <StackPane styleClass="stat-icon, icon-sm, icon-green">
-                        <FontIcon iconLiteral="fth-user-plus" iconSize="16"/>
+                        <FontIcon iconLiteral="fth-user-plus" iconSize="16" />
                     </StackPane>
                 </HBox>
-                <Label fx:id="lblNouveaux" text="+ 12" styleClass="stat-value, stat-value-success"/>
+                <Label fx:id="lblNouveaux" styleClass="stat-value, stat-value-success" text="+ 12" />
             </VBox>
 
-            <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS">
+            <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label text="Garçons / Filles" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="stat-label" text="Garçons / Filles" HBox.hgrow="ALWAYS" />
                     <StackPane styleClass="stat-icon, icon-sm, icon-orange">
-                        <FontIcon iconLiteral="fth-pie-chart" iconSize="16"/>
+                        <FontIcon iconLiteral="fth-pie-chart" iconSize="16" />
                     </StackPane>
                 </HBox>
-                <Label fx:id="lblRepartition" text="52% / 48%" styleClass="stat-value"/>
-                <ProgressBar fx:id="pbRepartition" progress="0.52" styleClass="kpi-progress" maxWidth="Infinity"/>
+                <Label fx:id="lblRepartition" styleClass="stat-value" text="52% / 48%" />
+                <ProgressBar fx:id="pbRepartition" maxWidth="Infinity" progress="0.52" styleClass="kpi-progress" />
             </VBox>
 
-            <VBox fx:id="tileImpayes" styleClass="card, card-clickable" spacing="10" HBox.hgrow="ALWAYS" onMouseClicked="#onTileImpayes">
+            <VBox fx:id="tileImpayes" onMouseClicked="#onTileImpayes" spacing="10" styleClass="card, card-clickable" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label text="Impayés / Soldes négatifs" styleClass="stat-label" HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="stat-label" text="Impayés / Soldes négatifs" HBox.hgrow="ALWAYS" />
                     <StackPane styleClass="stat-icon, icon-sm, icon-red">
-                        <FontIcon iconLiteral="fth-alert-circle" iconSize="16"/>
+                        <FontIcon iconLiteral="fth-alert-circle" iconSize="16" />
                     </StackPane>
                 </HBox>
-                <Label fx:id="lblImpayes" text="45 familles" styleClass="stat-value, stat-value-danger"/>
+                <Label fx:id="lblImpayes" styleClass="stat-value, stat-value-danger" text="45 familles" />
             </VBox>
         </HBox>
 
         <!-- ===== Table (classe .custom-table existante, header navy) ===== -->
         <TableView fx:id="tableEleves" styleClass="custom-table" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colSelect" text="" prefWidth="40" sortable="false"/>
-                <TableColumn fx:id="colAvatar" text="" prefWidth="52" sortable="false"/>
-                <TableColumn fx:id="colIdentite" text="Élève" prefWidth="240"/>
-                <TableColumn fx:id="colClasse" text="Classe" prefWidth="90"/>
-                <TableColumn fx:id="colSexe" text="Sexe" prefWidth="60"/>
-                <TableColumn fx:id="colParent" text="Parent / Tuteur" prefWidth="200"/>
-                <TableColumn fx:id="colFinance" text="Situation financière" prefWidth="150"/>
-                <TableColumn fx:id="colStatut" text="Statut" prefWidth="90" sortable="false"/>
-                <TableColumn fx:id="colActions" text="" prefWidth="48" sortable="false"/>
+                <TableColumn fx:id="colSelect" prefWidth="40" sortable="false" text="" />
+                <TableColumn fx:id="colAvatar" prefWidth="52" sortable="false" text="" />
+                <TableColumn fx:id="colIdentite" prefWidth="240" text="Élève" />
+                <TableColumn fx:id="colClasse" prefWidth="90" text="Classe" />
+                <TableColumn fx:id="colSexe" prefWidth="60" text="Sexe" />
+                <TableColumn fx:id="colParent" prefWidth="200" text="Parent / Tuteur" />
+                <TableColumn fx:id="colFinance" prefWidth="150" text="Situation financière" />
+                <TableColumn fx:id="colStatut" prefWidth="90" sortable="false" text="Statut" />
+                <TableColumn fx:id="colActions" prefWidth="48" sortable="false" text="" />
             </columns>
-            <placeholder><Label text="Aucun élève ne correspond à ces critères" styleClass="table-placeholder"/></placeholder>
+            <placeholder><Label styleClass="table-placeholder" text="Aucun élève ne correspond à ces critères" /></placeholder>
         </TableView>
 
         <!-- ===== Pied de page / pagination ===== -->
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="table-footer">
-            <Label fx:id="lblAffichage" text="Affichage de 1 à 25 sur 1,250 élèves" styleClass="footer-info"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label text="Éléments par page :" styleClass="footer-info"/>
-            <ComboBox fx:id="cbTaillePage" styleClass="input" prefWidth="80"/>
-            <HBox fx:id="pagination" spacing="4" alignment="CENTER"/>
+            <Label fx:id="lblAffichage" styleClass="footer-info" text="Affichage de 1 à 25 sur 1,250 élèves" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label styleClass="footer-info" text="Éléments par page :" />
+            <ComboBox fx:id="cbTaillePage" prefWidth="80" styleClass="input" />
+            <HBox fx:id="pagination" alignment="CENTER" spacing="4" />
         </HBox>
 
-        <Region prefHeight="12"/>
+        <Region prefHeight="12" />
     </VBox>
 
     <!-- ===================== BARRE FLOTTANTE DE SÉLECTION ===================== -->
-    <HBox fx:id="bulkActionBar" styleClass="bulk-action-bar" alignment="CENTER_LEFT" spacing="16"
-          StackPane.alignment="BOTTOM_CENTER" visible="false" managed="false">
-        <Label fx:id="lblSelectionCount" text="0 élève(s) sélectionné(s)" styleClass="bulk-label"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Envoyer SMS" styleClass="app-bar-btn" onAction="#onEnvoyerSms">
-            <graphic><FontIcon iconLiteral="fth-message-circle" iconSize="14"/></graphic>
+    <HBox fx:id="bulkActionBar" alignment="CENTER_LEFT" managed="false" spacing="16" styleClass="bulk-action-bar" visible="false" StackPane.alignment="BOTTOM_CENTER">
+        <Label fx:id="lblSelectionCount" styleClass="bulk-label" text="0 élève(s) sélectionné(s)" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#onEnvoyerSms" styleClass="app-bar-btn" text="Envoyer SMS">
+            <graphic><FontIcon iconLiteral="fth-message-circle" iconSize="14" /></graphic>
         </Button>
-        <Button text="Générer certificats" styleClass="app-bar-btn" onAction="#onGenererCertificats">
-            <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14"/></graphic>
+        <Button onAction="#onGenererCertificats" styleClass="app-bar-btn" text="Générer certificats">
+            <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
         </Button>
-        <Button text="Classe supérieure" styleClass="app-bar-btn" onAction="#onPasserClasseSuperieure">
-            <graphic><FontIcon iconLiteral="fth-arrow-up-circle" iconSize="14"/></graphic>
+        <Button onAction="#onPasserClasseSuperieure" styleClass="app-bar-btn" text="Classe supérieure">
+            <graphic><FontIcon iconLiteral="fth-arrow-up-circle" iconSize="14" /></graphic>
         </Button>
-        <Button fx:id="btnCloseBulkBar" styleClass="window-btn, close-btn" onAction="#onFermerBarreSelection">
-            <graphic><FontIcon iconLiteral="fth-x" iconSize="14"/></graphic>
+        <Button fx:id="btnCloseBulkBar" onAction="#onFermerBarreSelection" styleClass="window-btn, close-btn">
+            <graphic><FontIcon iconLiteral="fth-x" iconSize="14" /></graphic>
         </Button>
     </HBox>
 
