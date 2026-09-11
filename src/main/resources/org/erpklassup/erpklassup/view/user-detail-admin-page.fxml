@@ -22,12 +22,13 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.UserDetailController">
+<?import javafx.scene.control.Accordion?>
+<StackPane prefHeight="668.0" prefWidth="806.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserDetailController">
 
     <VBox style="-fx-background-color: #111a2e;">
         <children>
 
-            <!-- ===== EN-TÊTE PROFIL ===== -->
+            <!-- ===== EN-TÊTE PROFIL (Avatar + Infos rapides) ===== -->
             <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
                 <StackPane>
                     <Circle fill="#F5A524" radius="28" />
@@ -40,38 +41,19 @@
                 <Region HBox.hgrow="ALWAYS" />
                 <Label fx:id="badgeStatut" styleClass="event-tag, tag-green" text="● Actif" />
                 <Label fx:id="badge2FA" styleClass="event-tag, tag-blue" text="● 2FA" />
-                <Label fx:id="badgeEmailVerifie" styleClass="event-tag, tag-green" text="✓ Email vérifié" />
             </HBox>
 
-            <!-- ===== TABPANE ===== -->
-            <TabPane fx:id="tabPane" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <!-- ===== TABPANE STYLÉ COMME TON PATTERN ===== -->
+            <TabPane fx:id="tabPane" style="-fx-background-color: transparent;" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
                 <!-- ===== ONGLET 1 : INFORMATIONS ===== -->
                 <Tab closable="false" styleClass="top-tab-btn" text="Informations">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                                <!-- Identifiants système -->
-                                <VBox spacing="15" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-hash" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Identifiants système" />
-                                    </HBox>
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="ID Utilisateur" />
-                                            <TextField fx:id="idUtilisateurField" editable="false" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="École" />
-                                            <TextField fx:id="idEcoleField" editable="false" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-                                </VBox>
-
-                                <!-- Informations personnelles -->
+                                <!-- Section : Informations personnelles -->
                                 <VBox spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon" />
@@ -106,58 +88,13 @@
                                             <TextField fx:id="telephoneField" styleClass="input" />
                                         </VBox>
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Téléphone 2FA" />
-                                            <TextField fx:id="telephone2FAField" promptText="Pour l'authentification à 2 facteurs" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
                                             <Label styleClass="field-label" text="Type d'utilisateur" />
                                             <ComboBox fx:id="typeUserCombo" maxWidth="Infinity" styleClass="combo-box" />
                                         </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Langue préférée" />
-                                            <ComboBox fx:id="langueCombo" maxWidth="Infinity" styleClass="combo-box" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <VBox spacing="6">
-                                        <Label styleClass="field-label" text="Fuseau horaire" />
-                                        <ComboBox fx:id="fuseauCombo" maxWidth="Infinity" styleClass="combo-box" />
-                                    </VBox>
-                                </VBox>
-
-                                <!-- Métadonnées -->
-                                <VBox spacing="15" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-clock" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Métadonnées" />
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Créé le" />
-                                            <TextField fx:id="createdAtField" editable="false" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Dernière modification" />
-                                            <TextField fx:id="updatedAtField" editable="false" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Dernier changement MDP" />
-                                            <TextField fx:id="dateChangementMdpField" editable="false" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Version" />
-                                            <TextField fx:id="versionField" editable="false" styleClass="input" />
-                                        </VBox>
                                     </HBox>
                                 </VBox>
 
+                                <!-- Boutons -->
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
                                     <Button fx:id="btnAnnulerInfo" styleClass="btn-icon-light" text="Annuler" />
                                     <Button fx:id="btnEnregistrerInfo" styleClass="button-primary" text="Enregistrer">
@@ -171,7 +108,7 @@
 
                 <!-- ===== ONGLET 2 : RÔLES ===== -->
                 <Tab closable="false" styleClass="top-tab-btn" text="Rôles">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
@@ -215,12 +152,12 @@
 
                 <!-- ===== ONGLET 3 : PERMISSIONS ===== -->
                 <Tab closable="false" styleClass="top-tab-btn" text="Permissions d'exception">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                                <VBox spacing="15" styleClass="card">
+                                <VBox prefHeight="439.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon" />
                                         <Label styleClass="card-title" text="Permissions d'exception" />
@@ -237,7 +174,7 @@
 
                                     <ScrollPane fitToWidth="true" prefHeight="350" styleClass="page-scroll">
                                         <content>
-                                            <VBox fx:id="permissionsContainer" spacing="5" />
+                                            <Accordion fx:id="accordionPermissions" />
                                         </content>
                                     </ScrollPane>
                                 </VBox>
@@ -254,89 +191,31 @@
 
                 <!-- ===== ONGLET 4 : SÉCURITÉ ===== -->
                 <Tab closable="false" styleClass="top-tab-btn" text="Sécurité">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                                <!-- Statut du compte -->
-                                <VBox spacing="15" styleClass="card">
+                                <VBox prefHeight="295.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Statut du compte" />
+                                        <Label styleClass="card-title" text="Sécurité du compte" />
                                     </HBox>
 
                                     <HBox alignment="CENTER_LEFT" spacing="20">
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="Compte actif" />
-                                            <ToggleButton fx:id="toggleActif" text="Actif">
-                                    <styleClass>
-                                       <String fx:value="event-tag" />
-                                       <String fx:value="tag-green" />
-                                    </styleClass></ToggleButton>
+                                            <ToggleButton fx:id="toggleActif" text="Actif" styleClass="toggle-switch" />
                                         </VBox>
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="Double authentification (2FA)" />
-                                            <ToggleButton fx:id="toggle2FA" text="2FA">
-                                    <styleClass>
-                                       <String fx:value="event-tag" />
-                                       <String fx:value="tag-blue" />
-                                    </styleClass></ToggleButton>
-                                        </VBox>
-                                        <VBox spacing="5">
-                                            <Label styleClass="field-label" text="Email vérifié" />
-                                            <ToggleButton fx:id="toggleEmailVerifie" text="Vérifié">
-                                    <styleClass>
-                                       <String fx:value="event-tag" />
-                                       <String fx:value="tag-green" />
-                                    </styleClass></ToggleButton>
+                                            <ToggleButton fx:id="toggle2FA" text="Désactivé" styleClass="toggle-switch" />
                                         </VBox>
                                     </HBox>
-
                                     <Separator />
 
-                                    <!-- État de verrouillage -->
                                     <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-alert-triangle" iconSize="16" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="État de verrouillage" />
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Compte verrouillé" />
-                                            <TextField fx:id="compteVerrouilleField" editable="false" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Verrouillé jusqu'à" />
-                                            <TextField fx:id="verrouilleJusquaField" editable="false" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Nombre de tentatives échouées" />
-                                            <TextField fx:id="nombreTentativesField" editable="false" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Date dernier échec" />
-                                            <TextField fx:id="dateDernierEchecField" editable="false" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="10">
-                                        <Button fx:id="btnDeverrouiller" styleClass="btn-icon-light" text="Déverrouiller le compte">
-                                            <graphic><FontIcon iconLiteral="fth-unlock" iconSize="14" /></graphic>
-                                        </Button>
-                                        <Button fx:id="btnReinitialiserTentatives" styleClass="btn-icon-light" text="Réinitialiser tentatives">
-                                            <graphic><FontIcon iconLiteral="fth-refresh-cw" iconSize="14" /></graphic>
-                                        </Button>
-                                    </HBox>
-                                </VBox>
-
-                                <!-- Réinitialisation MDP -->
-                                <VBox spacing="15" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon" />
+                                        <FontIcon iconLiteral="fth-key" iconSize="16" styleClass="tile-icon" />
                                         <Label styleClass="card-title" text="Réinitialiser le mot de passe" />
                                     </HBox>
 
@@ -350,13 +229,6 @@
                                     </HBox>
 
                                     <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="L'utilisateur doit changer son mot de passe à la prochaine connexion" />
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Date vérification email" />
-                                            <TextField fx:id="dateVerificationEmailField" editable="false" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
                                 </VBox>
 
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
@@ -369,11 +241,11 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ===== ONGLET 5 : HISTORIQUE ===== -->
+                <!-- ===== ONGLET 5 : AUDIT / HISTORIQUE ===== -->
                 <Tab closable="false" styleClass="top-tab-btn" text="Historique">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
-                            <VBox maxWidth="858" spacing="20" styleClass="content-area">
+                            <VBox maxWidth="858.0" prefHeight="515.0" prefWidth="858.0" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
                                 <VBox spacing="15" styleClass="card">
@@ -386,8 +258,8 @@
                                         <columns>
                                             <TableColumn fx:id="colDateAudit" prefWidth="150" text="DATE" />
                                             <TableColumn fx:id="colActionAudit" prefWidth="200" text="ACTION" />
-                                            <TableColumn fx:id="colDetailAudit" prefWidth="164" text="DÉTAILS" />
-                                            <TableColumn fx:id="colIpAudit" prefWidth="256" text="ADRESSE IP" />
+                                            <TableColumn fx:id="colDetailAudit" prefWidth="164.0" text="DÉTAILS" />
+                                            <TableColumn fx:id="colIpAudit" prefWidth="256.0" text="ADRESSE IP" />
                                         </columns>
                                         <placeholder><Label styleClass="table-placeholder" text="Aucun historique" /></placeholder>
                                     </TableView>
@@ -401,5 +273,7 @@
 
         </children>
     </VBox>
-    <padding><Insets bottom="8.0" /></padding>
+   <padding>
+      <Insets bottom="8.0" />
+   </padding>
 </StackPane>

@@ -97,7 +97,7 @@ public class SettingsTabControllers {
      */
     public void fermer() {
         if (viewRegistry != null) {
-            viewRegistry.toutRéinitialiser();
+            viewRegistry.toutReinitialiser();
         }
     }
 }

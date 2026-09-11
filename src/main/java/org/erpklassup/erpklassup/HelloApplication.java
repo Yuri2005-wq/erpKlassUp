@@ -10,6 +10,12 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.erpklassup.erpklassup.util.ToastNotification;
+import org.kordamp.ikonli.IkonHandler;
+import org.kordamp.ikonli.feather.Feather;
+import org.kordamp.ikonli.feather.FeatherIkonHandler;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.javafx.IkonResolver;
 
 import java.io.IOException;
 
@@ -43,7 +49,6 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        // Appliquer la couleur à la barre de titre
         WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
 
         //Configuration du nom de la fenetre et de l'icône d'application

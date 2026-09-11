@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Permission (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Role (
-                                    idRole VARCHAR(50) NOT NULL,
+    idRole VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idGroupe VARCHAR(50) NULL,
     nomRole VARCHAR(50) NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS ActionPermission (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS RoleHeritage (
-                                            idRoleHeritage VARCHAR(50) NOT NULL,
+    idRoleHeritage VARCHAR(50) NOT NULL,
     idRoleParent VARCHAR(50) NOT NULL,
     idRoleEnfant VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NULL,
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS RoleHeritage (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Utilisateur (
-                                           idUtilisateur VARCHAR(50) NOT NULL,
+    idUtilisateur VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idGroupePrincipal VARCHAR(50) NULL,
     username VARCHAR(50) NOT NULL,
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS Utilisateur (
 
 
 CREATE TABLE IF NOT EXISTS UtilisateurRole (
-                                               idUtilisateurRole VARCHAR(50) NOT NULL,
+    idUtilisateurRole VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     idRole VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NULL,
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS UtilisateurPermission (
 
 -- Table : Token de réinitialisation de mot de passe
 CREATE TABLE IF NOT EXISTS TokenReinitialisation (
-                                                     idToken VARCHAR(50) NOT NULL,
+    idToken VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     tokenHash VARCHAR(64) NOT NULL UNIQUE,
     dateCreation DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS TokenReinitialisation (
 
 -- Table : Session utilisateur (connexion active)
 CREATE TABLE IF NOT EXISTS SessionUtilisateur (
-                                                  idSession VARCHAR(50) NOT NULL,
+    idSession VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     idEcoleActive VARCHAR(50) NULL,
     idGroupeActif VARCHAR(50) NULL,
@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS SessionUtilisateur (
 
 -- Table : Code 2FA (Double authentification)
 CREATE TABLE IF NOT EXISTS Code2FA (
-                                       idCode VARCHAR(50) NOT NULL,
+    idCode VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     codeHash VARCHAR(64) NOT NULL,
     typeCode VARCHAR(20) NOT NULL,
@@ -299,7 +299,7 @@ CREATE TABLE IF NOT EXISTS Code2FA (
 
 -- Table : Codes de secours 2FA (backup codes)
 CREATE TABLE IF NOT EXISTS CodeSecours2FA (
-                                              idCodeSecours VARCHAR(50) NOT NULL,
+    idCodeSecours VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     codeHash VARCHAR(64) NOT NULL,
     estUtilise TINYINT(1) DEFAULT 0,
@@ -311,7 +311,7 @@ CREATE TABLE IF NOT EXISTS CodeSecours2FA (
 
 -- Table : Tentatives de connexion (journal de sécurité)
 CREATE TABLE IF NOT EXISTS TentativeConnexion (
-                                                  idTentative VARCHAR(50) NOT NULL,
+    idTentative VARCHAR(50) NOT NULL,
     usernameSaisi VARCHAR(100) NOT NULL,
     adresseIp VARCHAR(45) NOT NULL,
     userAgent VARCHAR(255),
@@ -477,6 +477,60 @@ CREATE TABLE IF NOT EXISTS Eleve (
     CONSTRAINT fk_eleve_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_eleve_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ==============================================================
+-- MIGRATION : ENTITÉ PARENT + LIAISON PARENT-ÉLÈVE
+-- À appliquer après le schéma existant (Utilisateur, Eleve, Ecole déjà créés)
+-- ==============================================================
+
+CREATE TABLE IF NOT EXISTS Parent (
+                                      idParent VARCHAR(50) NOT NULL,
+    idEcole VARCHAR(50) NOT NULL,
+    idUtilisateur VARCHAR(50) NULL UNIQUE,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100),
+    sexe VARCHAR(10),
+    telephone VARCHAR(30),
+    email VARCHAR(150),
+    profession VARCHAR(100),
+    adresse TEXT,
+    photo VARCHAR(255),
+    estActif TINYINT(1) DEFAULT 1,
+    version BIGINT DEFAULT 1,
+    deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
+    created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (idParent),
+    INDEX idx_parent_sync (idEcole, updated_at, version),
+    INDEX idx_parent_email (email),
+    CONSTRAINT fk_parent_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
+    CONSTRAINT fk_parent_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ParentEleve (
+    idParentEleve VARCHAR(50) NOT NULL,
+    idEcole VARCHAR(50) NOT NULL,
+    idParent VARCHAR(50) NOT NULL,
+    idEleve VARCHAR(50) NOT NULL,
+    lienParente VARCHAR(30) DEFAULT 'PERE',        -- PERE, MERE, TUTEUR_LEGAL, AUTRE
+    estContactPrincipal TINYINT(1) DEFAULT 0,
+    estResponsableFinancier TINYINT(1) DEFAULT 0,   -- reçoit les rappels de paiement
+    version BIGINT DEFAULT 1,
+    deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
+    created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (idParentEleve),
+    UNIQUE KEY uq_parent_eleve (idParent, idEleve),
+    INDEX idx_pe_sync (idEcole, updated_at, version),
+    INDEX idx_pe_eleve (idEleve),
+    CONSTRAINT fk_pe_parent FOREIGN KEY (idParent) REFERENCES Parent(idParent) ON DELETE CASCADE,
+    CONSTRAINT fk_pe_eleve FOREIGN KEY (idEleve) REFERENCES Eleve(idEleve) ON DELETE CASCADE,
+    CONSTRAINT fk_pe_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
 
 CREATE TABLE IF NOT EXISTS Inscription (
                                            idInscription VARCHAR(50) NOT NULL,
@@ -732,4 +786,60 @@ CREATE TABLE IF NOT EXISTS SyncConflit (
     INDEX idx_conf_sync (idEcole, statut)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+-- ==============================================================
+-- 11. TABLES D'AUDIT (À AJOUTER AVANT SET FOREIGN_KEY_CHECKS = 1)
+-- ==============================================================
+
+-- Table : Audit RBAC (traçabilité des rôles et permissions)
+-- ==============================================================
+-- 11. TABLES D'AUDIT (CORRIGÉES POUR CORRESPONDRE AUX DAOs)
+-- ==============================================================
+
+-- Table : Audit RBAC (traçabilité des rôles et permissions)
+CREATE TABLE IF NOT EXISTS AuditRBAC (
+                                         idAuditRBAC VARCHAR(50) NOT NULL,
+    idUtilisateurAction VARCHAR(50) NOT NULL,
+    typeAction VARCHAR(30) NOT NULL,
+    idUtilisateurCible VARCHAR(50) NULL,
+    idRole VARCHAR(50) NULL,
+    idPermission VARCHAR(50) NULL,
+    idEcoleConcernee VARCHAR(50) NULL,
+    details TEXT,
+    dateAction DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (idAuditRBAC),
+    INDEX idx_arbac_date (dateAction),
+    INDEX idx_arbac_action (idUtilisateurAction),
+    INDEX idx_arbac_cible (idUtilisateurCible),
+    CONSTRAINT fk_arbac_act FOREIGN KEY (idUtilisateurAction)
+    REFERENCES Utilisateur(idUtilisateur),
+    CONSTRAINT fk_arbac_cib FOREIGN KEY (idUtilisateurCible)
+    REFERENCES Utilisateur(idUtilisateur) ON DELETE SET NULL,
+    CONSTRAINT fk_arbac_ecole FOREIGN KEY (idEcoleConcernee)
+    REFERENCES Ecole(idEcole) ON DELETE SET NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table : LogsAudit (CORRIGÉE - Alignée avec LogsAuditDAO.java)
+
+CREATE TABLE IF NOT EXISTS LogsAudit (
+    idLogAudit VARCHAR(50) NOT NULL,
+    idEcole VARCHAR(50) NOT NULL,
+    idUtilisateur VARCHAR(50) NOT NULL,
+    nomAuteur VARCHAR(150) NOT NULL,
+    categorieAction VARCHAR(50) NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    details TEXT NOT NULL,
+    adresseIp VARCHAR(45),
+    appareil VARCHAR(255),
+    dateAction TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (idLogAudit),
+    INDEX idx_log_date (dateAction),
+    INDEX idx_log_user (idUtilisateur),
+    INDEX idx_log_categorie (categorieAction),
+    INDEX idx_log_ecole (idEcole),
+    CONSTRAINT fk_log_usr FOREIGN KEY (idUtilisateur)
+    REFERENCES Utilisateur(idUtilisateur),
+    CONSTRAINT fk_log_ecole FOREIGN KEY (idEcole)
+    REFERENCES Ecole(idEcole) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox spacing="15" styleClass="card" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.renduView.UserSecurityTabController">
+
+    <padding><Insets bottom="20" left="20" right="20" top="20"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon"/>
+        <Label text="Sécurité du compte" styleClass="card-title"/>
+    </HBox>
+
+    <!-- Statut -->
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <VBox spacing="5">
+            <Label text="Compte actif" styleClass="field-label"/>
+            <ToggleButton fx:id="toggleActif" text="Actif" styleClass="custom-toggle-button"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Double authentification (2FA)" styleClass="field-label"/>
+            <ToggleButton fx:id="toggle2FA" text="2FA" styleClass="custom-toggle-button"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Réinitialisation MDP -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <FontIcon iconLiteral="fth-key" iconSize="16" styleClass="tile-icon"/>
+        <Label text="Réinitialiser le mot de passe" styleClass="card-title"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Button fx:id="btnEnvoyerLien" styleClass="btn-icon-light" text="Envoyer un lien par email">
+            <graphic><FontIcon iconLiteral="fth-mail" iconSize="14"/></graphic>
+        </Button>
+        <Button fx:id="btnGenererTemp" styleClass="btn-icon-light" text="Générer un mot de passe temporaire">
+            <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14"/></graphic>
+        </Button>
+    </HBox>
+
+    <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="L'utilisateur doit changer son mot de passe à la prochaine connexion"/>
+
+</VBox>

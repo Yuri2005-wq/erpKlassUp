@@ -16,8 +16,10 @@ import javafx.stage.StageStyle;
 import org.erpklassup.erpklassup.BoutonChargement;
 import org.erpklassup.erpklassup.HelloApplication;
 import org.erpklassup.erpklassup.WindowsTitleBar;
+import org.erpklassup.erpklassup.dao.EcoleDAO;
 import org.erpklassup.erpklassup.dao.UtilisateurDAO;
 import org.erpklassup.erpklassup.dao.UtilisateurRoleDAO;
+import org.erpklassup.erpklassup.models.Ecole;
 import org.erpklassup.erpklassup.models.Role;
 import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.service.AppExecutor;
@@ -29,10 +31,14 @@ import org.erpklassup.erpklassup.util.ToastNotification;
 
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.List;
 
 public class LoginController {
@@ -136,6 +142,77 @@ public class LoginController {
 //        AppExecutor.get().submit(tacheConnexion);
 //    }
 
+//    public void handleLogin() {
+//        String login = champEmail.getText().trim();
+//        String motDePasse = motDePasseVisible ? champMotDePasseVisible.getText() : champMotDePasse.getText();
+//
+//        if (login.isEmpty() || motDePasse.isEmpty()) {
+//            afficherErreur("Veuillez remplir tous les champs.");
+//            return;
+//        }
+//
+//        String ecole = "ECO_001";
+//        BoutonChargement.demarrer(btnConnecter, "Connexion en cours...");
+//
+//        Task<AuthService.ResultatConnexion> tacheConnexion = new Task<>() {
+//            @Override
+//            protected AuthService.ResultatConnexion call() {
+//                return new AuthService().seConnecter(login, motDePasse, ecole);
+//            }
+//        };
+//
+//        tacheConnexion.setOnSucceeded(event -> {
+//            AuthService.ResultatConnexion resultat = tacheConnexion.getValue();
+//
+//            if (resultat.isSucces()) {
+//                SessionManager sessionManager = SessionManager.getInstance();
+//
+//                if (sessionManager.estConnecte()) {
+//                    Utilisateur user = sessionManager.getUtilisateurCourant();
+//
+//                    // ✅ LOG SANS getIdRole
+//                    System.out.println("✅ Connecté en tant que : " + user.getNomComplet());
+//                    System.out.println("   Username : " + user.getUsername());
+//
+//                    // ✅ Récupérer les rôles via UtilisateurRoleDAO
+//                    List<Role> roles = new UtilisateurRoleDAO()
+//                            .findRolesByUtilisateur(user.getIdUtilisateur());
+//                    if (!roles.isEmpty()) {
+//                        String nomsRoles = roles.stream()
+//                                .map(Role::getNomRole)
+//                                .reduce((a, b) -> a + ", " + b)
+//                                .orElse("Aucun");
+//                        System.out.println("   Rôles : " + nomsRoles);
+//                    }
+//
+//                    // ✅ Toast de bienvenue
+//                    ToastNotification.succes(
+//                            StageHelper.getStage(btnConnecter),
+//                            "Bienvenue " + user.getNomComplet() + " !"
+//                    );
+//
+//                    naviguerVersDashboard();
+//
+//                } else {
+//                    BoutonChargement.arreter(btnConnecter);
+//                    afficherErreur("Erreur : session non démarrée");
+//                }
+//
+//            } else {
+//                BoutonChargement.arreter(btnConnecter);
+//                afficherErreur(resultat.getMessage());
+//            }
+//        });
+//
+//        tacheConnexion.setOnFailed(event -> {
+//            BoutonChargement.arreter(btnConnecter);
+//            System.err.println("Erreur de connexion : " + tacheConnexion.getException().getMessage());
+//            afficherErreur("Erreur technique lors de la connexion.");
+//        });
+//
+//        AppExecutor.get().submit(tacheConnexion);
+//    }
+
     public void handleLogin() {
         String login = champEmail.getText().trim();
         String motDePasse = motDePasseVisible ? champMotDePasseVisible.getText() : champMotDePasse.getText();
@@ -145,13 +222,36 @@ public class LoginController {
             return;
         }
 
-        String ecole = "ECO_001";
+        // Récupération de la fenêtre JavaFX courante pour les ToastNotifications
+        Stage stageCourant = StageHelper.getStage(btnConnecter);
+
         BoutonChargement.demarrer(btnConnecter, "Connexion en cours...");
 
+        // ✅ TÂCHE : Charger l'école depuis la BD + Se connecter
         Task<AuthService.ResultatConnexion> tacheConnexion = new Task<>() {
             @Override
             protected AuthService.ResultatConnexion call() {
-                return new AuthService().seConnecter(login, motDePasse, ecole);
+                // 1. Charger l'école (une seule école en BD)
+                EcoleDAO ecoleDAO = new EcoleDAO();
+                var ecoleOpt = ecoleDAO.findPremiereEcoleActive();
+
+                if (ecoleOpt.isEmpty()) {
+                    return new AuthService.ResultatConnexion(false, "Aucune école active trouvée dans la base de données");
+                }
+
+                Ecole ecole = ecoleOpt.get();
+                System.out.println("🏫 École chargée : " + ecole.getNomEcole() + " (ID: " + ecole.getIdEcole() + ")");
+
+                // 2. Stocker l'école dans SessionManager
+                SessionManager.getInstance().setEcoleCourante(ecole);
+
+                // 3. Récupérer les informations système / réseau (ex: IP locale et Client App)
+                String ipAdresse = obtenirAdresseIpLocale(); // Peut être remplacé par une utilitaire réseau local
+                String userAgent = obtenirInfoAppareil();
+
+                // 4. Se connecter avec AuthService mis à jour (prend le stage en paramètre)
+                AuthService authService = new AuthService();
+                return authService.seConnecter(stageCourant, login, motDePasse, ecole.getIdEcole(), ipAdresse, userAgent);
             }
         };
 
@@ -164,13 +264,12 @@ public class LoginController {
                 if (sessionManager.estConnecte()) {
                     Utilisateur user = sessionManager.getUtilisateurCourant();
 
-                    // ✅ LOG SANS getIdRole
-                    System.out.println("✅ Connecté en tant que : " + user.getNomComplet());
+                    System.out.println("✅ Connecté : " + user.getNomComplet());
                     System.out.println("   Username : " + user.getUsername());
+                    System.out.println("   École : " + sessionManager.getEcoleCourante().getNomEcole());
 
-                    // ✅ Récupérer les rôles via UtilisateurRoleDAO
-                    List<Role> roles = new UtilisateurRoleDAO()
-                            .findRolesByUtilisateur(user.getIdUtilisateur());
+                    // Log des rôles pour le débogage
+                    List<Role> roles = new UtilisateurRoleDAO().findRolesByUtilisateur(user.getIdUtilisateur());
                     if (!roles.isEmpty()) {
                         String nomsRoles = roles.stream()
                                 .map(Role::getNomRole)
@@ -179,12 +278,7 @@ public class LoginController {
                         System.out.println("   Rôles : " + nomsRoles);
                     }
 
-                    // ✅ Toast de bienvenue
-                    ToastNotification.succes(
-                            StageHelper.getStage(btnConnecter),
-                            "Bienvenue " + user.getNomComplet() + " !"
-                    );
-
+                    // Le Toast de succès est automatiquement affiché par AuthService.seConnecter()
                     naviguerVersDashboard();
 
                 } else {
@@ -194,13 +288,15 @@ public class LoginController {
 
             } else {
                 BoutonChargement.arreter(btnConnecter);
+                // Les erreurs d'authentification ou verrous sont gérées et affichées par les Toasts dans AuthService
                 afficherErreur(resultat.getMessage());
             }
         });
 
         tacheConnexion.setOnFailed(event -> {
             BoutonChargement.arreter(btnConnecter);
-            System.err.println("Erreur de connexion : " + tacheConnexion.getException().getMessage());
+            Throwable exception = tacheConnexion.getException();
+            System.err.println("Erreur de connexion : " + (exception != null ? exception.getMessage() : "Inconnue"));
             afficherErreur("Erreur technique lors de la connexion.");
         });
 
@@ -272,5 +368,54 @@ public class LoginController {
                     + " — vérifie qu'il est bien dans src/main/resources et dans le classpath.");
         }
         return new FXMLLoader(url);
+    }
+
+    public String obtenirAdresseIpLocale() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces != null && interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+
+                // Ignorer les interfaces inactives, de bouclage (loopback) ou virtuelles (ex: Docker, VPN, VirtualBox)
+                if (!iface.isUp() || iface.isLoopback() || iface.isVirtual()) {
+                    continue;
+                }
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+
+                    // On filtre pour ne garder que les adresses IPv4 de site/réseau local
+                    if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+
+            // Tentative de fallback simple si le parcours d'interfaces n'a pas abouti
+            InetAddress localHost = InetAddress.getLocalHost();
+            if (!localHost.isLoopbackAddress()) {
+                return localHost.getHostAddress();
+            }
+        } catch (Exception e) {
+            System.err.println("Impossible de déterminer l'adresse IP locale : " + e.getMessage());
+        }
+
+        return "127.0.0.1";
+    }
+
+    /**
+     * Génère une chaîne descriptive complète de la machine (Nom d'hôte + OS + Architecture).
+     */
+    public String obtenirInfoAppareil() {
+        String hostName = "Machine";
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (Exception ignored) {}
+
+        String osName = System.getProperty("os.name", "Inconnu");
+        String osArch = System.getProperty("os.arch", "");
+
+        return String.format("%s (%s %s)", hostName, osName, osArch).trim();
     }
 }

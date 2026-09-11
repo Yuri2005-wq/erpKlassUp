@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefWidth="480.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.RoleModalController">
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+    <children>
+
+        <!-- En-tête -->
+        <VBox spacing="4.0">
+            <children>
+                <Label fx:id="lblTitreModal" text="Nouveau Rôle" textFill="#1E293B">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                </Label>
+                <Label fx:id="lblSousTitreModal" text="Définissez les informations de base pour ce rôle utilisateur." textFill="#64748B">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+
+        <!-- Formulaire -->
+        <VBox spacing="16.0">
+            <children>
+
+                <!-- Champ : Nom du rôle -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Nom du rôle *" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNomRole" promptText="Ex: Administrateur, Enseignant..." styleClass="input" />
+                    </children>
+                </VBox>
+
+                <!-- Champ : Description -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Description" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextArea fx:id="txtDescription" prefRowCount="3" promptText="Décrivez brièvement les responsabilités de ce rôle..." styleClass="input" wrapText="true" />
+                    </children>
+                </VBox>
+
+                <!-- Champ : Statut Actif -->
+                <CheckBox fx:id="chkIsActive" selected="true" styleClass="remember-checkbox" text="Rôle actif dès sa création" textFill="#334155">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets top="4.0" />
+                    </VBox.margin>
+                </CheckBox>
+
+            </children>
+        </VBox>
+
+        <!-- Actions (Pied de page) -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrer"  defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Créer le rôle">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

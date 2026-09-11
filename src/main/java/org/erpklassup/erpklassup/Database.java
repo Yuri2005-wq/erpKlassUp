@@ -19,7 +19,11 @@ public class Database {
     private static final String PASSWORD = "yuriDjaleu";
 
     private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
-            + "?useSSL=false&serverTimezone=UTC&allowMultiQueries=true";
+            + "?useSSL=false&serverTimezone=Africa/Douala&allowMultiQueries=true";
+
+
+//   private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
+//            + "?useSSL=false&serverTimezone=UTC&allowMultiQueries=true";
 
     private static final HikariDataSource dataSource;
 

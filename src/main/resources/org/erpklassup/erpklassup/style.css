@@ -1428,6 +1428,69 @@
 
 /* ========================= 11. STATISTIQUES COMPACTES ========================= */
 
+
+/* ==========================================================================
+   PAGINATION PERSONNALISÉE (.custom-pagination)
+   ========================================================================== */
+
+/* Conteneur principal */
+.custom-pagination {
+    -fx-page-information-visible: false; /* Masque le texte "1 sur 10" natif */
+    -fx-padding: 0;
+}
+
+/* Zone des boutons de numéros et flèches */
+.custom-pagination .pagination-control {
+    -fx-background-color: transparent;
+    -fx-spacing: 4px;
+}
+
+/* Style de tous les boutons (chiffres + flèches) */
+.custom-pagination .pagination-control .button,
+.custom-pagination .pagination-control .number-button {
+    -fx-background-color: #F3F4F6;
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-cursor: hand;
+}
+
+/* Survol des boutons */
+.custom-pagination .pagination-control .button:hover,
+.custom-pagination .pagination-control .number-button:hover {
+    -fx-background-color: #E5E7EB;
+    -fx-text-fill: #111827;
+}
+
+/* Bouton de la page actuellement sélectionnée */
+.custom-pagination .pagination-control .number-button:selected {
+    -fx-background-color:  #F5A524; /* Bleue primaire */
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Style des flèches Précédent / Suivant */
+.custom-pagination .pagination-control .left-arrow,
+.custom-pagination .pagination-control .right-arrow {
+    -fx-background-color: #4B5563;
+    -fx-padding: 4px;
+}
+
+.custom-pagination .pagination-control .button:hover .left-arrow,
+.custom-pagination .pagination-control .button:hover .right-arrow {
+    -fx-background-color: #111827;
+}
+
+/* État désactivé (ex: première ou dernière page) */
+.custom-pagination .pagination-control .button:disabled {
+    -fx-opacity: 0.4;
+    -fx-cursor: default;
+}
 /* Mini-card statistique ultra compacte */
 .stat-card-compact {
     -fx-background-color: #FFFFFF;
@@ -1458,3 +1521,183 @@
 .stat-danger { -fx-text-fill: #E5484D; }
 .stat-warning { -fx-text-fill: #F5A524; }
 .stat-info { -fx-text-fill: #3B82F6; }
+
+
+
+
+/* ============================================================
+   À fusionner dans style.css — ne pas créer un fichier séparé,
+   sinon il faut l'ajouter aux stylesheets du FXML.
+   Basé sur les couleurs déjà utilisées dans l'app :
+     navy foncé   #111a2e / #16213A
+     accent ambre #F5A524
+     succès vert  #16A34A
+     fond clair   #F4F6FA
+   ============================================================ */
+
+/* ---------- En-tête profil ---------- */
+.user-detail-header {
+    -fx-background-color: #16213A;
+}
+
+.user-detail-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.page-subtitle-light {
+    -fx-text-fill: #8592AD;
+    -fx-font-size: 12px;
+}
+
+.online-label {
+    -fx-text-fill: #16A34A;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+.online-dot {
+    -fx-effect: dropshadow(gaussian, rgba(22,163,74,0.6), 4, 0.4, 0, 0);
+}
+
+/* ---------- TabPane : le point qui corrige le rendu gris ----------
+   Par défaut, JavaFX applique .tab-header-background et .tab avec
+   le thème Modena (gris). Il faut recibler ces sélecteurs internes,
+   pas seulement la styleClass qu'on pose sur le TabPane/Tab. */
+
+.top-tab-pane {
+    -fx-background-color: #16213A;
+    -fx-tab-min-height: 44px;
+}
+
+/* Modena empile plusieurs couches dans le header (tab-header-area,
+   headers-region, tab-header-background) et CHACUNE peut porter son
+   propre -fx-background-color. Il faut toutes les recouvrir, sinon
+   une couche grise reste visible derrière/à côté des tabs. */
+.top-tab-pane > .tab-header-area {
+    -fx-background-color: #16213A;
+    -fx-padding: 0 20 0 20;
+}
+
+.top-tab-pane > .tab-header-area > .headers-region {
+    -fx-background-color: #16213A;
+}
+
+.top-tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: #16213A, #16213A;
+    -fx-background-insets: 0, 0;
+}
+
+.top-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 12 18 12 18;
+    -fx-border-color: transparent transparent transparent transparent;
+}
+
+.top-tab-pane .tab .tab-label {
+    -fx-text-fill: #8592AD;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+}
+
+.top-tab-pane .tab:hover {
+    -fx-background-color: rgba(245,165,36,0.08);
+}
+
+.top-tab-pane .tab:hover .tab-label {
+    -fx-text-fill: #C7CEDE;
+}
+
+.top-tab-pane .tab:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #F5A524 transparent;
+    -fx-border-width: 0 0 3 0;
+}
+
+.top-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #F5A524;
+    -fx-font-weight: 700;
+}
+
+/* Supprime le focus ring bleu par défaut sur les tabs */
+.top-tab-pane .tab:selected .focus-indicator,
+.top-tab-pane .tab .focus-indicator {
+    -fx-border-width: 0;
+}
+
+/* Supprime la ligne de séparation grise sous le tab-header-area */
+.top-tab-pane > .tab-header-area > .headers-region {
+    -fx-effect: null;
+}
+
+.top-tab-pane > *.tab-content-area {
+    -fx-background-color: #F4F6FA;
+    -fx-border-width: 0;
+}
+
+/* ---------- Badge de statut (réutilise event-tag/tag-green si déjà défini,
+   sinon fallback ci-dessous) ---------- */
+.tag-green {
+    -fx-background-color: rgba(22,163,74,0.15);
+    -fx-text-fill: #16A34A;
+    -fx-background-radius: 12;
+    -fx-padding: 3 10 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+/* ---------- Stepper de la modale création de compte ---------- */
+.step-circle       { -fx-fill: #2A3B61; }
+.step-circle.active    { -fx-fill: #F5A524; }
+.step-circle.completed { -fx-fill: #16A34A; }
+
+.step-num       { -fx-text-fill: #94A3B8; -fx-font-weight: bold; -fx-font-size: 13px; }
+.step-num.active    { -fx-text-fill: #16213A; }
+.step-num.completed { -fx-text-fill: #FFFFFF; }
+
+.step-label       { -fx-text-fill: #94A3B8; -fx-font-size: 11px; -fx-font-weight: 600; }
+.step-label.active    { -fx-text-fill: #F5A524; -fx-font-weight: 800; }
+.step-label.completed { -fx-text-fill: #16A34A; }
+
+.step-connector          { -fx-background-color: #2A3B61; }
+.step-connector.completed { -fx-background-color: #F5A524; }
+
+/* ---------- Erreurs de champ (formulaire identifiants) ---------- */
+.field-error { -fx-text-fill: #E5484D; -fx-font-size: 11px; -fx-font-weight: 600; }
+
+/* ---------- Récap étape 3 : ne pas réutiliser .stat-value (trop grand) ---------- */
+.recap-value { -fx-text-fill: #16213A; -fx-font-size: 14px; -fx-font-weight: 700; }
+
+/* Style de base pour les ToggleButton */
+.toggle-switch {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-padding: 6px 16px;
+    -fx-cursor: hand;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 1px;
+}
+
+/* Effet au survol */
+.toggle-switch:hover {
+    -fx-background-color: #CBD5E1;
+}
+
+/* État ACTIF / SÉLECTIONNÉ */
+.toggle-switch:selected {
+    -fx-background-color: #16A34A;
+    -fx-text-fill: white;
+    -fx-border-color: #15803D;
+}
+
+/* Effet au survol lorsqu'il est sélectionné */
+.toggle-switch:selected:hover {
+    -fx-background-color: #15803D;
+}

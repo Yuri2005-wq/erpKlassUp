@@ -1,6 +1,5 @@
 package org.erpklassup.erpklassup.util;
 
-import atlantafx.base.theme.Styles;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,42 +8,73 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.erpklassup.erpklassup.HelloApplication;
 import org.erpklassup.erpklassup.WindowsTitleBar;
+import atlantafx.base.theme.Styles;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Utilitaires pour afficher des boîtes de dialogue / alertes personnalisées.
+ */
 public class AlertUtil {
 
-    private static final String APP_BAR_COLOR = "#16213A";
+    private static final String APP_BAR_COLOR = "#16213A"; // Couleur de la barre de titre
 
     public enum AlertType {
-        INFORMATION,
         SUCCESS,
-        WARNING,
         ERROR,
-        CONFIRMATION
+        WARNING,
+        INFO
     }
 
-    /**
-     * Affiche une alerte personnalisée avec la barre de titre stylisée.
-     */
-    public static void afficherAlerte(String titre, String message, AlertType type, Window parent) {
-        afficherBoiteDialogue(titre, message, type, parent, false);
+    // ========== MÉTHODES PUBLIQUES RACCOURCIS ==========
+
+    public static void afficherInformation(String titre, String message) {
+        afficherBoiteDialogue(titre, message, AlertType.INFO, null, false);
     }
 
-    /**
-     * Affiche une alerte de confirmation (Oui / Non) stylisée.
-     * @return true si l'utilisateur a cliqué sur le bouton de confirmation, false sinon.
-     */
+    public static void afficherInformation(String titre, String message, Window parent) {
+        afficherBoiteDialogue(titre, message, AlertType.INFO, parent, false);
+    }
+
+    public static void afficherSucces(String titre, String message) {
+        afficherBoiteDialogue(titre, message, AlertType.SUCCESS, null, false);
+    }
+
+    public static void afficherSucces(String titre, String message, Window parent) {
+        afficherBoiteDialogue(titre, message, AlertType.SUCCESS, parent, false);
+    }
+
+    public static void afficherAvertissement(String titre, String message) {
+        afficherBoiteDialogue(titre, message, AlertType.WARNING, null, false);
+    }
+
+    public static void afficherAvertissement(String titre, String message, Window parent) {
+        afficherBoiteDialogue(titre, message, AlertType.WARNING, parent, false);
+    }
+
+    public static void afficherErreur(String titre, String message) {
+        afficherBoiteDialogue(titre, message, AlertType.ERROR, null, false);
+    }
+
+    public static void afficherErreur(String titre, String message, Window parent) {
+        afficherBoiteDialogue(titre, message, AlertType.ERROR, parent, false);
+    }
+
+    public static boolean afficherConfirmation(String titre, String message) {
+        return afficherBoiteDialogue(titre, message, AlertType.WARNING, null, true);
+    }
+
     public static boolean afficherConfirmation(String titre, String message, Window parent) {
-        return afficherBoiteDialogue(titre, message, AlertType.CONFIRMATION, parent, true);
+        return afficherBoiteDialogue(titre, message, AlertType.WARNING, parent, true);
     }
+
+    // ========== CRÉATION ET AFFICHAGE DE LA BOÎTE DE DIALOGUE ==========
 
     private static boolean afficherBoiteDialogue(String titre, String message, AlertType type, Window parent, boolean estConfirmation) {
         AtomicBoolean resultatConfirmation = new AtomicBoolean(false);
@@ -57,21 +87,23 @@ public class AlertUtil {
         if (parent != null) {
             stage.initOwner(parent);
             stage.initModality(Modality.WINDOW_MODAL);
+        } else {
+            stage.initModality(Modality.APPLICATION_MODAL);
         }
 
-        // Layout Principal
+        // --- Layout Principal ---
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER_LEFT);
         root.setStyle("-fx-background-color: #ffffff;");
 
-        // Label du message
+        // --- Message ---
         Label labelMessage = new Label(message);
         labelMessage.setWrapText(true);
         labelMessage.setMaxWidth(380);
         labelMessage.setStyle("-fx-font-size: 14px; -fx-text-fill: #2c3e50;");
 
-        // Zone des Boutons
+        // --- Barre de Boutons ---
         HBox barreBoutons = new HBox(10);
         barreBoutons.setAlignment(Pos.CENTER_RIGHT);
 
@@ -95,7 +127,6 @@ public class AlertUtil {
             Button btnOk = new Button("D'accord");
             btnOk.getStyleClass().add(Styles.ACCENT);
 
-            // Adapter le style du bouton selon le type d'alerte
             if (type == AlertType.ERROR) {
                 btnOk.getStyleClass().add(Styles.DANGER);
             } else if (type == AlertType.WARNING) {
@@ -110,22 +141,24 @@ public class AlertUtil {
 
         root.getChildren().addAll(labelMessage, barreBoutons);
 
-        // Scene et Stage
         Scene scene = new Scene(root, 420, 160);
         stage.setScene(scene);
 
-        // Charger l'icône de l'application
+        // --- Icône de la fenêtre ---
         try {
             stage.getIcons().add(new Image(HelloApplication.class.getResourceAsStream("logo.png")));
         } catch (Exception ignored) {}
 
-        stage.show();
+        // ✅ APPLIQUER LA COULEUR UNE FOIS LA FENÊTRE AFFICHÉE (Active au premier plan)
+        stage.setOnShown(e -> {
+            WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
+        });
 
-        // Appliquer la couleur personnalisée à la barre de titre
-        WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
-
+        // --- Affichage ---
         if (estConfirmation) {
-            stage.showAndWait(); // Attend l'action utilisateur en mode confirmation
+            stage.showAndWait(); // Bloque l'exécution jusqu'à la fermeture
+        } else {
+            stage.show();
         }
 
         return resultatConfirmation.get();

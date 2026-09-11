@@ -1,5 +1,6 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
+import eu.hansolo.tilesfx.Command;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,13 +20,14 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import org.erpklassup.erpklassup.dto.*;
+import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.service.UtilisateurService;
-import org.erpklassup.erpklassup.util.AvatarUtil;
-import org.erpklassup.erpklassup.util.VueDisposable;
+import org.erpklassup.erpklassup.util.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
@@ -44,6 +46,8 @@ public class UtilisateursView implements Initializable, VueDisposable {
     @FXML private ComboBox<StatutCompte> filterStatut;
     @FXML private Button btnActionsGroupees;
     @FXML private Button btnAjouterUtilisateur;
+    private final AuditService auditService = new AuditService();
+
 
     @FXML private TableView<UtilisateurLigne> tableUtilisateurs;
     @FXML private TableColumn<UtilisateurLigne, Boolean> colSelect;
@@ -61,6 +65,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
     @FXML private Label statActifsLabel;
     @FXML private Label statVerrouillesLabel;
     @FXML private Label statSuspendusLabel;
+    @FXML private Pagination paginationAudit;
 
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final int TAILLE_PAGE = FiltreUtilisateur.TAILLE_PAGE_DEFAUT;
@@ -71,12 +76,14 @@ public class UtilisateursView implements Initializable, VueDisposable {
     private final Runnable ecouteurPermissions = this::appliquerControlesAcces;
 
     private String idEcoleCourante;
-    private int pageCourante = 1;
-    private int nombreTotalDePages = 1;
+    private GestionnairePagination<UtilisateurLigne> gestionnairePagination;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         idEcoleCourante = SessionManager.getInstance().getIdEcoleCourante();
+
+        // Initialisation de la classe utilitaire de pagination
+        gestionnairePagination = new GestionnairePagination<>(tableUtilisateurs, paginationAudit, TAILLE_PAGE);
 
         configurerTable();
         configurerFiltres();
@@ -101,15 +108,13 @@ public class UtilisateursView implements Initializable, VueDisposable {
     }
 
     private void appliquerControlesAcces() {
-        org.erpklassup.erpklassup.util.ControleAcces.appliquerAction(btnAjouterUtilisateur, "user.creer");
-        org.erpklassup.erpklassup.util.ControleAcces.appliquerAction(btnActionsGroupees, "user.modifier");
+        ControleAcces.appliquerAction(btnAjouterUtilisateur, "user.creer");
+        ControleAcces.appliquerAction(btnActionsGroupees, "user.activer");
+        tableUtilisateurs.refresh();
     }
-
-    // ---------- Configuration ----------
 
     private void configurerTable() {
         tableUtilisateurs.setEditable(true);
-        tableUtilisateurs.setItems(FXCollections.observableArrayList());
 
         colSelect.setCellValueFactory(data -> {
             UtilisateurLigne ligne = data.getValue();
@@ -227,7 +232,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
 
                 btnVoir.setOnAction(e -> {
                     UtilisateurLigne ligne = getItem();
-                    if (ligne != null) ouvrirFormulaire(ligne);
+                    if (ligne != null) ouvrirModalEditionUtilisateur(ligne);
                 });
 
                 btnSupprimer.setOnAction(e -> {
@@ -241,10 +246,10 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 if (vide || ligne == null) {
                     setGraphic(null);
                 } else {
-                    btnVoir.setVisible(org.erpklassup.erpklassup.util.ControleAcces.autoriseAction("user.voir"));
+                    btnVoir.setVisible(ControleAcces.autoriseAction("user.modifier"));
                     btnVoir.setManaged(btnVoir.isVisible());
 
-                    btnSupprimer.setVisible(org.erpklassup.erpklassup.util.ControleAcces.autoriseAction("user.supprimer"));
+                    btnSupprimer.setVisible(ControleAcces.autoriseAction("user.supprimer"));
                     btnSupprimer.setManaged(btnSupprimer.isVisible());
 
                     setGraphic(conteneur);
@@ -296,7 +301,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
     }
 
     private void configurerBoutonsHautNiveau() {
-        btnAjouterUtilisateur.setOnAction(e -> ouvrirFormulaire(null));
+        btnAjouterUtilisateur.setOnAction(e -> ouvrirModalCreationUtilisateur());
         btnActionsGroupees.setOnAction(this::ouvrirActionsGroupees);
     }
 
@@ -322,26 +327,20 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur)));
     }
 
-    // ---------- Recherche / listing ----------
-
     private void lancerRecherche() {
-        pageCourante = 1;
-        executerRecherche();
-    }
-
-    private void executerRecherche() {
         if (idEcoleCourante == null) return;
 
         RoleOption role = filterRole.getSelectionModel().getSelectedItem();
         StatutCompte statut = filterStatut.getSelectionModel().getSelectedItem();
 
+        // Passage de 0 ou 1 pour charger tous les éléments filtrés côté backend afin que le GestionnairePagination découpe la liste.
         FiltreUtilisateur filtre = new FiltreUtilisateur(
                 idEcoleCourante,
                 (role != null) ? role.idRole() : null,
                 statut,
                 searchField.getText(),
-                pageCourante,
-                TAILLE_PAGE
+                1,
+                Integer.MAX_VALUE
         );
 
         tableUtilisateurs.setPlaceholder(new Label("Chargement..."));
@@ -355,94 +354,83 @@ public class UtilisateursView implements Initializable, VueDisposable {
     }
 
     private void afficherResultat(ResultatPagine<UtilisateurLigne> resultat) {
-        tableUtilisateurs.setItems(FXCollections.observableArrayList(resultat.elements()));
+        List<UtilisateurLigne> liste = resultat.elements();
+
+        // Mettre à jour la TableView et le composant Pagination via le gestionnaire
+        gestionnairePagination.mettreAJourDonnees(liste);
+
         tableUtilisateurs.setPlaceholder(new Label("Aucun utilisateur trouvé"));
 
-        nombreTotalDePages = resultat.nombreDePages();
-
-        mettreAJourStatistiques(resultat.elements(), resultat.total());
+        mettreAJourStatistiques(liste, resultat.total());
         checkAllUsers.setSelected(false);
         selectionnes.clear();
     }
 
-    // ---------- Formulaire ajout / modification ----------
+    private void ouvrirModalCreationUtilisateur() {
+        String fxmlPath = "/org/erpklassup/erpklassup/view/create-user-view.fxml"; // Ajustez le chemin vers votre FXML
 
-    private void ouvrirFormulaire(UtilisateurLigne ligneExistante) {
-        boolean modification = ligneExistante != null;
+        UserCreateController ctrl = ModalUtil.ouvrirModal(
+                getClass(),
+                fxmlPath,
+                "Ajouter un utilisateur",
+                tableUtilisateurs.getScene().getWindow(),
+                850,
+                750
+        );
 
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(modification ? "Détails de l'utilisateur" : "Ajouter un utilisateur");
-        ButtonType boutonValider = new ButtonType(modification ? "Enregistrer" : "Créer", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(boutonValider, ButtonType.CANCEL);
-
-        TextField champUsername = new TextField();
-        TextField champNom = new TextField();
-        TextField champPrenom = new TextField();
-        TextField champEmail = new TextField();
-        PasswordField champMotDePasse = new PasswordField();
-        ComboBox<RoleOption> champRole = new ComboBox<>(filterRole.getItems());
-        champMotDePasse.setPromptText(modification ? "Laisser vide pour ne pas changer" : "");
-
-        if (modification) {
-            champUsername.setText(ligneExistante.username());
-            champUsername.setDisable(true);
-            champNom.setText(ligneExistante.nom());
-            champPrenom.setText(ligneExistante.prenom());
-            champEmail.setText(ligneExistante.email());
+        if (ctrl != null) {
+            ctrl.initData(this.idEcoleCourante, filterRole.getItems(), this::lancerRecherche);
         }
-
-        GridPane grille = new GridPane();
-        grille.setHgap(10); grille.setVgap(10); grille.setPadding(new Insets(16));
-        grille.addRow(0, new Label("Nom d'utilisateur"), champUsername);
-        grille.addRow(1, new Label("Nom"), champNom);
-        grille.addRow(2, new Label("Prénom"), champPrenom);
-        grille.addRow(3, new Label("Email"), champEmail);
-        if (!modification) grille.addRow(4, new Label("Mot de passe"), champMotDePasse);
-        grille.addRow(5, new Label("Rôle"), champRole);
-        dialog.getDialogPane().setContent(grille);
-
-        Node boutonNode = dialog.getDialogPane().lookupButton(boutonValider);
-        boutonNode.addEventFilter(ActionEvent.ACTION, event -> {
-            boolean invalide = champNom.getText().isBlank()
-                    || (!modification && (champUsername.getText().isBlank() || champMotDePasse.getText().isBlank()));
-            if (invalide) {
-                new Alert(Alert.AlertType.WARNING, "Champs obligatoires manquants.").showAndWait();
-                event.consume();
-            }
-        });
-
-        dialog.showAndWait().filter(b -> b == boutonValider).ifPresent(b -> {
-            if (modification) {
-                service.modifierUtilisateurAsync(ligneExistante.idUtilisateur(),
-                        champNom.getText().trim(), champPrenom.getText().trim(), champEmail.getText().trim(),
-                        () -> Platform.runLater(this::executerRecherche),
-                        erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur)));
-            } else {
-                service.creerUtilisateurAsync(idEcoleCourante, champUsername.getText().trim(), champMotDePasse.getText(),
-                        champNom.getText().trim(), champPrenom.getText().trim(), champEmail.getText().trim(),
-                        champRole.getValue() != null ? champRole.getValue().idRole() : null,
-                        () -> Platform.runLater(this::executerRecherche),
-                        erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur)));
-            }
-        });
     }
 
-    // ---------- Actions ligne ----------
+
+
+
+    private void ouvrirModalEditionUtilisateur(UtilisateurLigne ligne) {
+        if (ligne == null) return;
+
+        String fxmlPath = "/org/erpklassup/erpklassup/view/user-detail-admin-page.fxml"; // Même FXML ou un dédié
+
+        UserDetailController ctrl = ModalUtil.ouvrirModal(
+                getClass(),
+                fxmlPath,
+                "Détails de l'utilisateur",
+                tableUtilisateurs.getScene().getWindow(),
+                806,
+                668
+        );
+        if (ctrl != null) {
+            ctrl.initData(this.idEcoleCourante, ligne, this::lancerRecherche);
+        }
+    }
+
 
     private void supprimerUtilisateur(UtilisateurLigne ligne) {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
-                "Supprimer définitivement " + ligne.nomComplet() + " ?", ButtonType.YES, ButtonType.NO);
-        confirmation.showAndWait().filter(b -> b == ButtonType.YES).ifPresent(b ->
-                service.supprimerAsync(ligne.idUtilisateur(),
-                        () -> Platform.runLater(this::executerRecherche),
-                        erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur))));
-    }
+        Boolean confirmation = AlertUtil.afficherConfirmation(
+                "Supprimer Utilisateur",
+                "Supprimer définitivement " + ligne.nomComplet() + " ?",
+                tableUtilisateurs.getScene().getWindow()
+        );
 
-    // ---------- Actions par lot ----------
+        if ( confirmation ) {
+            Command lancerRecherche = this::lancerRecherche;
+            service.supprimerAsync(ligne.idUtilisateur(),
+                        () -> javafx.application.Platform.runLater(() -> {
+                            auditService.tracerActionAsync("HABILITATIONS", "SUPPRESSION_UTILISATEUR", "Utilisateur Supprimé : " + ligne.nomComplet());
+                            ToastNotification.succes((Stage) tableUtilisateurs.getScene().getWindow(), "Utilisateur Supprimé : " + ligne.nomComplet() + "avec succès.");
+                            lancerRecherche();                       }),
+                        erreur -> javafx.application.Platform.runLater(() -> {
+                            ToastNotification.erreur((Stage) tableUtilisateurs.getScene().getWindow(), "Erreur lors de la suppression l'utilisateur : " + erreur);
+                            System.out.print(erreur);
+                        }
+                        )
+            );
+        }
+    }
 
     private void ouvrirActionsGroupees(ActionEvent event) {
         if (selectionnes.isEmpty()) {
-            new Alert(Alert.AlertType.INFORMATION, "Sélectionnez au moins un utilisateur.").showAndWait();
+            AlertUtil.afficherInformation("Information", "Sélectionnez au moins un utilisateur.");
             return;
         }
 
@@ -456,12 +444,24 @@ public class UtilisateursView implements Initializable, VueDisposable {
 
         MenuItem supprimer = new MenuItem("Supprimer la sélection");
         supprimer.setOnAction(e -> {
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
-                    "Supprimer les " + selectionnes.size() + " utilisateur(s) sélectionné(s) ?", ButtonType.YES, ButtonType.NO);
-            confirmation.showAndWait().filter(b -> b == ButtonType.YES).ifPresent(b ->
-                    service.supprimerEnMasseAsync(new HashSet<>(selectionnes),
-                            () -> Platform.runLater(this::executerRecherche),
-                            erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur))));
+           boolean confirmation = AlertUtil.afficherConfirmation(
+                   "Suppression en Masse",
+                   "Supprimer les " + selectionnes.size() + " utilisateur(s) sélectionné(s) ?",
+                   tableUtilisateurs.getScene().getWindow()
+                   );
+           if (confirmation){
+               Command lancerRecherche = this::lancerRecherche;
+               service.supprimerEnMasseAsync(new HashSet<>(selectionnes),
+                       () -> javafx.application.Platform.runLater(() -> {
+                           auditService.tracerActionAsync("HABILITATIONS", "SUPPRESSION_UTILISATEUR", "Utilisateur(s) " + selectionnes + "supprimé(s)");
+                           ToastNotification.succes((Stage) tableUtilisateurs.getScene().getWindow(), "Utilisateur(s)"+ selectionnes +"Supprimé(s)");
+                           lancerRecherche();                       }),
+                       erreur -> {
+                           Platform.runLater(() -> {
+                               ToastNotification.erreur((Stage) tableUtilisateurs.getScene().getWindow(), "Erreur lors de la suppression en Masse de(s) utilisateur(s) : " + erreur);
+                           });
+                       });
+           }
         });
 
         menu.getItems().addAll(activer, desactiver, new SeparatorMenuItem(), supprimer);
@@ -475,7 +475,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
         for (String id : copiesIds) {
             service.changerStatutActifAsync(id, actif, () -> {
                 if (reste.decrementAndGet() == 0) {
-                    Platform.runLater(this::executerRecherche);
+                    Platform.runLater(this::lancerRecherche);
                 }
             }, erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur)));
         }
@@ -484,8 +484,6 @@ public class UtilisateursView implements Initializable, VueDisposable {
     private void afficherErreurDialogue(Throwable erreur) {
         new Alert(Alert.AlertType.ERROR, erreur != null && erreur.getMessage() != null ? erreur.getMessage() : "Une erreur est survenue.").showAndWait();
     }
-
-    // ---------- Gestion dynamique des statistiques ----------
 
     private void mettreAJourStatistiques(List<UtilisateurLigne> listeUtilisateurs, long totalElements) {
         if (listeUtilisateurs == null) {
@@ -540,18 +538,17 @@ public class UtilisateursView implements Initializable, VueDisposable {
     private void animerChangementStat(Label labelStat) {
         if (labelStat == null || labelStat.getParent() == null) return;
 
-        // Remontée vers la VBox conteneur de la carte
         Node carte = labelStat.getParent().getParent();
         if (carte == null) carte = labelStat.getParent();
 
         final Node conteneurCarte = carte;
         String styleOrigine = conteneurCarte.getStyle();
 
-        // Application du style temporaire orange
         conteneurCarte.setStyle(styleOrigine + "; -fx-background-color: rgba(255, 165, 0, 0.30); -fx-background-radius: 6px;");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(e -> conteneurCarte.setStyle(styleOrigine));
         pause.play();
     }
+
 }

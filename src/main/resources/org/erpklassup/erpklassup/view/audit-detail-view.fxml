@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefHeight="700" prefWidth="650" spacing="14" styleClass="card" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.AuditDetailDialogController">
+
+    <padding>
+        <Insets bottom="20" left="24" right="24" top="20" />
+    </padding>
+
+    <!-- ===== EN-TÊTE ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <StackPane styleClass="stat-icon, icon-blue">
+            <FontIcon iconLiteral="fth-file-text" iconSize="16" />
+        </StackPane>
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label styleClass="card-title" text="Détails sur l'Opération effectuée" />
+            <Label fx:id="lblIdAudit" styleClass="page-subtitle" text="ID : #" />
+        </VBox>
+
+        <!-- Actions rapides -->
+        <Button fx:id="btnCopierJson" styleClass="btn-icon-light">
+            <graphic><FontIcon iconLiteral="fth-code" iconSize="13" /></graphic>
+            <tooltip><Tooltip text="Copier le JSON brut" /></tooltip>
+        </Button>
+        <Button fx:id="btnExporterPdf" styleClass="btn-icon-light">
+            <graphic><FontIcon iconLiteral="fth-download" iconSize="13" /></graphic>
+            <tooltip><Tooltip text="Exporter en PDF" /></tooltip>
+        </Button>
+    </HBox>
+
+    <Separator />
+
+    <!-- ===== INDICATEUR DE GRAVITÉ ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="8">
+        <Label styleClass="field-label" text="Gravité :" />
+        <Label fx:id="lblGravite" styleClass="event-tag, tag-blue" text="INFO" />
+        <Label styleClass="footer-info" text="•" />
+        <Label fx:id="lblTempsEcoule" styleClass="footer-info" text="il y a 2 heures" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="lblStatutVerification" styleClass="stat-value, stat-value-success" text="✓ Vérifié" />
+    </HBox>
+
+    <Separator />
+
+    <!-- ===== INFORMATIONS PRINCIPALES ===== -->
+    <GridPane hgap="16" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" minWidth="130" prefWidth="140" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+        </columnConstraints>
+
+        <!-- Horodatage -->
+        <Label styleClass="field-label" text="Horodatage :" GridPane.rowIndex="0" />
+        <HBox alignment="CENTER_LEFT" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <FontIcon iconLiteral="fth-clock" iconSize="13" styleClass="tile-icon" />
+            <Label fx:id="lblHorodatage" styleClass="stat-value" text="—" />
+        </HBox>
+
+        <!-- Auteur -->
+        <Label styleClass="field-label" text="Auteur :" GridPane.rowIndex="1" />
+        <HBox alignment="CENTER_LEFT" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <FontIcon iconLiteral="fth-user" iconSize="13" styleClass="tile-icon" />
+            <Label fx:id="lblAuteur" styleClass="stat-value" text="—" />
+        </HBox>
+
+        <!-- Catégorie -->
+        <Label styleClass="field-label" text="Catégorie :" GridPane.rowIndex="2" />
+        <Label fx:id="lblCategorie" styleClass="event-tag, tag-orange" text="—" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- Action -->
+        <Label styleClass="field-label" text="Action :" GridPane.rowIndex="3" />
+        <Label fx:id="lblAction" styleClass="stat-value" text="—" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <!-- Adresse IP -->
+        <Label styleClass="field-label" text="Adresse IP :" GridPane.rowIndex="4" />
+        <Label fx:id="lblAdresseIp" styleClass="footer-info" text="—" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <!-- Appareil -->
+        <Label styleClass="field-label" text="Appareil :" GridPane.rowIndex="5" />
+        <Label fx:id="lblAppareil" styleClass="footer-info" text="—" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+
+    <Separator />
+
+    <!-- ===== DÉTAILS COMPLÉMENTAIRES ===== -->
+    <VBox spacing="6" VBox.vgrow="ALWAYS">
+        <Label styleClass="field-label" text="Détails complémentaires :" />
+        <TextArea fx:id="txtDetails" editable="false" prefHeight="100" promptText="Aucune donnée supplémentaire" styleClass="input" wrapText="true" />
+    </VBox>
+
+    <!-- ===== PIED DE PAGE ===== -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Label styleClass="footer-info" text="Copie conforme du journal d'audit" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnCopier" styleClass="btn-icon-light" text="Copier">
+            <graphic><FontIcon iconLiteral="fth-copy" iconSize="13" /></graphic>
+        </Button>
+        <Button fx:id="btnCloseBottom" styleClass="button-primary" text="Fermer" />
+    </HBox>
+
+</VBox>

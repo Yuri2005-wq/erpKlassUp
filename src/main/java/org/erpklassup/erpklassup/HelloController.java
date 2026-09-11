@@ -1,14 +1,12 @@
 package org.erpklassup.erpklassup;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Region;
@@ -18,7 +16,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import org.erpklassup.erpklassup.service.AuditService;
+import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.util.AlertUtil;
+import org.erpklassup.erpklassup.util.ToastNotification;
 import org.erpklassup.erpklassup.util.ViewRegistry;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -62,6 +63,8 @@ public class HelloController implements Initializable {
     @FXML private FontIcon chevronPresences;
     @FXML private FontIcon chevronNotes;
     @FXML private FontIcon chevronPaiement;
+    private final AuditService auditService = new AuditService();
+
 
     // État des sous-menus
     private final Map<String, Boolean> sousMenusState = new HashMap<>();
@@ -367,8 +370,17 @@ public class HelloController implements Initializable {
     /**
      * Gestionnaire de déconnexion utilisant AlertUtil et nettoyant le cache de navigation
      */
+
+    /**
+     * Gestionnaire de déconnexion professionnel
+     * 1. Confirme la déconnexion
+     * 2. Nettoie le ViewRegistry (cache, contrôleurs, états)
+     * 3. Termine la session (SessionManager)
+     * 4. Change de scène vers le login (même Stage)
+     * 5. Affiche un toast de confirmation
+     */
     @FXML
-    void handleLogout(ActionEvent event) {
+    void handleLogout(ActionEvent event) throws IOException {
         Window currentWindow = btnLogout.getScene().getWindow();
 
         boolean confirme = AlertUtil.afficherConfirmation(
@@ -378,19 +390,79 @@ public class HelloController implements Initializable {
         );
 
         if (confirme) {
-            // Nettoyer tous les états et réinitialiser la mémoire
-            if (viewRegistry != null) {
-                viewRegistry.toutRéinitialiser();
+            SessionManager sessionManager = SessionManager.getInstance();
+
+            // 1. Récupération sécurisée du nom avant de détruire la session
+            String nomUtilisateur = "Inconnu";
+            if (sessionManager.getUtilisateurCourant() != null) {
+                nomUtilisateur = sessionManager.getUtilisateurCourant().getNomComplet();
             }
 
-            try {
-                returnVerLogin((Stage) currentWindow);
-            } catch (IOException e) {
-                System.err.println("Erreur lors de la redirection vers l'écran de login.");
-                e.printStackTrace();
+            // 2. Traçage d'audit AVANT de terminer la session (pour avoir le contexte)
+            auditService.tracerActionAsync(
+                    "HABILITATION",
+                    "DECONNEXION_UTILISATEUR",
+                    "Utilisateur " + nomUtilisateur + " Déconnecté"
+            );
+
+            // 3. Réinitialisation des vues et fermeture de session
+            if (viewRegistry != null) {
+                viewRegistry.toutReinitialiser();
             }
+            sessionManager.terminerSession();
+
+            // 4. Redirection vers l'écran de login
+            retournerAuLogin((Stage) currentWindow);
+
+            // 5. Notification Toast sur la nouvelle scène du Stage
+            Stage stage = (Stage) currentWindow;
+            PauseTransition pause = new PauseTransition(Duration.millis(600));
+            pause.setOnFinished(e -> {
+                if (stage.isShowing()) {
+                    ToastNotification.info(
+                            stage,
+                            "Vous avez été déconnecté avec succès"
+                    );
+                }
+            });
+            pause.play();
         }
     }
+
+    /**
+     * Change la scène du Stage courant vers l'écran de login
+     * (SANS créer un nouveau Stage)
+     */
+    private void retournerAuLogin(Stage currentStage) throws IOException {
+        // Charger le FXML du login
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/login-view.fxml"));
+        Parent loginRoot = loader.load();
+
+        // Créer la nouvelle scène
+        Scene loginScene = new Scene(loginRoot, 1000, 640);
+
+        // ✅ CHANGER LA SCÈNE DU MÊME STAGE (pas de nouveau Stage)
+        currentStage.setScene(loginScene);
+        currentStage.setTitle("KlassUp - Connexion");
+        currentStage.setWidth(1000);
+        currentStage.setHeight(640);
+        currentStage.setResizable(false);
+        currentStage.centerOnScreen();
+
+        // Optionnel : réappliquer le style si nécessaire
+        // currentStage.initStyle(StageStyle.UNDECORATED);
+
+        // Afficher le login dans le MÊME Stage
+        currentStage.show();
+    }
+
+    /**
+     * Transition de déconnexion avec fondu
+     * 1. Fade OUT de la scène courante
+     * 2. Chargement du login
+     * 3. Fade IN de la nouvelle scène
+     */
+
 
     // ===== MÉTHODE UTILITAIRE POUR CHARGER LES PAGES =====
 
@@ -413,24 +485,5 @@ public class HelloController implements Initializable {
             }
             currentActiveButton = activeButton;
         }
-    }
-
-    private void returnVerLogin(Stage currentStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/login-view.fxml"));
-        Scene mainScene = new Scene(loader.load(), 1000, 640);
-
-        Stage loginStage = new Stage();
-        try {
-            loginStage.getIcons().add(new javafx.scene.image.Image(HelloApplication.class.getResourceAsStream("logo.png")));
-        } catch (Exception ignored) {}
-
-        loginStage.setTitle("KlassUp");
-        loginStage.setScene(mainScene);
-        loginStage.initStyle(StageStyle.UNDECORATED);
-        loginStage.setWidth(1000);
-        loginStage.setHeight(640);
-
-        currentStage.close();
-        loginStage.show();
     }
 }

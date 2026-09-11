@@ -1,22 +1,35 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import javafx.stage.Window;
+import javafx.util.Duration;
+import org.erpklassup.erpklassup.controllers.actionPage.RoleModalController;
+import org.erpklassup.erpklassup.dto.AuditLigne;
 import org.erpklassup.erpklassup.dto.PermissionOption;
 import org.erpklassup.erpklassup.dto.RoleOption;
+import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.RoleService;
 import org.erpklassup.erpklassup.service.SessionManager;
+import org.erpklassup.erpklassup.util.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class RolesPermissionsTabController implements Initializable {
+public class RolesPermissionsTabController implements Initializable, VueDisposable {
 
     @FXML private ListView<RoleOption> listRoles;
     @FXML private Button btnNouveauRole;
@@ -30,12 +43,15 @@ public class RolesPermissionsTabController implements Initializable {
     @FXML private Button btnEnregistrerPermissions;
 
     private final RoleService service = new RoleService();
+    private final AuditService auditService = new AuditService();
+
     private final Map<String, CheckBox> casesParIdPermission = new LinkedHashMap<>();
+    private final Runnable ecouteurPermissions = this::appliquerControlesAcces;
 
     private RoleOption roleSelectionne;
     private boolean enChargement = false;
-
-    private String idEcoleCourante;
+    private SessionManager session = SessionManager.getInstance();
+    private String idEcoleCourante = session.getIdEcoleCourante();
     private String idUtilisateurConnecte;
 
     @Override
@@ -52,18 +68,31 @@ public class RolesPermissionsTabController implements Initializable {
         btnNouveauRole.setOnAction(e -> creerNouveauRole());
         btnRenommerRole.setOnAction(e -> renommerRoleSelectionne());
         btnSupprimerRole.setOnAction(e -> supprimerRoleSelectionne());
+
+        // Action d'enregistrement des permissions
         btnEnregistrerPermissions.setOnAction(e -> enregistrerPermissions());
         btnAnnulerPermissions.setOnAction(e -> { if (roleSelectionne != null) chargerRole(roleSelectionne); });
 
+        // Inscription au bus d'événements de permissions
+        SessionManager.getInstance().ecouterChangementsPermissions(ecouteurPermissions);
+        appliquerControlesAcces();
+
         chargerPermissionsDisponibles();
-        rafraichirContexte(); // capture le contexte au chargement initial (cas où la vue n'est pas mise en cache)
+        rafraichirContexte();
     }
 
-    /**
-     * À appeler à chaque fois que cet onglet redevient visible (depuis ta navigation /
-     * ton système de cache de vues), pour reprendre l'idEcole et l'utilisateur courants
-     * — indispensable si le contrôleur est instancié UNE SEULE FOIS avant la connexion.
-     */
+    @Override
+    public void disposer() {
+        SessionManager.getInstance().arreterEcoute(ecouteurPermissions);
+    }
+
+    private void appliquerControlesAcces() {
+        ControleAcces.appliquerAction(btnNouveauRole, "role.creer");
+        ControleAcces.appliquerAction(btnRenommerRole, "role.renommer");
+        ControleAcces.appliquerAction(btnSupprimerRole, "role.supprimer");
+        ControleAcces.appliquerAction(btnEnregistrerPermissions, "role.modifier");
+    }
+
     public void rafraichirContexte() {
         SessionManager session = SessionManager.getInstance();
         this.idEcoleCourante = session.getIdEcoleCourante();
@@ -72,7 +101,7 @@ public class RolesPermissionsTabController implements Initializable {
 
         if (idEcoleCourante == null) {
             listRoles.setItems(FXCollections.observableArrayList());
-            listRoles.setPlaceholder(new Label("Aucune école active — connectez-vous d'abord."));
+            listRoles.setPlaceholder(new Label("Aucune école active, connectez-vous d'abord."));
             activerPanneauDroit(false);
             return;
         }
@@ -104,7 +133,7 @@ public class RolesPermissionsTabController implements Initializable {
                     listRoles.setItems(FXCollections.observableArrayList(roles));
                     listRoles.setPlaceholder(new Label("Aucun rôle pour cette école — créez-en un."));
                     if (!roles.isEmpty()) {
-                        listRoles.getSelectionModel().selectFirst(); // active le panneau automatiquement
+                        listRoles.getSelectionModel().selectFirst();
                     }
                 }),
                 erreur -> Platform.runLater(erreur::printStackTrace));
@@ -181,59 +210,113 @@ public class RolesPermissionsTabController implements Initializable {
         labelModificationsNonEnregistrees.setText("Modifications non enregistrées");
     }
 
+    /**
+     * Enregistre les permissions sélectionnées pour le rôle courant.
+     */
     private void enregistrerPermissions() {
         if (roleSelectionne == null) return;
         Set<String> idsCoches = new HashSet<>();
         casesParIdPermission.forEach((id, c) -> { if (c.isSelected()) idsCoches.add(id); });
 
+        Stage stage = StageHelper.getStage(btnEnregistrerPermissions);
         btnEnregistrerPermissions.setDisable(true);
+
         service.enregistrerPermissionsAsync(roleSelectionne.idRole(), idEcoleCourante, idsCoches, idUtilisateurConnecte,
                 () -> Platform.runLater(() -> {
                     labelModificationsNonEnregistrees.setText("Enregistré ✓");
                     btnEnregistrerPermissions.setDisable(false);
+
+                    auditService.tracerActionAsync(
+                            "HABILITATIONS",
+                            "MODIFICATION_PERMISSIONS",
+                            "Mise à jour des permissions du rôle : " + roleSelectionne.nomRole() + " (" + idsCoches.size() + " autorisations octroyées)"
+                    );
+
+                    ToastNotification.succes(stage, "Permissions enregistrées avec succès !");
                 }),
                 erreur -> Platform.runLater(() -> {
                     btnEnregistrerPermissions.setDisable(false);
-                    new Alert(Alert.AlertType.ERROR, "Échec de l'enregistrement des droits.").showAndWait();
+                    ToastNotification.erreur(stage, "Échec de l'enregistrement des permissions.");
                 }));
     }
 
+    /**
+     * Ouvre la modale FXML pour la création d'un rôle.
+     */
+    // ✅ DANS RolesPermissionsTabController.java
     private void creerNouveauRole() {
-        if (idEcoleCourante == null) {
-            new Alert(Alert.AlertType.WARNING, "Aucune école active. Reconnectez-vous.").showAndWait();
+        // Force la récupération directe de l'ID d'école actuel
+        String ecoleId = SessionManager.getInstance().getIdEcoleCourante();
+
+        if (ecoleId == null || ecoleId.isBlank()) {
+            Stage stage = StageHelper.getStage(btnNouveauRole);
+            ToastNotification.avertissement(stage, "Aucune école active. Veuillez vous reconnecter.");
             return;
         }
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nouveau rôle");
-        dialog.setHeaderText("Nom du nouveau rôle");
-        dialog.setContentText("Nom :");
-        dialog.showAndWait().filter(nom -> !nom.isBlank()).ifPresent(nom ->
-                service.creerRoleAsync(idEcoleCourante, nom.trim(), null,
-                        roleCree -> Platform.runLater(this::chargerRoles),
-                        erreur -> Platform.runLater(() -> new Alert(Alert.AlertType.ERROR,
-                                "Impossible de créer le rôle (nom déjà utilisé ?)").showAndWait())));
+
+        String fxmlPath = "/org/erpklassup/erpklassup/view/creer-role-view.fxml";
+        RoleModalController controller = ModalUtil.ouvrirModal(
+                getClass(),
+                fxmlPath,
+                "Créer un rôle",
+                btnNouveauRole.getScene().getWindow(),
+                480,
+                396.8
+        );
+        if (controller != null) {
+            controller.initCreation(ecoleId, this::chargerRoles);
+        }
     }
 
+    /**
+     * Ouvre la modale FXML pour la modification/renommage du rôle sélectionné.
+     */
     private void renommerRoleSelectionne() {
-        if (roleSelectionne == null) return;
-        TextInputDialog dialog = new TextInputDialog(roleSelectionne.nomRole());
-        dialog.setTitle("Renommer le rôle");
-        dialog.setHeaderText("Nouveau nom du rôle");
-        dialog.setContentText("Nom :");
-        dialog.showAndWait().filter(nom -> !nom.isBlank()).ifPresent(nom ->
-                service.renommerRoleAsync(roleSelectionne.idRole(), nom.trim(), roleSelectionne.description(),
-                        () -> Platform.runLater(this::chargerRoles),
-                        erreur -> Platform.runLater(erreur::printStackTrace)));
+
+        String fxmlPath = "/org/erpklassup/erpklassup/view/creer-role-view.fxml";
+        RoleModalController controller = ModalUtil.ouvrirModal(
+                getClass(),
+                fxmlPath,
+                "Modifier un rôle",
+                btnNouveauRole.getScene().getWindow(),
+                480,
+                396.8
+        );
+        if (controller != null) {
+            controller.initEdition(idEcoleCourante, roleSelectionne, this::chargerRoles);
+            System.out.println(idEcoleCourante);
+        }
     }
 
+    /**
+     * Supprime le rôle actuellement sélectionné.
+     */
     private void supprimerRoleSelectionne() {
         if (roleSelectionne == null) return;
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
-                "Supprimer le rôle \"" + roleSelectionne.nomRole() + "\" ? Les utilisateurs concernés perdront cet accès.",
-                ButtonType.YES, ButtonType.NO);
-        confirmation.showAndWait().filter(b -> b == ButtonType.YES).ifPresent(b ->
-                service.supprimerRoleAsync(roleSelectionne.idRole(),
-                        () -> Platform.runLater(() -> { roleSelectionne = null; chargerRoles(); activerPanneauDroit(false); }),
-                        erreur -> Platform.runLater(erreur::printStackTrace)));
+        Stage stage = StageHelper.getStage(btnSupprimerRole);
+
+        boolean confirme = AlertUtil.afficherConfirmation(
+                "Supprimer Role",
+                "Supprimer le rôle \"" + roleSelectionne.nomRole() + "\" ? Les utilisateurs concernés perdront cet accès." ,              stage
+        );
+        if (confirme) {
+            String nomRoleSupprime = roleSelectionne.nomRole();
+
+            service.supprimerRoleAsync(roleSelectionne.idRole(),
+                    () -> Platform.runLater(() -> {
+                        roleSelectionne = null;
+                        chargerRoles();
+                        activerPanneauDroit(false);
+
+                        auditService.tracerActionAsync(
+                                "HABILITATIONS",
+                                "SUPPRESSION_ROLE",
+                                "Suppression du rôle : " + nomRoleSupprime
+                        );
+
+                        ToastNotification.succes(stage, "Le rôle \"" + nomRoleSupprime + "\" a été supprimé.");
+                    }),
+                    erreur -> Platform.runLater(() -> ToastNotification.erreur(stage, "Erreur lors de la suppression du rôle.")));
+        };
+        }
     }
-}

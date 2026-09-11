@@ -114,7 +114,7 @@ public class ViewRegistry {
     /**
      * Vide complètement la mémoire (utile lors d'un logout)
      */
-    public void toutRéinitialiser() {
+    public void toutReinitialiser() {
         controllerCache.values().forEach(c -> {
             if (c instanceof VueDisposable d) d.disposer();
         });

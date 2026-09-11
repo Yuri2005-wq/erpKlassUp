@@ -262,19 +262,29 @@ public class UtilisateurDAO {
 
         long total = compterUtilisateurs(clause.toString(), parametres);
 
+        // Dans UtilisateurDAO.java (méthode rechercherPagine)
+
         String sqlPage = """
-            SELECT u.idUtilisateur, u.username, u.nom, u.prenom, u.email, u.telephone,
-                   u.estActif, u.compteVerrouille, u.deuxFacteursActive,
-                   (SELECT GROUP_CONCAT(DISTINCT r.nomRole ORDER BY r.nomRole SEPARATOR ', ')
-                      FROM UtilisateurRole ur INNER JOIN Role r ON r.idRole = ur.idRole
-                      WHERE ur.idUtilisateur = u.idUtilisateur AND ur.estActive = 1) AS roles,
-                   (SELECT MAX(s.dateDerniereActivite) FROM SessionUtilisateur s
-                      WHERE s.idUtilisateur = u.idUtilisateur) AS derniereConnexion,
-                   COALESCE(
-                       (SELECT p.photo FROM Personnel p WHERE p.idUtilisateur = u.idUtilisateur AND p.deleted_at IS NULL LIMIT 1),
-                       (SELECT el.photoPath FROM Eleve el WHERE el.idUtilisateur = u.idUtilisateur AND el.deleted_at IS NULL LIMIT 1)
-                   ) AS photoPath
-            """ + clause + " ORDER BY u.nom, u.prenom LIMIT ? OFFSET ?";
+    SELECT u.idUtilisateur, u.username, u.nom, u.prenom, u.email, u.telephone,
+           u.estActif, u.compteVerrouille, u.deuxFacteursActive,
+           (SELECT GROUP_CONCAT(DISTINCT r.nomRole ORDER BY r.nomRole SEPARATOR ', ')
+              FROM UtilisateurRole ur INNER JOIN Role r ON r.idRole = ur.idRole
+              WHERE ur.idUtilisateur = u.idUtilisateur AND ur.estActive = 1) AS roles,
+           (SELECT MAX(s.dateDerniereActivite) FROM SessionUtilisateur s
+              WHERE s.idUtilisateur = u.idUtilisateur) AS derniereConnexion,
+           EXISTS (
+              SELECT 1 FROM SessionUtilisateur s
+              WHERE s.idUtilisateur = u.idUtilisateur
+                AND s.estRevoque = 0
+                AND s.dateDeconnexion IS NULL
+                AND s.dateExpirationRefresh > NOW()
+                AND s.dateDerniereActivite >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+           ) AS estEnLigne,
+           COALESCE(
+               (SELECT p.photo FROM Personnel p WHERE p.idUtilisateur = u.idUtilisateur AND p.deleted_at IS NULL LIMIT 1),
+               (SELECT el.photoPath FROM Eleve el WHERE el.idUtilisateur = u.idUtilisateur AND el.deleted_at IS NULL LIMIT 1)
+           ) AS photoPath
+    """ + clause + " ORDER BY u.nom, u.prenom LIMIT ? OFFSET ?";
 
         List<UtilisateurLigne> lignes = new ArrayList<>();
 

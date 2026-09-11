@@ -1,47 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox spacing="15" styleClass="content-area" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.RoleListController">
+<VBox spacing="14.0" styleClass="card" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.JournalAuditTabController">
 
     <padding>
-        <Insets bottom="20" left="20" right="20" top="20" />
+        <Insets bottom="0.0" left="0.0" right="0.0" top="0.0" />
     </padding>
 
-    <!-- ===== EN-TÊTE ===== -->
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <VBox spacing="3">
-            <Label styleClass="page-title" text="Gestion des Rôles" />
-            <Label styleClass="page-subtitle" text="Créez et gérez les rôles et leurs permissions" />
-        </VBox>
-        <Region HBox.hgrow="ALWAYS" />
-        <Button fx:id="btnNouveauRole" onAction="#handleNouveauRole" styleClass="button-primary" text="Nouveau rôle">
-            <graphic>
-                <FontIcon iconLiteral="fth-plus-circle" iconSize="16" />
-            </graphic>
-        </Button>
+    <!-- ===== Filtres du journal ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="page-toolbar">
+        <children>
+            <!-- Barre de recherche -->
+            <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
+                <TextField fx:id="searchAudit" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <!-- Filtres de date -->
+            <DatePicker fx:id="datePickerDebut" promptText="Du" styleClass="date-picker-custom" />
+            <DatePicker fx:id="datePickerFin" promptText="Au" styleClass="date-picker-custom" />
+
+            <!-- Type d'action -->
+            <ComboBox fx:id="filterTypeAction" maxWidth="180.0" prefWidth="180.0" promptText="Type d'action" styleClass="filter-combo" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Bouton export -->
+            <Button fx:id="btnExporterAudit" styleClass="btn-secondary" text="Exporter">
+                <graphic>
+                    <FontIcon iconLiteral="fth-download" iconSize="14" styleClass="btn-icon" />
+                </graphic>
+            </Button>
+        </children>
     </HBox>
 
-    <!-- ===== TABLEAU ===== -->
-    <TableView fx:id="roleTable" styleClass="custom-table" VBox.vgrow="ALWAYS">
+    <!-- ===== Cartes de statistiques ===== -->
+    <HBox alignment="CENTER_LEFT" spacing="6">
+        <!-- Card Total -->
+        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER" spacing="6">
+                <FontIcon iconLiteral="fth-activity" iconSize="14" style="-fx-icon-color: #2563EB;" />
+                <Label fx:id="statTotalLabel" styleClass="stat-number" text="0" />
+            </HBox>
+            <Label styleClass="stat-card-label" text="TOTAL ÉVÉNEMENTS" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
+        </VBox>
+
+        <!-- Card Réussite / Connectés -->
+        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER" spacing="6">
+                <FontIcon iconLiteral="fth-check-circle" iconSize="14" style="-fx-icon-color: #16A34A;" />
+                <Label fx:id="statConnectesLabel" styleClass="stat-number, stat-success" text="0" />
+            </HBox>
+            <Label styleClass="stat-card-label" text="SUCCÈS" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
+        </VBox>
+
+        <!-- Card Suspendus / Alertes -->
+        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER" spacing="6">
+                <FontIcon iconLiteral="fth-alert-triangle" iconSize="14" style="-fx-icon-color: #DC2626;" />
+                <Label fx:id="statSuspendusLabel" styleClass="stat-number, stat-danger" text="0" />
+            </HBox>
+            <Label styleClass="stat-card-label" text="ALERTES &amp; ERREURS" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
+        </VBox>
+    </HBox>
+
+    <!-- ===== Tableau du journal ===== -->
+    <TableView fx:id="tableAudit" editable="false" styleClass="custom-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colIcon" prefWidth="50" resizable="false" text="" />
-            <TableColumn fx:id="colNomRole" prefWidth="200" text="NOM DU RÔLE" />
-            <TableColumn fx:id="colDescription" prefWidth="300" text="DESCRIPTION" />
-            <TableColumn fx:id="colNbPermissions" prefWidth="120" text="PERMISSIONS" />
-            <TableColumn fx:id="colStatut" prefWidth="100" text="STATUT" />
-            <TableColumn fx:id="colActions" prefWidth="60" resizable="false" text="" />
+            <TableColumn fx:id="colHorodatage" minWidth="160.0" prefWidth="170.0" styleClass="table-column-header" text="Horodatage" />
+            <TableColumn fx:id="colAuteur" minWidth="140.0" prefWidth="160.0" styleClass="table-column-header" text="Auteur" />
+            <TableColumn fx:id="colAction" minWidth="320.0" prefWidth="420.0" styleClass="table-column-header" text="Action" />
+            <TableColumn fx:id="colAdresseIp" minWidth="120.0" prefWidth="130.0" styleClass="table-column-header" text="Adresse IP" />
+            <TableColumn fx:id="colAppareil" minWidth="140.0" prefWidth="160.0" styleClass="table-column-header" text="Appareil" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_LAST_COLUMN" />
+        </columnResizePolicy>
         <placeholder>
-            <Label styleClass="table-placeholder" text="Aucun rôle trouvé" />
+            <Label styleClass="table-placeholder" text="Aucun enregistrement dans le journal d'audit" />
         </placeholder>
     </TableView>
+
+    <!-- Note de bas de page & Pagination -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <children>
+            <Label styleClass="audit-note" text="🔒 Ce journal est en lecture seule à des fins de conformité et de sécurité." />
+            <Region HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="paginationAudit" maxPageIndicatorCount="5" pageCount="1" styleClass="custom-pagination" />
+        </children>
+        <padding>
+            <Insets bottom="5.0" top="5.0" />
+        </padding>
+    </HBox>
+
 </VBox>
