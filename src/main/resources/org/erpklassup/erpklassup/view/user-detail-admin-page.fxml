@@ -203,7 +203,7 @@
                                         </VBox>
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="Double authentification (2FA)" />
-                                            <ToggleButton fx:id="toggle2FA" styleClass="toggle-switch" text="Désactivé" />
+                                            <ToggleButton onAction="#handleActiver2FA" fx:id="toggle2FA" styleClass="toggle-switch" text="Désactivé" />
                                         </VBox>
                                     </HBox>
                                     <Separator />

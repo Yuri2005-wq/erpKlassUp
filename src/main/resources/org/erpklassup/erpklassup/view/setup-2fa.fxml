@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.Setup2FAController"
+      spacing="14"
+      alignment="CENTER"
+      prefWidth="480"
+      prefHeight="620"
+      style="-fx-background-color: white; -fx-padding: 30;">
+
+    <Label text="Configuration 2FA"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #16213A;"/>
+
+    <Label text="Scannez ce QR code avec Google Authenticator, Authy ou Microsoft Authenticator."
+           wrapText="true"
+           maxWidth="380"
+           style="-fx-font-size: 12px; -fx-text-fill: #555; -fx-text-alignment: center;"/>
+
+    <ImageView fx:id="qrCodeView"
+               fitWidth="200"
+               fitHeight="200"
+               preserveRatio="true"/>
+
+    <Label text="Ou saisissez ce code manuellement :"
+           style="-fx-font-size: 11px; -fx-text-fill: #777;"/>
+
+    <Label fx:id="secretLabel"
+           wrapText="true"
+           maxWidth="380"
+           style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #16213A; -fx-font-family: 'Consolas', monospace;"/>
+
+    <Label text="Saisissez le code à 6 chiffres affiché par l'application :"
+           wrapText="true"
+           maxWidth="380"
+           style="-fx-font-size: 12px; -fx-padding: 8 0 0 0;"/>
+
+    <TextField fx:id="codeField"
+               promptText="000000"
+               maxWidth="180"
+               style="-fx-font-size: 18px; -fx-alignment: center;"/>
+
+    <Label fx:id="errorLabel"
+           wrapText="true"
+           maxWidth="380"
+           visible="false"
+           managed="false"
+           style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Valider et activer"
+                onAction="#handleValider"
+                style="-fx-background-color: #F5A524; -fx-text-fill: #16213A; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6;"/>
+    </HBox>
+
+    <VBox.margin>
+        <Insets top="10"/>
+    </VBox.margin>
+</VBox>

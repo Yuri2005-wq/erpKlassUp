@@ -10,6 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.erpklassup.erpklassup.dao.SessionUtilisateurDAO;
+import org.erpklassup.erpklassup.service.SessionManager;
 
 import java.io.IOException;
 
@@ -51,6 +53,15 @@ public class HelloApplication extends Application {
         // ✅ On ne révèle la fenêtre qu'une fois la couleur déjà appliquée :
         // plus aucun flash de barre de titre blanche.
         stage.setOpacity(1);
+        stage.setOnCloseRequest(event -> {
+            SessionManager sessionManager = SessionManager.getInstance();
+            if (sessionManager.estConnecte()) {
+                String idSession = sessionManager.getIdSessionCourante();
+                if (idSession != null) {
+                    new SessionUtilisateurDAO().InvaliderSession(idSession, "CLOSE_APP");
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {

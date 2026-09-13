@@ -2,17 +2,18 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -21,218 +22,284 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controller.UserDetailAdminController">
+<StackPane prefHeight="670.0" prefWidth="804.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserProfileController">
 
-    <VBox style="-fx-background-color: #F4F6FA;">
-        <children>
+    <VBox style="-fx-background-color: #111a2e;">
 
-            <!-- ===== EN-TÊTE PROFIL (Avatar + Infos + Badge) ===== -->
-            <HBox alignment="CENTER_LEFT" spacing="15" styleClass="user-detail-header">
-                <padding><Insets bottom="18" left="24" right="24" top="18" /></padding>
+        <!-- ===== EN-TÊTE PROFIL ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
+            <StackPane>
+                <Circle fill="#F5A524" radius="28" />
+                <Label fx:id="avatarLabel" style="-fx-text-fill: #16213A; -fx-font-size: 16px; -fx-font-weight: bold;" text="MK" />
+            </StackPane>
+            <VBox spacing="3">
+                <Label fx:id="nomCompletLabel" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="KAMDEM Marie" />
+                <Label fx:id="usernameLabel" styleClass="page-subtitle" text="mkamdem" />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="badgeStatut" styleClass="event-tag, tag-green" text="● Actif" />
+        </HBox>
 
-                <StackPane>
-                    <Circle fill="#F5A524" radius="30" />
-                    <Label fx:id="avatarLabel" style="-fx-text-fill: #16213A; -fx-font-size: 16px; -fx-font-weight: bold;" text="TK" />
-                    <Circle fx:id="enLigneDot" fill="#16A34A" radius="6" styleClass="online-dot" StackPane.alignment="BOTTOM_RIGHT" />
-                </StackPane>
+        <!-- ===== TABPANE ===== -->
+        <TabPane fx:id="tabPane" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
-                <VBox spacing="4" HBox.hgrow="ALWAYS">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label fx:id="nomCompletLabel" styleClass="user-detail-title" text="TCHOUA Sandrine" />
-                        <Label fx:id="badgeStatut" styleClass="event-tag, tag-green" text="Actif" />
-                    </HBox>
-                    <Label fx:id="usernameLabel" styleClass="page-subtitle-light" text="@admin" />
-                    <HBox alignment="CENTER_LEFT" spacing="6">
-                        <Circle fill="#16A34A" radius="4" />
-                        <Label fx:id="statusConnexionLabel" styleClass="online-label" text="En ligne" />
-                    </HBox>
-                </VBox>
-            </HBox>
+            <!-- ===== ONGLET 1 : MES INFORMATIONS ===== -->
+            <Tab closable="false" styleClass="top-tab-btn" text="Mes informations">
+                <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <content>
+                        <VBox maxWidth="800" spacing="20" styleClass="content-area">
+                            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-            <!-- ===== TABPANE ===== -->
-            <TabPane fx:id="tabPane" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                            <!-- Section : Informations personnelles -->
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Informations personnelles" />
+                                </HBox>
 
-                <!-- ===== ONGLET 1 : RÔLES & PERMISSIONS ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Rôles &amp; Permissions">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
-                        <content>
-                            <VBox maxWidth="850" spacing="16" styleClass="content-area">
-                                <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+                                <HBox spacing="15">
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Nom" />
+                                        <TextField fx:id="nomField" styleClass="input" />
+                                    </VBox>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Prénom" />
+                                        <TextField fx:id="prenomField" styleClass="input" />
+                                    </VBox>
+                                </HBox>
 
-                                <VBox spacing="12" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Rôles de l'utilisateur" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="roleCountLabel" styleClass="footer-info" text="0 sélectionné(s)" />
-                                    </HBox>
+                                <HBox spacing="15">
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Email" />
+                                        <TextField fx:id="emailField" styleClass="input" />
+                                    </VBox>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Téléphone" />
+                                        <TextField fx:id="telephoneField" styleClass="input" />
+                                    </VBox>
+                                </HBox>
 
-                                    <Label styleClass="field-label" text="Cochez les rôles à assigner (déjà cochés = déjà attribués) :" />
+                                <HBox spacing="15">
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Langue préférée" />
+                                        <ComboBox fx:id="langueCombo" maxWidth="Infinity" styleClass="combo-box" />
+                                    </VBox>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="field-label" text="Fuseau horaire" />
+                                        <ComboBox fx:id="fuseauCombo" maxWidth="Infinity" styleClass="combo-box" />
+                                    </VBox>
+                                </HBox>
+                            </VBox>
 
-                                    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-box-light">
-                                        <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-                                        <TextField fx:id="searchRoleField" promptText="Rechercher un rôle..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
-                                    </HBox>
+                            <!-- Section : Rôles (lecture seule) -->
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Mes rôles et accès" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label styleClass="footer-info" text="Lecture seule" />
+                                </HBox>
 
-                                    <ScrollPane fitToWidth="true" prefHeight="180" styleClass="page-scroll">
-                                        <content>
-                                            <FlowPane fx:id="rolesFlowPane" hgap="10" prefWrapLength="750" vgap="10" />
-                                        </content>
-                                    </ScrollPane>
+                                <FlowPane fx:id="rolesFlowPane" hgap="10" prefWrapLength="700" vgap="10" />
+
+                                <Label styleClass="footer-info" text="Ces informations sont gérées par l'administrateur. Contactez-le pour toute modification." wrapText="true" />
+                            </VBox>
+
+                            <HBox alignment="CENTER_RIGHT" spacing="10">
+                                <Button fx:id="btnAnnulerInfo" styleClass="btn-icon-light" text="Annuler" />
+                                <Button fx:id="btnEnregistrerInfo" styleClass="button-primary" text="Enregistrer les modifications">
+                                    <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+                                </Button>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ===== ONGLET 2 : SÉCURITÉ ===== -->
+            <Tab closable="false" styleClass="top-tab-btn" text="Sécurité">
+                <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <content>
+                        <VBox maxWidth="800" spacing="20" styleClass="content-area">
+                            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+
+                            <!-- Section : Changer mot de passe -->
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Changer mon mot de passe" />
+                                </HBox>
+
+                                <VBox spacing="6">
+                                    <Label styleClass="field-label" text="Mot de passe actuel *" />
+                                    <PasswordField fx:id="ancienMdpField" promptText="Saisissez votre mot de passe actuel" styleClass="input" />
                                 </VBox>
 
-                                <VBox spacing="12" styleClass="card">
+                                <VBox spacing="6">
+                                    <Label styleClass="field-label" text="Nouveau mot de passe *" />
                                     <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Permissions d'exception" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="permCountLabel" styleClass="footer-info" text="0 sélectionnée(s)" />
+                                        <PasswordField fx:id="nouveauMdpField" promptText="Minimum 8 caractères" styleClass="input" HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnTogglePassword" styleClass="btn-icon-light">
+                                            <graphic><FontIcon iconLiteral="fth-eye" iconSize="14" /></graphic>
+                                        </Button>
                                     </HBox>
-
-                                    <Label styleClass="field-label" text="Cochez les permissions supplémentaires (déjà cochées = déjà attribuées) :" />
-
-                                    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-box-light">
-                                        <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-                                        <TextField fx:id="searchPermissionField" promptText="Rechercher une permission..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                        <Label styleClass="footer-info" text="Force :" />
+                                        <Label fx:id="forceMdpLabel" style="-fx-font-weight: bold;" text="—" />
+                                        <ProgressBar fx:id="forceMdpProgress" prefHeight="6" prefWidth="150" styleClass="kpi-progress" visible="false" />
                                     </HBox>
+                                </VBox>
 
-                                    <ScrollPane fitToWidth="true" prefHeight="220" styleClass="page-scroll">
-                                        <content>
-                                            <VBox fx:id="permissionsContainer" spacing="5" />
-                                        </content>
-                                    </ScrollPane>
+                                <VBox spacing="6">
+                                    <Label styleClass="field-label" text="Confirmer le nouveau mot de passe *" />
+                                    <PasswordField fx:id="confirmMdpField" promptText="Retapez le nouveau mot de passe" styleClass="input" />
                                 </VBox>
 
                                 <HBox alignment="CENTER_RIGHT">
-                                    <Button fx:id="btnEnregistrerRolesPermissions" styleClass="button-primary" text="Enregistrer les modifications">
-                                        <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+                                    <Button fx:id="btnChangerMdp" styleClass="button-primary" text="Changer le mot de passe">
+                                        <graphic><FontIcon iconLiteral="fth-key" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
                             </VBox>
-                        </content>
-                    </ScrollPane>
-                </Tab>
 
-                <!-- ===== ONGLET 2 : INFORMATIONS PERSONNELLES ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Informations">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
-                        <content>
-                            <VBox maxWidth="850" spacing="16" styleClass="content-area">
-                                <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+                            <!-- Section : Double authentification (2FA Workflow) -->
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Double authentification (2FA)" />
+                                </HBox>
 
-                                <VBox spacing="15" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Informations personnelles" />
-                                    </HBox>
+                                <!-- 1. ETAT : NON ACTIVÉ -->
+                                <HBox fx:id="box2FADesactive" alignment="CENTER_LEFT" spacing="20">
+                                    <VBox spacing="5">
+                                        <Label styleClass="field-label" text="Statut 2FA" />
+                                        <Label fx:id="statut2FALabel" style="-fx-font-weight: bold; -fx-text-fill: #94A3B8;" text="Non activée" />
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="btnActiver2FA" styleClass="btn-icon-light" text="Activer la 2FA">
+                                        <graphic><FontIcon iconLiteral="fth-shield" iconSize="14" /></graphic>
+                                    </Button>
+                                </HBox>
 
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Nom *" />
-                                            <TextField fx:id="nomField" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Prénom" />
-                                            <TextField fx:id="prenomField" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Username *" />
-                                            <TextField fx:id="usernameField" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Email *" />
-                                            <TextField fx:id="emailField" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <HBox spacing="15">
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Téléphone" />
-                                            <TextField fx:id="telephoneField" styleClass="input" />
-                                        </VBox>
-                                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Type d'utilisateur" />
-                                            <ComboBox fx:id="typeUserCombo" maxWidth="Infinity" styleClass="input" />
-                                        </VBox>
-                                    </HBox>
-
-                                    <Separator />
+                                <!-- 2. WORKFLOW D'ACTIVATION (Masqué par défaut) -->
+                                <VBox fx:id="boxConfiguration2FA" managed="false" visible="false" spacing="15" style="-fx-background-color: #0d1527; -fx-padding: 15; -fx-background-radius: 8;">
+                                    <Label styleClass="field-label" text="1. Scannez le QR Code avec votre application (Google/Microsoft Authenticator) :" />
 
                                     <HBox alignment="CENTER_LEFT" spacing="20">
-                                        <VBox spacing="5">
-                                            <Label styleClass="field-label" text="Compte actif" />
-                                            <ToggleButton fx:id="toggleActif" styleClass="custom-toggle-button" text="Actif" />
-                                        </VBox>
-                                        <VBox spacing="5">
-                                            <Label styleClass="field-label" text="Double authentification (2FA)" />
-                                            <ToggleButton fx:id="toggle2FA" styleClass="custom-toggle-button" text="2FA" />
+                                        <!-- QR Code -->
+                                        <ImageView fx:id="qrCodeImageView" fitHeight="150" fitWidth="150" preserveRatio="true" />
+
+                                        <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                            <Label styleClass="footer-info" text="Ou saisissez cette clé secrète manuellement :" />
+                                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                                <TextField fx:id="cleSecreteField" editable="false" styleClass="input" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnCopierCle" styleClass="btn-icon-light" text="Copier" />
+                                            </HBox>
                                         </VBox>
                                     </HBox>
 
-                                    <Separator />
-
+                                    <Label styleClass="field-label" text="2. Entrez le code à 6 chiffres généré pour valider :" />
                                     <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-key" iconSize="16" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Réinitialiser le mot de passe" />
+                                        <TextField fx:id="codeVerification2FAField" promptText="000000" styleClass="input" prefWidth="150" />
+                                        <Button fx:id="btnConfirmer2FA" styleClass="button-primary" text="Valider et Activer" />
+                                        <Button fx:id="btnAnnuler2FA" styleClass="btn-icon-light" text="Annuler" />
                                     </HBox>
-
-                                    <HBox spacing="10">
-                                        <Button fx:id="btnEnvoyerLien" styleClass="btn-icon-light" text="Envoyer un lien par email">
-                                            <graphic><FontIcon iconLiteral="fth-mail" iconSize="14" /></graphic>
-                                        </Button>
-                                        <Button fx:id="btnGenererTemp" styleClass="btn-icon-light" text="Générer un mot de passe temporaire">
-                                            <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
-                                        </Button>
-                                    </HBox>
-
-                                    <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="L'utilisateur doit changer son mot de passe à la prochaine connexion" />
                                 </VBox>
 
-                                <HBox alignment="CENTER_RIGHT">
-                                    <Button fx:id="btnEnregistrerInfos" styleClass="button-primary" text="Enregistrer les infos">
-                                        <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+                                <!-- 3. ETAT : ACTIVÉ (Masqué par défaut) -->
+                                <VBox fx:id="box2FAActive" managed="false" visible="false" spacing="15">
+                                    <HBox alignment="CENTER_LEFT" spacing="20">
+                                        <VBox spacing="5">
+                                            <Label styleClass="field-label" text="Statut 2FA" />
+                                            <Label style="-fx-font-weight: bold; -fx-text-fill: #10B981;" text="● Activée" />
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnAfficherCodesSecours" styleClass="btn-icon-light" text="Codes de secours">
+                                            <graphic><FontIcon iconLiteral="fth-key" iconSize="14" /></graphic>
+                                        </Button>
+                                        <Button fx:id="btnDesactiver2FA" styleClass="btn-icon-light" style="-fx-text-fill: #EF4444;" text="Désactiver">
+                                            <graphic><FontIcon iconLiteral="fth-trash-2" iconSize="14" /></graphic>
+                                        </Button>
+                                    </HBox>
+                                </VBox>
+
+                                <Label styleClass="footer-info" text="La double authentification ajoute une couche de sécurité supplémentaire à votre compte." wrapText="true" />
+                            </VBox>
+
+                            <!-- Section : Mes sessions actives -->
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-monitor" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Mes sessions actives" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="btnDeconnecterAutres" styleClass="btn-icon-light" text="Déconnecter les autres">
+                                        <graphic><FontIcon iconLiteral="fth-log-out" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
+
+                                <TableView fx:id="sessionsTable" prefHeight="150" styleClass="custom-table">
+                                    <columns>
+                                        <TableColumn fx:id="colAppareilSession" prefWidth="200" text="APPAREIL" />
+                                        <TableColumn fx:id="colIpSession" prefWidth="150" text="ADRESSE IP" />
+                                        <TableColumn fx:id="colDateSession" prefWidth="180" text="DERNIÈRE ACTIVITÉ" />
+                                    </columns>
+                                    <placeholder><Label styleClass="table-placeholder" text="Aucune session active" /></placeholder>
+                                </TableView>
                             </VBox>
-                        </content>
-                    </ScrollPane>
-                </Tab>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </Tab>
 
-                <!-- ===== ONGLET 3 : ACTIVITÉS RÉCENTES ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Activités récentes">
-                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
-                        <content>
-                            <VBox maxWidth="850" spacing="16" styleClass="content-area">
-                                <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+            <!-- ===== ONGLET 3 : MES ACTIVITÉS ===== -->
+            <Tab closable="false" styleClass="top-tab-btn" text="Mes activités">
+                <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                    <content>
+                        <VBox maxWidth="850" spacing="20" styleClass="content-area">
+                            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                                <VBox spacing="12" styleClass="card">
-                                    <HBox alignment="CENTER_LEFT" spacing="10">
-                                        <FontIcon iconLiteral="fth-clock" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Activités récentes de l'utilisateur" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="auditCountLabel" styleClass="footer-info" text="0 activités" />
-                                    </HBox>
+                            <VBox spacing="15" styleClass="card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <FontIcon iconLiteral="fth-clock" iconSize="18" styleClass="tile-icon" />
+                                    <Label styleClass="card-title" text="Historique de mes actions" />
+                                </HBox>
 
-                                    <TableView fx:id="auditTable" prefHeight="400" styleClass="custom-table" VBox.vgrow="ALWAYS">
-                                        <columns>
-                                            <TableColumn fx:id="colDateAudit" prefWidth="150" text="DATE" />
-                                            <TableColumn fx:id="colActionAudit" prefWidth="130" text="ACTION" />
-                                            <TableColumn fx:id="colDetailAudit" prefWidth="380" text="DÉTAILS" />
-                                            <TableColumn fx:id="colIpAudit" prefWidth="120" text="IP" />
-                                        </columns>
-                                        <placeholder><Label styleClass="table-placeholder" text="Aucune activité récente" /></placeholder>
-                                    </TableView>
-                                </VBox>
+                                <TableView fx:id="activitesTable" prefHeight="400" styleClass="custom-table">
+                                    <columns>
+                                        <TableColumn fx:id="colDateActivite" prefWidth="150" text="DATE" />
+                                        <TableColumn fx:id="colActionActivite" prefWidth="130" text="ACTION" />
+                                        <TableColumn fx:id="colDetailActivite" prefWidth="380" text="DÉTAILS" />
+                                        <TableColumn fx:id="colIpActivite" prefWidth="120" text="IP" />
+                                    </columns>
+                                    <placeholder><Label styleClass="table-placeholder" text="Aucune activité récente" /></placeholder>
+                                </TableView>
                             </VBox>
-                        </content>
-                    </ScrollPane>
-                </Tab>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </Tab>
 
-            </TabPane>
+        </TabPane>
 
-        </children>
     </VBox>
+
+    <!-- ===== MODAL OVERLAY : CODES DE SECOURS ===== -->
+    <StackPane fx:id="modalCodesSecours" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);">
+        <VBox maxWidth="400" maxHeight="450" spacing="15" styleClass="card" style="-fx-background-color: #16213A; -fx-padding: 20;">
+            <HBox alignment="CENTER_LEFT">
+                <Label styleClass="card-title" text="Codes de secours 2FA" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnFermerModalCodes" styleClass="btn-icon-light" text="X" />
+            </HBox>
+
+            <Label styleClass="footer-info" text="Conservez ces codes en lieu sûr. Chaque code ne peut être utilisé qu'une seule fois si vous perdez l'accès à votre application." wrapText="true" />
+
+            <ListView fx:id="listCodesSecours" prefHeight="200" styleClass="custom-table" />
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button fx:id="btnImprimerCodes" styleClass="btn-icon-light" text="Télécharger / Imprimer" />
+            </HBox>
+        </VBox>
+    </StackPane>
+
 </StackPane>

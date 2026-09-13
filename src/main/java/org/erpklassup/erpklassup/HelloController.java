@@ -1,6 +1,7 @@
 package org.erpklassup.erpklassup;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,13 +18,20 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import org.erpklassup.erpklassup.dao.SessionUtilisateurDAO;
+import org.erpklassup.erpklassup.service.AppExecutor;
 import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.util.AlertUtil;
+import org.erpklassup.erpklassup.util.NavigationUtil;
 import org.erpklassup.erpklassup.util.ToastNotification;
 import org.erpklassup.erpklassup.util.ViewRegistry;
 import org.kordamp.ikonli.javafx.FontIcon;
-
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import org.erpklassup.erpklassup.util.NavigationUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -82,13 +90,112 @@ public class HelloController implements Initializable {
         // Initialiser le registre de vues pour contentArea (limite à 5 vues actives en mémoire RAM)
         this.viewRegistry = new ViewRegistry(contentArea, 5);
 
+        AppExecutor.get().submit(() ->
+                new SessionUtilisateurDAO().nettoyerSessionsObsoletes(30)
+        );
+
+        Platform.runLater(() -> {
+            if (contentArea.getScene() != null && contentArea.getScene().getWindow() != null) {
+                Stage stage = (Stage) contentArea.getScene().getWindow();
+                SessionManager.getInstance().initialiserContexteGraphique(stage, this.viewRegistry);
+                System.out.println("✅ [HelloController] ViewRegistry enregistré dans SessionManager");
+            } else {
+                System.err.println("⚠️ [HelloController] Impossible d'enregistrer le ViewRegistry : scène non prête");
+            }
+
+            installerMoniteurActivite(contentArea.getScene());
+
+            // ✅ NOUVEAU : enregistrer le callback de déconnexion pour inactivité
+            SessionManager.getInstance().setOnInactiviteDetectee(this::gererDeconnexionInactivite);
+        });
+
         setupSidebarResize();
         loadSousMenusState();
 
         // Chargement initial de la page Utilisateurs
         loadPage("/org/erpklassup/erpklassup/view/user.fxml", btnUtilisateurs);
+
     }
 
+
+    private void installerMoniteurActivite(Scene scene) {
+        if (scene == null) return;
+
+        EventHandler<MouseEvent> souris = e -> SessionManager.getInstance().enregistrerActivite();
+        EventHandler<KeyEvent> clavier = e -> SessionManager.getInstance().enregistrerActivite();
+
+        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, souris);
+        scene.addEventFilter(MouseEvent.MOUSE_MOVED, souris);
+        scene.addEventFilter(MouseEvent.MOUSE_CLICKED, souris);
+        scene.addEventFilter(MouseEvent.MOUSE_DRAGGED, souris);
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, clavier);
+        scene.addEventFilter(KeyEvent.KEY_TYPED, clavier);
+
+        System.out.println("✅ [HelloController] Moniteur d'activité installé");
+    }
+
+    /**
+     * ✅ Callback exécuté par SessionManager quand l'inactivité dépasse le seuil.
+     * - Trace dans l'audit
+     * - Redirige vers le login
+     * - Affiche un toast
+     */
+    private void gererDeconnexionInactivite() {
+        SessionManager sessionManager = SessionManager.getInstance();
+
+        // 1. Récupérer le nom AVANT destruction de session
+        String nomUtilisateur = "Inconnu";
+        if (sessionManager.getUtilisateurCourant() != null) {
+            nomUtilisateur = sessionManager.getUtilisateurCourant().getNomComplet();
+        }
+
+        long minutesInactif = sessionManager.getMinutesInactivite();
+
+        // 2. Audit
+        auditService.tracerActionAsync(
+                "AUTHENTIFICATION",
+                "DECONNEXION_INACTIVITE",
+                "Déconnexion automatique pour inactivité (" + minutesInactif
+                        + " min) — utilisateur : " + nomUtilisateur
+        );
+
+        // 3. Nettoyer le registre des vues
+        if (viewRegistry != null) {
+            viewRegistry.toutReinitialiser();
+        }
+
+        // 4. Terminer la session
+        sessionManager.terminerSession();
+
+        // 5. Rediriger vers le login (même animation que la déconnexion manuelle)
+        Stage stage = sessionManager.getStagePrincipal();
+        if (stage == null) {
+            stage = (Stage) contentArea.getScene().getWindow();   // ⚠️ réaffectation
+        }
+
+        final Stage stageFinal = stage;   // ✅ effectively final
+
+
+        if (stageFinal != null) {
+            try {
+                NavigationUtil.retournerAuLogin(stageFinal);
+
+                PauseTransition pause = new PauseTransition(Duration.millis(600));
+                pause.setOnFinished(e -> {
+                    if (stageFinal.isShowing()) {
+                        ToastNotification.avertissement(
+                                stageFinal,
+                                "Vous avez été déconnecté pour inactivité (" + minutesInactif + " min)."
+                        );
+                    }
+                });
+                pause.play();
+
+            } catch (IOException e) {
+                System.err.println("❌ Erreur redirection login (inactivité) : " + e.getMessage());
+            }
+        }
+    }
     private void setupSidebarResize() {
         resizeHandle.setOnMouseEntered(e -> sidebarContainer.setCursor(Cursor.H_RESIZE));
         resizeHandle.setOnMouseExited(e -> sidebarContainer.setCursor(Cursor.DEFAULT));
@@ -434,47 +541,12 @@ public class HelloController implements Initializable {
      * Change la scène du Stage courant vers l'écran de login
      * (SANS créer un nouveau Stage)
      */
-    private void retournerAuLogin(Stage currentStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/login-view.fxml"));
-        Parent loginRoot = loader.load();
-
-        Scene loginScene = new Scene(loginRoot, 1000, 640);
-
-        Scene sceneActuelle = currentStage.getScene();
-        Parent rootActuel = sceneActuelle != null ? sceneActuelle.getRoot() : null;
-
-        Runnable appliquerNouvelleScene = () -> {
-            // ✅ sortir du mode maximisé AVANT de fixer la taille,
-            // sinon setWidth/setHeight sont silencieusement ignorés par Windows
-            if (currentStage.isMaximized()) {
-                currentStage.setMaximized(false);
-            }
-
-            currentStage.setScene(loginScene);
-            currentStage.setWidth(1000);
-            currentStage.setHeight(640);
-            currentStage.setResizable(false);
-            currentStage.setTitle("KlassUp - Connexion");
-            currentStage.centerOnScreen();
-
-            WindowsTitleBar.setTitleBarColor(currentStage, "#16213A");
-
-            loginRoot.setOpacity(0);
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(220), loginRoot);
-            fadeIn.setFromValue(0);
-            fadeIn.setToValue(1);
-            fadeIn.play();
-        };
-
-        if (rootActuel != null) {
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), rootActuel);
-            fadeOut.setFromValue(1);
-            fadeOut.setToValue(0);
-            fadeOut.setOnFinished(e -> appliquerNouvelleScene.run());
-            fadeOut.play();
-        } else {
-            appliquerNouvelleScene.run();
-        }
+    /**
+     * Change la scène du Stage courant vers l'écran de login.
+     * Délègue à NavigationUtil pour centraliser la logique.
+     */
+    public void retournerAuLogin(Stage currentStage) throws IOException {
+        NavigationUtil.retournerAuLogin(currentStage);
     }
     /**
      * Transition de déconnexion avec fondu

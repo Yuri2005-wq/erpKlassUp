@@ -2,6 +2,13 @@
 -- BASE DE DONNÉES ERP SCOLAIRE - VERSION FINALE COMPLÈTE
 -- Compatible avec synchronisation Offline-First (JavaFX <-> Cloud)
 -- Engine : InnoDB | Encodage : utf8mb4_unicode_ci
+--
+-- ✅ Unicité "soft-delete aware" : chaque contrainte UNIQUE sensible au
+-- soft-delete repose sur une colonne générée VIRTUAL qui ne porte la
+-- valeur métier que lorsque deleted_at IS NULL, et vaut NULL sinon.
+-- Deux lignes NULL n'entrent jamais en conflit dans un index UNIQUE :
+-- une ligne archivée ne bloque donc plus la recréation d'un même
+-- code/matricule/username actif.
 -- ==============================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -10,7 +17,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- 0. GROUPE D'ÉCOLES (RÉSEAU DU PROMOTEUR)
 -- ==============================================================
 CREATE TABLE IF NOT EXISTS GroupeEcole (
-    idGroupe VARCHAR(50) NOT NULL,
+                                           idGroupe VARCHAR(50) NOT NULL,
     nomGroupe VARCHAR(150) NOT NULL,
     nomPromoteur VARCHAR(150),
     contactPromoteur VARCHAR(30),
@@ -53,8 +60,9 @@ CREATE TABLE IF NOT EXISTS Ecole (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    codeEcole_actif VARCHAR(20) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN codeEcole END) VIRTUAL,
     PRIMARY KEY (idEcole),
-    UNIQUE KEY uq_ecole_code (codeEcole),
+    UNIQUE KEY uq_ecole_code_actif (codeEcole_actif),
     INDEX idx_ecole_sync (idEcole, updated_at, version),
     INDEX idx_ecole_groupe (idGroupe),
     CONSTRAINT fk_ecole_groupe FOREIGN KEY (idGroupe) REFERENCES GroupeEcole(idGroupe) ON DELETE SET NULL
@@ -72,13 +80,14 @@ CREATE TABLE IF NOT EXISTS Permission (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    codePermission_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN codePermission END) VIRTUAL,
     PRIMARY KEY (idPermission),
-    UNIQUE KEY uq_code_permission (codePermission),
+    UNIQUE KEY uq_code_permission_actif (codePermission_actif),
     INDEX idx_permission_sync (updated_at, version)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Role (
-    idRole VARCHAR(50) NOT NULL,
+                                    idRole VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idGroupe VARCHAR(50) NULL,
     nomRole VARCHAR(50) NOT NULL,
@@ -88,15 +97,16 @@ CREATE TABLE IF NOT EXISTS Role (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    nomRole_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN nomRole END) VIRTUAL,
     PRIMARY KEY (idRole),
-    UNIQUE KEY uq_role_ecole (nomRole, idEcole),
+    UNIQUE KEY uq_role_ecole_actif (nomRole_actif, idEcole),
     INDEX idx_role_sync (idEcole, updated_at, version),
     CONSTRAINT fk_role_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_role_groupe FOREIGN KEY (idGroupe) REFERENCES GroupeEcole(idGroupe) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS RolePermission (
-                                              idRolePermission VARCHAR(50) NOT NULL,
+    idRolePermission VARCHAR(50) NOT NULL,
     idRole VARCHAR(50) NOT NULL,
     idPermission VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
@@ -109,8 +119,9 @@ CREATE TABLE IF NOT EXISTS RolePermission (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idPermission_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idPermission END) VIRTUAL,
     PRIMARY KEY (idRolePermission),
-    UNIQUE KEY uq_role_permission (idRole, idPermission),
+    UNIQUE KEY uq_role_permission_actif (idRole, idPermission_actif),
     INDEX idx_roleperm_sync (idEcole, updated_at, version),
     CONSTRAINT fk_rp_role FOREIGN KEY (idRole) REFERENCES Role(idRole) ON DELETE CASCADE,
     CONSTRAINT fk_rp_permission FOREIGN KEY (idPermission) REFERENCES Permission(idPermission) ON DELETE CASCADE,
@@ -119,7 +130,7 @@ CREATE TABLE IF NOT EXISTS RolePermission (
 
 CREATE TABLE IF NOT EXISTS ActionPermission (
                                                 idActionPermission VARCHAR(50) NOT NULL,
-    codeAction VARCHAR(100) NOT NULL UNIQUE,
+    codeAction VARCHAR(100) NOT NULL,
     libelleAction VARCHAR(150) NOT NULL,
     idPermission VARCHAR(50) NOT NULL,
     module VARCHAR(50) NOT NULL,
@@ -128,13 +139,15 @@ CREATE TABLE IF NOT EXISTS ActionPermission (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    codeAction_actif VARCHAR(100) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN codeAction END) VIRTUAL,
     PRIMARY KEY (idActionPermission),
+    UNIQUE KEY uq_action_code_actif (codeAction_actif),
     INDEX idx_ap_sync (updated_at, version),
     CONSTRAINT fk_ap_perm FOREIGN KEY (idPermission) REFERENCES Permission(idPermission) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS RoleHeritage (
-    idRoleHeritage VARCHAR(50) NOT NULL,
+                                            idRoleHeritage VARCHAR(50) NOT NULL,
     idRoleParent VARCHAR(50) NOT NULL,
     idRoleEnfant VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NULL,
@@ -142,8 +155,9 @@ CREATE TABLE IF NOT EXISTS RoleHeritage (
     version BIGINT DEFAULT 1,
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idRoleEnfant_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idRoleEnfant END) VIRTUAL,
     PRIMARY KEY (idRoleHeritage),
-    UNIQUE KEY uq_role_heritage (idRoleParent, idRoleEnfant),
+    UNIQUE KEY uq_role_heritage_actif (idRoleParent, idRoleEnfant_actif),
     INDEX idx_rh_sync (idEcole, updated_at),
     CONSTRAINT fk_rh_parent FOREIGN KEY (idRoleParent) REFERENCES Role(idRole) ON DELETE CASCADE,
     CONSTRAINT fk_rh_enfant FOREIGN KEY (idRoleEnfant) REFERENCES Role(idRole) ON DELETE CASCADE,
@@ -151,14 +165,14 @@ CREATE TABLE IF NOT EXISTS RoleHeritage (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Utilisateur (
-    idUtilisateur VARCHAR(50) NOT NULL,
+                                           idUtilisateur VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idGroupePrincipal VARCHAR(50) NULL,
     username VARCHAR(50) NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
     nom VARCHAR(50) NOT NULL,
     prenom VARCHAR(50),
-    email VARCHAR(100) UNIQUE,
+    email VARCHAR(100),
     telephone VARCHAR(30),
     emailVerifie TINYINT(1) DEFAULT 0,
     hashTokenVerificationEmail VARCHAR(64) NULL,
@@ -176,21 +190,24 @@ CREATE TABLE IF NOT EXISTS Utilisateur (
     nombreTentativesEchec INT DEFAULT 0,
     dateDernierEchec DATETIME NULL,
     estActif TINYINT(1) DEFAULT 1,
+    doitConfigurer2FA TINYINT(1) DEFAULT 0,
     version BIGINT DEFAULT 1,
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    username_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN username END) VIRTUAL,
+    email_actif VARCHAR(100) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN email END) VIRTUAL,
     PRIMARY KEY (idUtilisateur),
-    UNIQUE KEY uq_user_ecole (username, idEcole),
+    UNIQUE KEY uq_user_ecole_actif (username_actif, idEcole),
+    UNIQUE KEY uq_user_email_actif (email_actif),
     INDEX idx_user_sync (idEcole, updated_at, version),
     INDEX idx_user_email (email),
     CONSTRAINT fk_user_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_user_groupe FOREIGN KEY (idGroupePrincipal) REFERENCES GroupeEcole(idGroupe) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 CREATE TABLE IF NOT EXISTS UtilisateurRole (
-    idUtilisateurRole VARCHAR(50) NOT NULL,
+                                               idUtilisateurRole VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     idRole VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NULL,
@@ -203,13 +220,13 @@ CREATE TABLE IF NOT EXISTS UtilisateurRole (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idRole_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idRole END) VIRTUAL,
     PRIMARY KEY (idUtilisateurRole),
-    UNIQUE KEY uq_user_role (idUtilisateur, idRole),
+    UNIQUE KEY uq_user_role_actif (idUtilisateur, idRole_actif),
     INDEX idx_ur_sync (idEcole, updated_at, version),
     CONSTRAINT fk_ur_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE,
     CONSTRAINT fk_ur_role FOREIGN KEY (idRole) REFERENCES Role(idRole) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 CREATE TABLE IF NOT EXISTS UtilisateurPermission (
                                                      idUtilisateurPermission VARCHAR(50) NOT NULL,
@@ -225,8 +242,9 @@ CREATE TABLE IF NOT EXISTS UtilisateurPermission (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idPermission_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idPermission END) VIRTUAL,
     PRIMARY KEY (idUtilisateurPermission),
-    UNIQUE KEY uq_user_perm (idUtilisateur, idPermission),
+    UNIQUE KEY uq_user_perm_actif (idUtilisateur, idPermission_actif),
     INDEX idx_up_sync (updated_at, version),
     CONSTRAINT fk_up_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE,
     CONSTRAINT fk_up_perm FOREIGN KEY (idPermission) REFERENCES Permission(idPermission) ON DELETE CASCADE
@@ -236,9 +254,8 @@ CREATE TABLE IF NOT EXISTS UtilisateurPermission (
 -- 3. TABLES LOCALES DU MODULE AUTHENTIFICATION (NON SYNCHRONISÉES)
 -- ==============================================================
 
--- Table : Token de réinitialisation de mot de passe
 CREATE TABLE IF NOT EXISTS TokenReinitialisation (
-    idToken VARCHAR(50) NOT NULL,
+                                                     idToken VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     tokenHash VARCHAR(64) NOT NULL UNIQUE,
     dateCreation DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -252,9 +269,8 @@ CREATE TABLE IF NOT EXISTS TokenReinitialisation (
     CONSTRAINT fk_reset_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table : Session utilisateur (connexion active)
 CREATE TABLE IF NOT EXISTS SessionUtilisateur (
-    idSession VARCHAR(50) NOT NULL,
+                                                  idSession VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     idEcoleActive VARCHAR(50) NULL,
     idGroupeActif VARCHAR(50) NULL,
@@ -283,9 +299,8 @@ CREATE TABLE IF NOT EXISTS SessionUtilisateur (
     CONSTRAINT fk_sess_ecole FOREIGN KEY (idEcoleActive) REFERENCES Ecole(idEcole) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table : Code 2FA (Double authentification)
 CREATE TABLE IF NOT EXISTS Code2FA (
-    idCode VARCHAR(50) NOT NULL,
+                                       idCode VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     codeHash VARCHAR(64) NOT NULL,
     typeCode VARCHAR(20) NOT NULL,
@@ -297,9 +312,8 @@ CREATE TABLE IF NOT EXISTS Code2FA (
     CONSTRAINT fk_c2fa_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table : Codes de secours 2FA (backup codes)
 CREATE TABLE IF NOT EXISTS CodeSecours2FA (
-    idCodeSecours VARCHAR(50) NOT NULL,
+                                              idCodeSecours VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     codeHash VARCHAR(64) NOT NULL,
     estUtilise TINYINT(1) DEFAULT 0,
@@ -309,9 +323,8 @@ CREATE TABLE IF NOT EXISTS CodeSecours2FA (
     CONSTRAINT fk_secours_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table : Tentatives de connexion (journal de sécurité)
 CREATE TABLE IF NOT EXISTS TentativeConnexion (
-    idTentative VARCHAR(50) NOT NULL,
+                                                  idTentative VARCHAR(50) NOT NULL,
     usernameSaisi VARCHAR(100) NOT NULL,
     adresseIp VARCHAR(45) NOT NULL,
     userAgent VARCHAR(255),
@@ -327,7 +340,7 @@ CREATE TABLE IF NOT EXISTS TentativeConnexion (
 -- 4. PERSONNEL (SYNCHRONISÉE - REMPLACE ENSEIGNANT)
 -- ==============================================================
 CREATE TABLE IF NOT EXISTS Personnel (
-    idPersonnel VARCHAR(50) NOT NULL,
+                                         idPersonnel VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NULL UNIQUE,
     matriculeInterne VARCHAR(50) NOT NULL,
@@ -350,8 +363,9 @@ CREATE TABLE IF NOT EXISTS Personnel (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    matriculeInterne_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN matriculeInterne END) VIRTUAL,
     PRIMARY KEY (idPersonnel),
-    UNIQUE KEY uq_personnel_matricule (matriculeInterne, idEcole),
+    UNIQUE KEY uq_personnel_matricule_actif (matriculeInterne_actif, idEcole),
     INDEX idx_pers_sync (idEcole, updated_at, version),
     CONSTRAINT fk_pers_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_pers_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE SET NULL
@@ -371,14 +385,15 @@ CREATE TABLE IF NOT EXISTS AnneeScolaire (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    libelle_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN libelle END) VIRTUAL,
     PRIMARY KEY (idAnnee),
-    UNIQUE KEY uq_annee_ecole (libelle, idEcole),
+    UNIQUE KEY uq_annee_ecole_actif (libelle_actif, idEcole),
     INDEX idx_annee_sync (idEcole, updated_at, version),
     CONSTRAINT fk_annee_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS Niveau (
-    idNiveau VARCHAR(50) NOT NULL,
+                                      idNiveau VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     nomNiveau VARCHAR(50) NOT NULL,
     ordre INT DEFAULT 0,
@@ -386,8 +401,9 @@ CREATE TABLE IF NOT EXISTS Niveau (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    nomNiveau_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN nomNiveau END) VIRTUAL,
     PRIMARY KEY (idNiveau),
-    UNIQUE KEY uq_niveau_ecole (nomNiveau, idEcole),
+    UNIQUE KEY uq_niveau_ecole_actif (nomNiveau_actif, idEcole),
     INDEX idx_niveau_sync (idEcole, updated_at, version),
     CONSTRAINT fk_niveau_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -403,8 +419,9 @@ CREATE TABLE IF NOT EXISTS Classe (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    nomClasse_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN nomClasse END) VIRTUAL,
     PRIMARY KEY (idClasse),
-    UNIQUE KEY uq_classe_annee (nomClasse, idAnnee, idEcole),
+    UNIQUE KEY uq_classe_annee_actif (nomClasse_actif, idAnnee, idEcole),
     INDEX idx_classe_sync (idEcole, updated_at, version),
     CONSTRAINT fk_classe_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_classe_niveau FOREIGN KEY (idNiveau) REFERENCES Niveau(idNiveau),
@@ -421,8 +438,9 @@ CREATE TABLE IF NOT EXISTS Matiere (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    codeMatiere_actif VARCHAR(20) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN codeMatiere END) VIRTUAL,
     PRIMARY KEY (idMatiere),
-    UNIQUE KEY uq_matiere_code (codeMatiere, idEcole),
+    UNIQUE KEY uq_matiere_code_actif (codeMatiere_actif, idEcole),
     INDEX idx_matiere_sync (idEcole, updated_at, version),
     CONSTRAINT fk_mat_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -438,8 +456,9 @@ CREATE TABLE IF NOT EXISTS AffectationMatiere (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idMatiere_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idMatiere END) VIRTUAL,
     PRIMARY KEY (idAffectation),
-    UNIQUE KEY uq_classe_mat (idClasse, idMatiere),
+    UNIQUE KEY uq_classe_mat_actif (idClasse, idMatiere_actif),
     INDEX idx_aff_sync (idEcole, updated_at, version),
     CONSTRAINT fk_aff_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_aff_classe FOREIGN KEY (idClasse) REFERENCES Classe(idClasse),
@@ -471,17 +490,16 @@ CREATE TABLE IF NOT EXISTS Eleve (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    matricule_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN matricule END) VIRTUAL,
     PRIMARY KEY (idEleve),
-    UNIQUE KEY uq_eleve_matricule (matricule, idEcole),
+    UNIQUE KEY uq_eleve_matricule_actif (matricule_actif, idEcole),
     INDEX idx_eleve_sync (idEcole, updated_at, version),
     CONSTRAINT fk_eleve_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_eleve_user FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- ==============================================================
 -- MIGRATION : ENTITÉ PARENT + LIAISON PARENT-ÉLÈVE
--- À appliquer après le schéma existant (Utilisateur, Eleve, Ecole déjà créés)
 -- ==============================================================
 
 CREATE TABLE IF NOT EXISTS Parent (
@@ -509,28 +527,26 @@ CREATE TABLE IF NOT EXISTS Parent (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS ParentEleve (
-    idParentEleve VARCHAR(50) NOT NULL,
+                                           idParentEleve VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idParent VARCHAR(50) NOT NULL,
     idEleve VARCHAR(50) NOT NULL,
-    lienParente VARCHAR(30) DEFAULT 'PERE',        -- PERE, MERE, TUTEUR_LEGAL, AUTRE
+    lienParente VARCHAR(30) DEFAULT 'PERE',
     estContactPrincipal TINYINT(1) DEFAULT 0,
-    estResponsableFinancier TINYINT(1) DEFAULT 0,   -- reçoit les rappels de paiement
+    estResponsableFinancier TINYINT(1) DEFAULT 0,
     version BIGINT DEFAULT 1,
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idEleve_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idEleve END) VIRTUAL,
     PRIMARY KEY (idParentEleve),
-    UNIQUE KEY uq_parent_eleve (idParent, idEleve),
+    UNIQUE KEY uq_parent_eleve_actif (idParent, idEleve_actif),
     INDEX idx_pe_sync (idEcole, updated_at, version),
     INDEX idx_pe_eleve (idEleve),
     CONSTRAINT fk_pe_parent FOREIGN KEY (idParent) REFERENCES Parent(idParent) ON DELETE CASCADE,
     CONSTRAINT fk_pe_eleve FOREIGN KEY (idEleve) REFERENCES Eleve(idEleve) ON DELETE CASCADE,
     CONSTRAINT fk_pe_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-
 
 CREATE TABLE IF NOT EXISTS Inscription (
                                            idInscription VARCHAR(50) NOT NULL,
@@ -545,8 +561,9 @@ CREATE TABLE IF NOT EXISTS Inscription (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idAnnee_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idAnnee END) VIRTUAL,
     PRIMARY KEY (idInscription),
-    UNIQUE KEY uq_eleve_annee (idEleve, idAnnee),
+    UNIQUE KEY uq_eleve_annee_actif (idEleve, idAnnee_actif),
     INDEX idx_insc_sync (idEcole, updated_at, version),
     CONSTRAINT fk_insc_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_insc_eleve FOREIGN KEY (idEleve) REFERENCES Eleve(idEleve),
@@ -609,8 +626,9 @@ CREATE TABLE IF NOT EXISTS Note (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idEleve_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idEleve END) VIRTUAL,
     PRIMARY KEY (idNote),
-    UNIQUE KEY uq_eval_eleve (idEvaluation, idEleve),
+    UNIQUE KEY uq_eval_eleve_actif (idEvaluation, idEleve_actif),
     INDEX idx_note_sync (idEcole, updated_at, version),
     CONSTRAINT fk_note_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_note_eval FOREIGN KEY (idEvaluation) REFERENCES Evaluation(idEvaluation),
@@ -646,8 +664,9 @@ CREATE TABLE IF NOT EXISTS Tarification (
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    idTypeFrais_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idTypeFrais END) VIRTUAL,
     PRIMARY KEY (idTarification),
-    UNIQUE KEY uq_tarif (idNiveau, idAnnee, idTypeFrais, idEcole),
+    UNIQUE KEY uq_tarif_actif (idNiveau, idAnnee, idTypeFrais_actif, idEcole),
     INDEX idx_tar_sync (idEcole, updated_at, version),
     CONSTRAINT fk_tar_ecole FOREIGN KEY (idEcole) REFERENCES Ecole(idEcole),
     CONSTRAINT fk_tar_niveau FOREIGN KEY (idNiveau) REFERENCES Niveau(idNiveau),
@@ -655,6 +674,9 @@ CREATE TABLE IF NOT EXISTS Tarification (
     CONSTRAINT fk_tar_tf FOREIGN KEY (idTypeFrais) REFERENCES TypeFrais(idTypeFrais)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ⚠️ Paiement.numeroRecu reste UNIQUE strict, sans variante _actif :
+-- l'annulation d'un reçu se fait via statut = 'ANNULE' (traçabilité comptable),
+-- jamais via deleted_at. Un numéro de reçu doit rester unique pour toujours.
 CREATE TABLE IF NOT EXISTS Paiement (
                                         idPaiement VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
@@ -786,17 +808,9 @@ CREATE TABLE IF NOT EXISTS SyncConflit (
     INDEX idx_conf_sync (idEcole, statut)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- ==============================================================
--- 11. TABLES D'AUDIT (À AJOUTER AVANT SET FOREIGN_KEY_CHECKS = 1)
+-- 11. TABLES D'AUDIT
 -- ==============================================================
-
--- Table : Audit RBAC (traçabilité des rôles et permissions)
--- ==============================================================
--- 11. TABLES D'AUDIT (CORRIGÉES POUR CORRESPONDRE AUX DAOs)
--- ==============================================================
-
--- Table : Audit RBAC (traçabilité des rôles et permissions)
 CREATE TABLE IF NOT EXISTS AuditRBAC (
                                          idAuditRBAC VARCHAR(50) NOT NULL,
     idUtilisateurAction VARCHAR(50) NOT NULL,
@@ -819,10 +833,8 @@ CREATE TABLE IF NOT EXISTS AuditRBAC (
     REFERENCES Ecole(idEcole) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table : LogsAudit (CORRIGÉE - Alignée avec LogsAuditDAO.java)
-
 CREATE TABLE IF NOT EXISTS LogsAudit (
-    idLogAudit VARCHAR(50) NOT NULL,
+                                         idLogAudit VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idUtilisateur VARCHAR(50) NOT NULL,
     nomAuteur VARCHAR(150) NOT NULL,
@@ -841,5 +853,6 @@ CREATE TABLE IF NOT EXISTS LogsAudit (
     REFERENCES Utilisateur(idUtilisateur),
     CONSTRAINT fk_log_ecole FOREIGN KEY (idEcole)
     REFERENCES Ecole(idEcole) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

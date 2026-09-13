@@ -5,11 +5,13 @@ import org.erpklassup.erpklassup.dto.FiltreUtilisateur;
 import org.erpklassup.erpklassup.dto.ResultatPagine;
 import org.erpklassup.erpklassup.dto.UtilisateurLigne;
 import org.erpklassup.erpklassup.models.Utilisateur;
+import org.erpklassup.erpklassup.service.PasswordService;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class UtilisateurDAO {
 
@@ -266,6 +268,7 @@ public class UtilisateurDAO {
 
         String sqlPage = """
     SELECT u.idUtilisateur, u.username, u.nom, u.prenom, u.email, u.telephone,
+           u.typeUtilisateur, u.doitChangerMotDePasse,
            u.estActif, u.compteVerrouille, u.deuxFacteursActive,
            (SELECT GROUP_CONCAT(DISTINCT r.nomRole ORDER BY r.nomRole SEPARATOR ', ')
               FROM UtilisateurRole ur INNER JOIN Role r ON r.idRole = ur.idRole
@@ -284,7 +287,7 @@ public class UtilisateurDAO {
                (SELECT p.photo FROM Personnel p WHERE p.idUtilisateur = u.idUtilisateur AND p.deleted_at IS NULL LIMIT 1),
                (SELECT el.photoPath FROM Eleve el WHERE el.idUtilisateur = u.idUtilisateur AND el.deleted_at IS NULL LIMIT 1)
            ) AS photoPath
-    """ + clause + " ORDER BY u.nom, u.prenom LIMIT ? OFFSET ?";
+    """ + clause + " ORDER BY u.nom ASC, u.prenom ASC LIMIT ? OFFSET ?";
 
         List<UtilisateurLigne> lignes = new ArrayList<>();
 
@@ -342,6 +345,7 @@ public class UtilisateurDAO {
         user.setSecret2FA(rs.getString("secret2FA"));
         user.setTelephone2FA(rs.getString("telephone2FA"));
         user.setDeuxFacteursActive(rs.getBoolean("deuxFacteursActive"));
+        user.setDoitConfigurer2FA(rs.getBoolean("doitConfigurer2FA"));
         user.setTypeUtilisateur(rs.getString("typeUtilisateur"));
         user.setCompteVerrouille(rs.getBoolean("compteVerrouille"));
         user.setNombreTentativesEchec(rs.getInt("nombreTentativesEchec"));
@@ -366,10 +370,86 @@ public class UtilisateurDAO {
         return user;
     }
 
+
+    public boolean activer2FA(String idUtilisateur, String secret2FA) {
+        String sql = "UPDATE Utilisateur SET secret2FA = ?, deuxFacteursActive = 1, updated_at = CURRENT_TIMESTAMP(3) WHERE idUtilisateur = ?";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, secret2FA);
+            stmt.setString(2, idUtilisateur);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Enregistrer les codes de secours hachés
+
+
+
+
+    public boolean mettreAJourSecurite(String idUtilisateur, boolean deuxFacteurs, boolean doitChangerMdp, String telephone, String typeUtilisateur) {
+        String sql = "UPDATE Utilisateur SET deuxFacteursActive = ?, doitChangerMotDePasse = ?, telephone = ? WHERE idUtilisateur = ?";
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBoolean(1, deuxFacteurs);
+            stmt.setBoolean(2, doitChangerMdp);
+            stmt.setString(3, telephone);
+            stmt.setString(4, idUtilisateur);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur de mise à jour sécurité utilisateur : " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Desactiver la double authentification
+    public boolean desactiver2FA(String idUtilisateur) {
+        String sql = "UPDATE Utilisateur SET secret2FA = NULL, deuxFacteursActive = 0, updated_at = CURRENT_TIMESTAMP(3) WHERE idUtilisateur = ?";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idUtilisateur);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
+    public boolean forcerActivation2FA(String idUtilisateur) {
+        String sql = "UPDATE Utilisateur SET doitConfigurer2FA = 1, updated_at = CURRENT_TIMESTAMP(3) WHERE idUtilisateur = ?";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idUtilisateur);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean finaliserSetup2FA(String idUtilisateur, String secret2FA) {
+        String sql = "UPDATE Utilisateur SET secret2FA = ?, deuxFacteursActive = 1, doitConfigurer2FA = 0, updated_at = CURRENT_TIMESTAMP(3) WHERE idUtilisateur = ?";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, secret2FA);
+            stmt.setString(2, idUtilisateur);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private UtilisateurLigne mapToLigne(ResultSet rs) throws SQLException {
         String prenom = rs.getString("prenom");
         String nom = rs.getString("nom");
-        String nomComplet = (prenom != null && !prenom.isBlank()) ? prenom + " " + nom : nom;
+        String nomComplet = (prenom != null && !prenom.isBlank()) ? nom + " " + prenom : nom;
         Timestamp derniereConnexionTs = rs.getTimestamp("derniereConnexion");
 
         return new UtilisateurLigne(
@@ -380,6 +460,8 @@ public class UtilisateurDAO {
                 nomComplet,
                 rs.getString("email"),
                 rs.getString("telephone"),
+                rs.getString("typeUtilisateur"),       // Add typeUtilisateur
+                rs.getBoolean("doitChangerMotDePasse"), // Add doitChangerMotDePasse
                 rs.getString("roles"),
                 rs.getString("photoPath"),
                 rs.getBoolean("estActif"),
@@ -387,5 +469,120 @@ public class UtilisateurDAO {
                 rs.getBoolean("deuxFacteursActive"),
                 derniereConnexionTs != null ? derniereConnexionTs.toLocalDateTime() : null
         );
+    }
+
+    // ==========================================
+// ✅ CODES DE SECOURS 2FA (hachés bcrypt)
+// ==========================================
+
+    /**
+     * Enregistre les codes de secours en les HACHANT avant insertion.
+     * ⚠️ À utiliser uniquement si tu ne passes PAS par CodeSecours2FADAO.genererEtEnregistrer().
+     *
+     * @param codesEnClair Les codes en clair (ex: "0428173596")
+     */
+    public void enregistrerCodesSecours(String idUtilisateur, List<String> codesEnClair) {
+        if (codesEnClair == null || codesEnClair.isEmpty()) return;
+
+        String sql = """
+        INSERT INTO CodeSecours2FA (idCodeSecours, idUtilisateur, codeHash, estUtilise)
+        VALUES (?, ?, ?, 0)
+        """;
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (String code : codesEnClair) {
+                stmt.setString(1, UUID.randomUUID().toString());
+                stmt.setString(2, idUtilisateur);
+                stmt.setString(3, PasswordService.hacher(code));   // ✅ HACHÉ
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur enregistrerCodesSecours : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Vérifie un code de secours (bcrypt) et le consomme s'il est valide.
+     */
+    public boolean validerEtConsommerCodeSecours(String idUtilisateur, String codeSecoursSaisi) {
+        if (idUtilisateur == null || codeSecoursSaisi == null || codeSecoursSaisi.trim().isEmpty()) {
+            return false;
+        }
+
+        String codeNettoye = codeSecoursSaisi.trim();
+
+        String sqlSelect = """
+        SELECT idCodeSecours, codeHash
+        FROM CodeSecours2FA
+        WHERE idUtilisateur = ? AND estUtilise = 0
+        """;
+
+        String sqlUpdate = """
+        UPDATE CodeSecours2FA
+        SET estUtilise = 1, dateUtilisation = CURRENT_TIMESTAMP
+        WHERE idCodeSecours = ?
+        """;
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
+
+            stmtSelect.setString(1, idUtilisateur);
+
+            try (ResultSet rs = stmtSelect.executeQuery()) {
+                while (rs.next()) {
+                    String idCode = rs.getString("idCodeSecours");
+                    String hash = rs.getString("codeHash");
+
+                    // ✅ Comparaison bcrypt
+                    if (PasswordService.verifier(codeNettoye, hash)) {
+                        try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+                            stmtUpdate.setString(1, idCode);
+                            stmtUpdate.executeUpdate();
+                        }
+                        return true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur validerEtConsommerCodeSecours : " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Supprime TOUS les codes de secours d'un utilisateur.
+     * Utilisé lors d'une désactivation de la 2FA.
+     */
+    public void supprimerCodesSecours(String idUtilisateur) {
+        String sql = "DELETE FROM CodeSecours2FA WHERE idUtilisateur = ?";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idUtilisateur);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur supprimerCodesSecours : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Compte les codes restants (non utilisés). Utile pour afficher "Il vous reste X codes".
+     */
+    public int compterCodesSecoursRestants(String idUtilisateur) {
+        String sql = "SELECT COUNT(*) FROM CodeSecours2FA WHERE idUtilisateur = ? AND estUtilise = 0";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idUtilisateur);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur compterCodesSecoursRestants : " + e.getMessage());
+        }
+        return 0;
     }
 }

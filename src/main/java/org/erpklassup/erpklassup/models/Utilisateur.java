@@ -29,6 +29,7 @@ public class Utilisateur extends BaseEntity {
     private int nombreTentativesEchec;
     private LocalDateTime dateDernierEchec;
     private boolean estActif;
+    private boolean doitConfigurer2FA;
 
     public Utilisateur() {
         super();
@@ -133,6 +134,9 @@ public class Utilisateur extends BaseEntity {
         if (prenom != null && !prenom.isEmpty()) return prenom + " " + nom;
         return nom;
     }
+    public boolean getDeuxFacteursActive() { return deuxFacteursActive; } // Alias à ajouter
+    public boolean isDoitConfigurer2FA() { return doitConfigurer2FA; }
+    public void setDoitConfigurer2FA(boolean doitConfigurer2FA) { this.doitConfigurer2FA = doitConfigurer2FA; }
 
     @Override
     public String toString() { return getNomComplet(); }

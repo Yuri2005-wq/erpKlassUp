@@ -27,6 +27,11 @@ module org.erpklassup.erpklassup {
     requires java.sql;
     requires bcrypt;
     requires okhttp3;
+    requires googleauth;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
+    requires org.apache.commons.codec;
+    requires javafx.swing;
 
     exports org.erpklassup.erpklassup;
     exports org.erpklassup.erpklassup.util;

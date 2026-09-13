@@ -63,6 +63,7 @@ public class AuditService extends ServiceAsyncBase {
         );
     }
 
+
     /**
      * Parcourt les interfaces réseau pour extraire l'adresse IPv4 réseau réelle de la machine.
      */

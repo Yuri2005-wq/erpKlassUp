@@ -4,7 +4,9 @@ import org.erpklassup.erpklassup.Database;
 import org.erpklassup.erpklassup.dto.SessionInfo;
 
 import java.sql.*;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class SessionUtilisateurDAO {
 
@@ -138,6 +140,89 @@ public class SessionUtilisateurDAO {
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Erreur révocation globale des sessions : " + e.getMessage());
+        }
+    }
+
+    public int compterSessionsActives(String idEcole, int fenetreActiviteMinutes) {
+        String sql = """
+            SELECT COUNT(DISTINCT idUtilisateur)
+            FROM SessionUtilisateur
+            WHERE idEcoleActive = ?
+              AND estRevoque = 0
+              AND dateDeconnexion IS NULL
+              AND dateExpirationRefresh > NOW()
+              AND dateDerniereActivite > DATE_SUB(NOW(), INTERVAL ? MINUTE)
+            """;
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, idEcole);
+            stmt.setInt(2, fenetreActiviteMinutes);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur compterSessionsActives : " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public Set<String> findIdsUtilisateursConnectes(String idEcole, int fenetreActiviteMinutes) {
+        Set<String> ids = new HashSet<>();
+        String sql = """
+        SELECT DISTINCT idUtilisateur
+        FROM SessionUtilisateur
+        WHERE idEcoleActive = ?
+          AND estRevoque = 0
+          AND dateDeconnexion IS NULL
+          AND dateExpirationRefresh > NOW()
+          AND dateDerniereActivite > DATE_SUB(NOW(), INTERVAL ? MINUTE)
+        """;
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, idEcole);
+            stmt.setInt(2, fenetreActiviteMinutes);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) ids.add(rs.getString("idUtilisateur"));
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur findIdsUtilisateursConnectes : " + e.getMessage());
+        }
+        return ids;
+    }
+
+    /**
+     * Révoque automatiquement les sessions expirées ou inactives depuis trop longtemps.
+     * À appeler au démarrage de l'app ou périodiquement.
+     */
+    public void nettoyerSessionsObsoletes(int fenetreInactiviteMinutes) {
+        String sql = """
+        UPDATE SessionUtilisateur
+        SET dateDeconnexion = NOW(),
+            motifDeconnexion = 'EXPIRATION_AUTO',
+            estRevoque = 1
+        WHERE estRevoque = 0
+          AND dateDeconnexion IS NULL
+          AND (
+              dateExpirationRefresh < NOW()
+              OR dateDerniereActivite < DATE_SUB(NOW(), INTERVAL ? MINUTE)
+          )
+        """;
+
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, fenetreInactiviteMinutes);
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("🧹 " + rows + " session(s) obsolète(s) nettoyée(s)");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur nettoyerSessionsObsoletes : " + e.getMessage());
         }
     }
 }
