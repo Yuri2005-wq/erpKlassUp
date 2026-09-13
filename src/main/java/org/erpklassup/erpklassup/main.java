@@ -17,7 +17,7 @@ public class main {
         PasswordService passwordService = new PasswordService();
         String var = passwordService.hacher(mpd);
 
-        boolean estVrai = passwordService.verifier(mpd, "$2a$12$3hg4yjMILr3zCFL9cW8/eO4npSMHdJWTGZghoGl3TXM3AweELo3Rm");
+        boolean estVrai = passwordService.verifier(mpd, " $2a$12$3hg4yjMILr3zCFL9cW8/eO4npSMHdJWTGZghoGl3TXM3AweELo3Rm");
         SessionManager session = SessionManager.getInstance();
         var text = session.getIdUtilisateurCourant();
 
@@ -25,7 +25,7 @@ public class main {
         String ip = ctrl.obtenirAdresseIpLocale();
         String t = userAgent;
 
-        System.out.println("id de mon pc : " + ip + t);
+        System.out.println(var);
 
     }
 }

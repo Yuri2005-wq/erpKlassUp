@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class AuditService extends ServiceAsyncBase {
 
     private final LogsAuditDAO dao;
-    private final SessionManager sessionManager;
+    private SessionManager sessionManager;   // ← plus de "final", plus d'init ici
 
     public AuditService() {
         this(new LogsAuditDAO());
@@ -23,27 +23,33 @@ public class AuditService extends ServiceAsyncBase {
 
     public AuditService(LogsAuditDAO dao) {
         this.dao = dao;
-        this.sessionManager = SessionManager.getInstance();
+        // ✅ On ne touche PLUS à SessionManager ici (c'était la cause du StackOverflowError)
+    }
+
+    /**
+     * Récupère le SessionManager à la demande, après construction complète.
+     */
+    private SessionManager session() {
+        if (sessionManager == null) {
+            sessionManager = SessionManager.getInstance();
+        }
+        return sessionManager;
     }
 
     /**
      * Enregistre une action d'audit de manière asynchrone (non bloquante pour l'UI).
-     *
-     * @param categorie La catégorie fonctionnelle (ex: "ELEVE", "PAYEMENT")
-     * @param action    Le type d'action effectuée (ex: "CREATION", "SUPPRESSION")
-     * @param details   La description détaillée de l'opération
      */
     public void tracerActionAsync(String categorie, String action, String details) {
-        if (!sessionManager.estConnecte()) {
+        SessionManager sm = session();
+        if (!sm.estConnecte()) {
             return;
         }
 
-        Utilisateur user = sessionManager.getUtilisateurCourant();
-        String idEcole = sessionManager.getIdEcoleCourante();
+        Utilisateur user = sm.getUtilisateurCourant();
+        String idEcole = sm.getIdEcoleCourante();
         String idUser = user.getIdUtilisateur();
         String nomAuteur = user.getNomComplet();
 
-        // ✅ Récupération de la véritable adresse IP et des informations de l'appareil
         String adresseIp = obtenirAdresseIpLocale();
         String appareil = obtenirInfoAppareil();
 
@@ -59,7 +65,6 @@ public class AuditService extends ServiceAsyncBase {
 
     /**
      * Parcourt les interfaces réseau pour extraire l'adresse IPv4 réseau réelle de la machine.
-     * En cas d'échec ou d'absence de réseau, retourne "127.0.0.1".
      */
     private String obtenirAdresseIpLocale() {
         try {
@@ -67,7 +72,6 @@ public class AuditService extends ServiceAsyncBase {
             while (interfaces != null && interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
 
-                // Ignorer les interfaces inactives, de bouclage (loopback) ou virtuelles (ex: Docker, VPN, VirtualBox)
                 if (!iface.isUp() || iface.isLoopback() || iface.isVirtual()) {
                     continue;
                 }
@@ -76,14 +80,12 @@ public class AuditService extends ServiceAsyncBase {
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
 
-                    // On filtre pour ne garder que les adresses IPv4 de site/réseau local
                     if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
                         return addr.getHostAddress();
                     }
                 }
             }
 
-            // Tentative de fallback simple si le parcours d'interfaces n'a pas abouti
             InetAddress localHost = InetAddress.getLocalHost();
             if (!localHost.isLoopbackAddress()) {
                 return localHost.getHostAddress();
@@ -132,6 +134,7 @@ public class AuditService extends ServiceAsyncBase {
                 onErreur
         );
     }
+
     public List<AuditLigne> rechercher(FiltreAudit filtre) {
         return dao.rechercher(filtre);
     }

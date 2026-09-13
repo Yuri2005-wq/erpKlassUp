@@ -1701,3 +1701,42 @@
 .toggle-switch:selected:hover {
     -fx-background-color: #15803D;
 }
+
+
+
+
+/* btn search clear*/
+
+
+/* Réserve la place à droite du champ pour ne jamais faire chevaucher le texte saisi et le bouton */
+.search-field-with-clear {
+    -fx-padding: 0 26 0 0;
+}
+
+.btn-clear-search {
+    -fx-background-color: transparent;
+    -fx-background-radius: 100%;
+    -fx-min-width: 20;
+    -fx-min-height: 20;
+    -fx-max-width: 20;
+    -fx-max-height: 20;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.btn-clear-search .ikonli-font-icon {
+    -fx-icon-color: -fx-text-muted;
+}
+
+.btn-clear-search:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.06);
+}
+
+.btn-clear-search:hover .ikonli-font-icon {
+    -fx-icon-color: derive(-fx-text-muted, -20%);
+}
+
+.btn-clear-search:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.10);
+}

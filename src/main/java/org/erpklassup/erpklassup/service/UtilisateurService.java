@@ -85,7 +85,7 @@ public class UtilisateurService extends ServiceAsyncBase {
         }, onSucces, onErreur);
     }
 
-    public void modifierUtilisateurAsync(String idUtilisateur, String nom, String prenom, String email,
+    public void modifierUtilisateurAsync(String idUtilisateur, String nom, String prenom, String email, String numero,
                                          Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
             Autorisation.exigerAction("user.modifier");
@@ -94,6 +94,7 @@ public class UtilisateurService extends ServiceAsyncBase {
             u.setNom(nom);
             u.setPrenom(prenom);
             u.setEmail(email);
+            u.setTelephone(numero);
             utilisateurDAO.update(u);
             rafraichisseur.rafraichirPourUtilisateur(idUtilisateur);
         }, onSucces, onErreur);

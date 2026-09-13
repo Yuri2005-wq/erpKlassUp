@@ -26,7 +26,6 @@ public class SessionManager {
     private Utilisateur utilisateurCourant;
     private Ecole ecoleCourante;
 
-    // Contexte graphique pour redirection et notifications Toast
     private Stage stagePrincipal;
     private ViewRegistry viewRegistry;
 
@@ -35,7 +34,9 @@ public class SessionManager {
     private final List<Runnable> ecouteursPermissions = new CopyOnWriteArrayList<>();
 
     private final SessionUtilisateurDAO sessionUtilisateurDAO = new SessionUtilisateurDAO();
-    private final RafraichisseurPermissions rafraichisseur = new RafraichisseurPermissions();
+
+    // ✅ Plus de "final" ni de "new" ici : instanciation paresseuse pour casser la boucle
+    private RafraichisseurPermissions rafraichisseur;
 
     private ScheduledExecutorService schedulerBackground;
 
@@ -52,9 +53,6 @@ public class SessionManager {
         return instance;
     }
 
-    /**
-     * Lie le contexte graphique à la session (Stage principal + ViewRegistry)
-     */
     public void initialiserContexteGraphique(Stage stage, ViewRegistry registry) {
         this.stagePrincipal = stage;
         this.viewRegistry = registry;
@@ -92,6 +90,11 @@ public class SessionManager {
             t.setDaemon(true);
             return t;
         });
+
+        // ✅ Initialisation paresseuse du rafraichisseur AVANT de l'utiliser
+        if (rafraichisseur == null) {
+            rafraichisseur = new RafraichisseurPermissions();
+        }
 
         // Heartbeat BDD toutes les 5 minutes
         schedulerBackground.scheduleAtFixedRate(() -> {

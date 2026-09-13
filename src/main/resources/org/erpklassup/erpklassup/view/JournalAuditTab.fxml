@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
+<?import javafx.scene.layout.StackPane?>
 <VBox spacing="14.0" styleClass="card" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.JournalAuditTabController">
 
     <padding>
@@ -30,18 +31,17 @@
 <!--                <TextField fx:id="searchAudit" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />-->
 <!--            </HBox>-->
             <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">
-                <!-- Icône de recherche -->
                 <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
 
-                <!-- Champ de texte -->
-                <TextField fx:id="searchAudit" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
-
-                <!-- Bouton pour vider le champ -->
-                <Button fx:id="btnClearSearch" managed="false" styleClass="btn-clear-search" visible="false">
-                    <graphic>
-                        <FontIcon iconLiteral="fth-x" iconSize="14" styleClass="clear-icon-light" />
-                    </graphic>
-                </Button>
+                <StackPane HBox.hgrow="ALWAYS">
+                    <TextField fx:id="searchAudit" promptText="Rechercher par auteur, action..."
+                               styleClass="search-field-inner, search-field-with-clear" />
+                    <Button fx:id="btnClearSearch" styleClass="btn-clear-search" visible="false"
+                            StackPane.alignment="CENTER_RIGHT">
+                        <graphic><FontIcon iconLiteral="fth-x" iconSize="11" /></graphic>
+                        <StackPane.margin><Insets right="4.0" /></StackPane.margin>
+                    </Button>
+                </StackPane>
             </HBox>
 
             <!-- Filtres de date -->

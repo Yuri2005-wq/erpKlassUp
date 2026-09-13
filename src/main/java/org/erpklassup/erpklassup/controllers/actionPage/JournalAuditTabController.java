@@ -41,6 +41,7 @@ public class JournalAuditTabController implements Initializable, VueDisposable {
     @FXML private DatePicker datePickerFin;
     @FXML private ComboBox<String> filterTypeAction;
     @FXML private Button btnExporterAudit;
+    @FXML private Button btnClearSearch;
 
     @FXML private Label statTotalLabel;
     @FXML private Label statConnectesLabel;
@@ -169,7 +170,7 @@ public class JournalAuditTabController implements Initializable, VueDisposable {
     }
 
     private void appliquerControlesAcces() {
-        ControleAcces.appliquerAction(btnExporterAudit, "AUDIT_EXPORTER");
+        ControleAcces.appliquerAction(btnExporterAudit, "user.modifier");
     }
 
     private void configurerTable() {
@@ -198,7 +199,21 @@ public class JournalAuditTabController implements Initializable, VueDisposable {
 
     private void configurerRecherche() {
         debounceRecherche.setOnFinished(e -> relancerServiceInmediatement());
-        searchAudit.textProperty().addListener((obs, ancien, nouveau) -> debounceRecherche.playFromStart());
+        searchAudit.textProperty().addListener((obs, ancien, nouveau) -> {
+            boolean aDutexte = nouveau != null && !nouveau.trim().isEmpty();
+            debounceRecherche.playFromStart();
+
+            if (btnClearSearch != null) {
+                btnClearSearch.setVisible(aDutexte);
+            }
+        });
+
+        if (btnClearSearch != null) {
+            btnClearSearch.setOnAction(e -> {
+                searchAudit.clear();
+                searchAudit.requestFocus();
+            });
+        }
     }
 
     private void configurerPagination() {

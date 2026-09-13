@@ -416,6 +416,7 @@ public class UserDetailController implements Initializable {
                 nomField.getText().trim(),
                 prenomField.getText().trim(),
                 emailField.getText().trim(),
+                telephoneField.getText().trim(),
                 () -> Platform.runLater(() -> {
                     auditService.tracerActionAsync(
                             "UTILISATEUR",

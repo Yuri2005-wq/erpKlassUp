@@ -374,8 +374,8 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 fxmlPath,
                 "Ajouter un utilisateur",
                 tableUtilisateurs.getScene().getWindow(),
-                850,
-                750
+                695,
+                680
         );
 
         if (ctrl != null) {

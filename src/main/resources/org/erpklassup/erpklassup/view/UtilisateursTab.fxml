@@ -21,9 +21,22 @@
     <!-- ===== Barre d'outils ===== -->
     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="rbac-toolbar">
 
+<!--        <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">-->
+<!--            <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />-->
+<!--            <TextField fx:id="searchField" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />-->
+<!--        </HBox>-->
         <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">
             <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-            <TextField fx:id="searchField" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+
+            <StackPane HBox.hgrow="ALWAYS">
+                <TextField fx:id="searchField" promptText="Rechercher par auteur, action..."
+                           styleClass="search-field-inner, search-field-with-clear" />
+                <Button fx:id="btnClearSearch" styleClass="btn-clear-search" visible="false"
+                        StackPane.alignment="CENTER_RIGHT">
+                    <graphic><FontIcon iconLiteral="fth-x" iconSize="11" /></graphic>
+                    <StackPane.margin><Insets right="4.0" /></StackPane.margin>
+                </Button>
+            </StackPane>
         </HBox>
 
 

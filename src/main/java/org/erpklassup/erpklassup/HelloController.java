@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -434,28 +435,47 @@ public class HelloController implements Initializable {
      * (SANS créer un nouveau Stage)
      */
     private void retournerAuLogin(Stage currentStage) throws IOException {
-        // Charger le FXML du login
         FXMLLoader loader = new FXMLLoader(getClass().getResource("view/login-view.fxml"));
         Parent loginRoot = loader.load();
 
-        // Créer la nouvelle scène
         Scene loginScene = new Scene(loginRoot, 1000, 640);
 
-        // ✅ CHANGER LA SCÈNE DU MÊME STAGE (pas de nouveau Stage)
-        currentStage.setScene(loginScene);
-        currentStage.setTitle("KlassUp - Connexion");
-        currentStage.setWidth(1000);
-        currentStage.setHeight(640);
-        currentStage.setResizable(false);
-        currentStage.centerOnScreen();
+        Scene sceneActuelle = currentStage.getScene();
+        Parent rootActuel = sceneActuelle != null ? sceneActuelle.getRoot() : null;
 
-        // Optionnel : réappliquer le style si nécessaire
-        // currentStage.initStyle(StageStyle.UNDECORATED);
+        Runnable appliquerNouvelleScene = () -> {
+            // ✅ sortir du mode maximisé AVANT de fixer la taille,
+            // sinon setWidth/setHeight sont silencieusement ignorés par Windows
+            if (currentStage.isMaximized()) {
+                currentStage.setMaximized(false);
+            }
 
-        // Afficher le login dans le MÊME Stage
-        currentStage.show();
+            currentStage.setScene(loginScene);
+            currentStage.setWidth(1000);
+            currentStage.setHeight(640);
+            currentStage.setResizable(false);
+            currentStage.setTitle("KlassUp - Connexion");
+            currentStage.centerOnScreen();
+
+            WindowsTitleBar.setTitleBarColor(currentStage, "#16213A");
+
+            loginRoot.setOpacity(0);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(220), loginRoot);
+            fadeIn.setFromValue(0);
+            fadeIn.setToValue(1);
+            fadeIn.play();
+        };
+
+        if (rootActuel != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), rootActuel);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setOnFinished(e -> appliquerNouvelleScene.run());
+            fadeOut.play();
+        } else {
+            appliquerNouvelleScene.run();
+        }
     }
-
     /**
      * Transition de déconnexion avec fondu
      * 1. Fade OUT de la scène courante

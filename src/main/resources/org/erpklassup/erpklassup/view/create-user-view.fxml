@@ -260,7 +260,7 @@
                     <!-- Récapitulatif de la liaison -->
                     <VBox fx:id="recapCard" spacing="10" styleClass="card">
                         <HBox alignment="CENTER_LEFT" spacing="10">
-                            <FontIcon iconLiteral="fth-check" iconSize="18" style="-fx-icon-color: #16A34A;" />
+                            <FontIcon iconLiteral="fth-user" iconSize="18" style="-fx-icon-color: #16A34A;" />
                             <Label styleClass="card-title" text="Personne liée" />
                         </HBox>
                         <HBox spacing="30">
@@ -339,7 +339,7 @@
 
         <!-- ===== PIED DE PAGE ===== -->
         <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
-            <Button fx:id="btnPrecedent" managed="false" styleClass="btn-icon-light" text="Précédent" visible="false">
+            <Button fx:id="btnPrecedent" managed="false" style="-fx-background-color: white;" styleClass="btn-icon-light" text="Précédent" visible="false">
                 <graphic><FontIcon iconLiteral="fth-arrow-left" iconSize="14" /></graphic>
             </Button>
             <Region HBox.hgrow="ALWAYS" />
