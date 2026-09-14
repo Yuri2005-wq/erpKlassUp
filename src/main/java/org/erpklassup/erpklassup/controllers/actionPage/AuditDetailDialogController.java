@@ -10,6 +10,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.stage.Stage;
 
 import org.erpklassup.erpklassup.dto.AuditLigne;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.net.URL;
@@ -42,11 +43,19 @@ public class AuditDetailDialogController implements Initializable {
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private AuditLigne auditLigneCourante;
 
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         btnCloseBottom.setOnAction(e -> fermer());
         btnCopier.setOnAction(e -> copierDansPressePapier());
         btnCopierJson.setOnAction(e -> copierJsonBrut());
+        btnExporterPdf.setOnAction(e -> ToastNotification.info(
+                (Stage) btnExporterPdf.getScene().getWindow(),
+                i18n().t("audit.detail.export_pdf_soon")));
     }
 
     /**
@@ -56,7 +65,8 @@ public class AuditDetailDialogController implements Initializable {
         this.auditLigneCourante = ligne;
 
         // ID d'Audit
-        lblIdAudit.setText("ID Log : #" + (ligne.idLogAudit() != null ? ligne.idLogAudit() : "N/A"));
+        String idLog = ligne.idLogAudit() != null ? ligne.idLogAudit() : "N/A";
+        lblIdAudit.setText(i18n().t("audit.detail.id_log", idLog));
 
         // Horodatage & calcul du temps écoulé
         if (ligne.horodatage() != null) {
@@ -64,18 +74,20 @@ public class AuditDetailDialogController implements Initializable {
             lblTempsEcoule.setText(calculerTempsEcoule(ligne.horodatage()));
         } else {
             lblHorodatage.setText("—");
-            lblTempsEcoule.setText("Indéterminé");
+            lblTempsEcoule.setText(i18n().t("audit.detail.time_unknown"));
         }
 
         // Informations principales
-        lblAuteur.setText(ligne.auteur() != null ? ligne.auteur() : "Inconnu");
-        lblCategorie.setText(ligne.categorie() != null ? ligne.categorie() : "GÉNÉRAL");
+        lblAuteur.setText(ligne.auteur() != null ? ligne.auteur() : i18n().t("audit.detail.unknown"));
+        lblCategorie.setText(ligne.categorie() != null ? ligne.categorie() : i18n().t("audit.detail.general"));
         lblAction.setText(ligne.action() != null ? ligne.action() : "—");
         lblAdresseIp.setText(ligne.adresseIp() != null ? ligne.adresseIp() : "—");
         lblAppareil.setText(ligne.appareil() != null ? ligne.appareil() : "—");
 
         // Détails
-        txtDetails.setText(ligne.details() != null ? ligne.details() : "Aucun détail complémentaire enregistré pour cette action.");
+        txtDetails.setText(ligne.details() != null
+                ? ligne.details()
+                : i18n().t("audit.detail.no_details"));
 
         // Gravité dynamique basée sur les mots-clés d'action
         evaluerGraviteEtStatut(ligne.action());
@@ -85,26 +97,32 @@ public class AuditDetailDialogController implements Initializable {
         if (action == null) action = "";
         String actionLower = action.toLowerCase();
 
-        if (actionLower.contains("erreur") || actionLower.contains("échec") || actionLower.contains("suppression") || actionLower.contains("refus")) {
-            lblGravite.setText("CRITIQUE");
+        if (actionLower.contains("erreur") || actionLower.contains("échec")
+                || actionLower.contains("suppression") || actionLower.contains("refus")) {
+            lblGravite.setText(i18n().t("audit.severity.critical"));
             lblGravite.getStyleClass().removeAll("tag-blue", "tag-orange");
             lblGravite.getStyleClass().add("tag-red");
 
-            lblStatutVerification.setText("⚠ Alerte Système");
+            lblStatutVerification.setText(i18n().t("audit.detail.status_alert"));
             lblStatutVerification.getStyleClass().removeAll("stat-value-success");
             lblStatutVerification.getStyleClass().add("stat-value-danger");
-        } else if (actionLower.contains("modification") || actionLower.contains("renommage") || actionLower.contains("mise à jour")) {
-            lblGravite.setText("AVERTISSEMENT");
+        } else if (actionLower.contains("modification") || actionLower.contains("renommage")
+                || actionLower.contains("mise à jour")) {
+            lblGravite.setText(i18n().t("audit.severity.warning"));
             lblGravite.getStyleClass().removeAll("tag-blue", "tag-red");
             lblGravite.getStyleClass().add("tag-orange");
 
-            lblStatutVerification.setText("✓ Vérifié");
+            lblStatutVerification.setText(i18n().t("audit.detail.status_verified"));
+            lblStatutVerification.getStyleClass().removeAll("stat-value-danger");
+            lblStatutVerification.getStyleClass().add("stat-value-success");
         } else {
-            lblGravite.setText("INFO");
+            lblGravite.setText(i18n().t("audit.severity.info"));
             lblGravite.getStyleClass().removeAll("tag-red", "tag-orange");
             lblGravite.getStyleClass().add("tag-blue");
 
-            lblStatutVerification.setText("✓ Vérifié");
+            lblStatutVerification.setText(i18n().t("audit.detail.status_verified"));
+            lblStatutVerification.getStyleClass().removeAll("stat-value-danger");
+            lblStatutVerification.getStyleClass().add("stat-value-success");
         }
     }
 
@@ -114,17 +132,17 @@ public class AuditDetailDialogController implements Initializable {
         long heures = duration.toHours();
         long jours = duration.toDays();
 
-        if (minutes < 1) return "à l'instant";
-        if (minutes < 60) return "il y a " + minutes + " minute" + (minutes > 1 ? "s" : "");
-        if (heures < 24) return "il y a " + heures + " heure" + (heures > 1 ? "s" : "");
-        return "il y a " + jours + " jour" + (jours > 1 ? "s" : "");
+        if (minutes < 1) return i18n().t("audit.time.now");
+        if (minutes < 60) return i18n().t("audit.time.minutes", minutes);
+        if (heures < 24) return i18n().t("audit.time.hours", heures);
+        return i18n().t("audit.time.days", jours);
     }
 
     private void copierDansPressePapier() {
         if (auditLigneCourante == null) return;
 
         String contenu = String.format(
-                "ID Log: %s\nHorodatage: %s\nAuteur: %s\nCatégorie: %s\nAction: %s\nIP: %s\nAppareil: %s\nDétails: %s",
+                i18n().t("audit.detail.copy_format"),
                 auditLigneCourante.idLogAudit(),
                 lblHorodatage.getText(),
                 auditLigneCourante.auteur(),
@@ -138,7 +156,7 @@ public class AuditDetailDialogController implements Initializable {
         ClipboardContent content = new ClipboardContent();
         content.putString(contenu);
         Clipboard.getSystemClipboard().setContent(content);
-        ToastNotification.succes(stage, "Audit copier !");
+        ToastNotification.succes(stage, i18n().t("audit.detail.copied"));
     }
 
     private void copierJsonBrut() {
@@ -159,7 +177,7 @@ public class AuditDetailDialogController implements Initializable {
         ClipboardContent content = new ClipboardContent();
         content.putString(json);
         Clipboard.getSystemClipboard().setContent(content);
-        ToastNotification.succes(stage, "Audit Copier au Format Json !");
+        ToastNotification.succes(stage, i18n().t("audit.detail.copied_json"));
     }
 
     private void fermer() {

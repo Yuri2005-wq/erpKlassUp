@@ -1,23 +1,14 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javafx.stage.Window;
-import javafx.util.Duration;
-import org.erpklassup.erpklassup.controllers.actionPage.RoleModalController;
-import org.erpklassup.erpklassup.dto.AuditLigne;
 import org.erpklassup.erpklassup.dto.PermissionOption;
 import org.erpklassup.erpklassup.dto.RoleOption;
 import org.erpklassup.erpklassup.service.AuditService;
@@ -25,7 +16,6 @@ import org.erpklassup.erpklassup.service.RoleService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.util.*;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -47,6 +37,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
 
     private final Map<String, CheckBox> casesParIdPermission = new LinkedHashMap<>();
     private final Runnable ecouteurPermissions = this::appliquerControlesAcces;
+    private final Runnable ecouteurI18n = this::rafraichirTextes;
 
     private RoleOption roleSelectionne;
     private boolean enChargement = false;
@@ -54,10 +45,14 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
     private String idEcoleCourante = session.getIdEcoleCourante();
     private String idUtilisateurConnecte;
 
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         listRoles.setItems(FXCollections.observableArrayList());
-        listRoles.setPlaceholder(new Label("Chargement..."));
+        listRoles.setPlaceholder(new Label(i18n().t("roles.loading")));
         activerPanneauDroit(false);
 
         listRoles.getSelectionModel().selectedItemProperty().addListener((obs, ancien, nouveau) -> {
@@ -69,13 +64,14 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         btnRenommerRole.setOnAction(e -> renommerRoleSelectionne());
         btnSupprimerRole.setOnAction(e -> supprimerRoleSelectionne());
 
-        // Action d'enregistrement des permissions
         btnEnregistrerPermissions.setOnAction(e -> enregistrerPermissions());
         btnAnnulerPermissions.setOnAction(e -> { if (roleSelectionne != null) chargerRole(roleSelectionne); });
 
-        // Inscription au bus d'événements de permissions
         SessionManager.getInstance().ecouterChangementsPermissions(ecouteurPermissions);
         appliquerControlesAcces();
+
+        // ✅ S'abonner aux changements de langue
+        i18n().ecouterChangement(ecouteurI18n);
 
         chargerPermissionsDisponibles();
         rafraichirContexte();
@@ -84,6 +80,25 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
     @Override
     public void disposer() {
         SessionManager.getInstance().arreterEcoute(ecouteurPermissions);
+        i18n().arreterEcoute(ecouteurI18n);
+    }
+
+    private void rafraichirTextes() {
+        // Le placeholder
+        if (listRoles.getItems().isEmpty()) {
+            listRoles.setPlaceholder(new Label(i18n().t("roles.empty")));
+        }
+        // Les titres des modules (Accordion)
+        if (accordionModules != null) {
+            accordionModules.getPanes().forEach(p -> {
+                // Le titre vient des permissions BDD → pas traduisible ici
+            });
+        }
+        // Le label de sélection
+        if (roleSelectionne == null) {
+            labelRoleSelectionne.setText(i18n().t("roles.select_hint"));
+            labelRoleDescription.setText(i18n().t("roles.description_hint"));
+        }
     }
 
     private void appliquerControlesAcces() {
@@ -101,7 +116,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
 
         if (idEcoleCourante == null) {
             listRoles.setItems(FXCollections.observableArrayList());
-            listRoles.setPlaceholder(new Label("Aucune école active, connectez-vous d'abord."));
+            listRoles.setPlaceholder(new Label(i18n().t("roles.no_school")));
             activerPanneauDroit(false);
             return;
         }
@@ -116,8 +131,8 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         btnEnregistrerPermissions.setDisable(!actif);
         btnAnnulerPermissions.setDisable(!actif);
         if (!actif) {
-            labelRoleSelectionne.setText("Sélectionnez un rôle");
-            labelRoleDescription.setText("Les droits ci-dessous s'appliquent à tous les utilisateurs de ce rôle.");
+            labelRoleSelectionne.setText(i18n().t("roles.select_hint"));
+            labelRoleDescription.setText(i18n().t("roles.description_hint"));
         }
     }
 
@@ -131,7 +146,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         service.listerRolesAsync(idEcoleCourante,
                 roles -> Platform.runLater(() -> {
                     listRoles.setItems(FXCollections.observableArrayList(roles));
-                    listRoles.setPlaceholder(new Label("Aucun rôle pour cette école — créez-en un."));
+                    listRoles.setPlaceholder(new Label(i18n().t("roles.empty")));
                     if (!roles.isEmpty()) {
                         listRoles.getSelectionModel().selectFirst();
                     }
@@ -143,7 +158,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         activerPanneauDroit(true);
         labelRoleSelectionne.setText(role.nomRole());
         labelRoleDescription.setText(role.description() != null && !role.description().isBlank()
-                ? role.description() : "Les droits ci-dessous s'appliquent à tous les utilisateurs de ce rôle.");
+                ? role.description() : i18n().t("roles.description_hint"));
 
         service.chargerPermissionsDuRoleAsync(role.idRole(),
                 idsActifs -> Platform.runLater(() -> appliquerSelection(idsActifs)),
@@ -159,7 +174,8 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
 
     private void construireAccordion(List<PermissionOption> permissions) {
         Map<String, List<PermissionOption>> parCategorie = new LinkedHashMap<>();
-        for (PermissionOption p : permissions) parCategorie.computeIfAbsent(p.categorie(), k -> new ArrayList<>()).add(p);
+        for (PermissionOption p : permissions)
+            parCategorie.computeIfAbsent(p.categorie(), k -> new ArrayList<>()).add(p);
 
         accordionModules.getPanes().clear();
         casesParIdPermission.clear();
@@ -173,7 +189,9 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
             for (PermissionOption permission : entree.getValue()) {
                 CheckBox caseACocher = new CheckBox(permission.libelle());
                 caseACocher.getStyleClass().add("permission-check");
-                caseACocher.selectedProperty().addListener((obs, a, n) -> { if (!enChargement) signalerModification(); });
+                caseACocher.selectedProperty().addListener((obs, a, n) -> {
+                    if (!enChargement) signalerModification();
+                });
                 cases.add(caseACocher);
                 casesParIdPermission.put(permission.idPermission(), caseACocher);
             }
@@ -187,12 +205,13 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
             accordionModules.getPanes().add(pane);
         }
 
-        if (!accordionModules.getPanes().isEmpty()) accordionModules.setExpandedPane(accordionModules.getPanes().get(0));
+        if (!accordionModules.getPanes().isEmpty())
+            accordionModules.setExpandedPane(accordionModules.getPanes().get(0));
         if (roleSelectionne != null) chargerRole(roleSelectionne);
     }
 
     private CheckBox creerCaseSelectionnerTout(List<CheckBox> cases) {
-        CheckBox toutSelectionner = new CheckBox("Tout sélectionner");
+        CheckBox toutSelectionner = new CheckBox(i18n().t("roles.select_all"));
         toutSelectionner.getStyleClass().add("check-select-all");
         toutSelectionner.setOnAction(e -> {
             boolean coche = toutSelectionner.isSelected();
@@ -207,50 +226,45 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
     }
 
     private void signalerModification() {
-        labelModificationsNonEnregistrees.setText("Modifications non enregistrées");
+        labelModificationsNonEnregistrees.setText(i18n().t("roles.unsaved_changes"));
     }
 
-    /**
-     * Enregistre les permissions sélectionnées pour le rôle courant.
-     */
     private void enregistrerPermissions() {
         if (roleSelectionne == null) return;
         Set<String> idsCoches = new HashSet<>();
-        casesParIdPermission.forEach((id, c) -> { if (c.isSelected()) idsCoches.add(id); });
+        casesParIdPermission.forEach((id, c) -> {
+            if (c.isSelected()) idsCoches.add(id);
+        });
 
         Stage stage = StageHelper.getStage(btnEnregistrerPermissions);
         btnEnregistrerPermissions.setDisable(true);
 
         service.enregistrerPermissionsAsync(roleSelectionne.idRole(), idEcoleCourante, idsCoches, idUtilisateurConnecte,
                 () -> Platform.runLater(() -> {
-                    labelModificationsNonEnregistrees.setText("Enregistré ✓");
+                    labelModificationsNonEnregistrees.setText(i18n().t("roles.saved"));
                     btnEnregistrerPermissions.setDisable(false);
 
                     auditService.tracerActionAsync(
                             "HABILITATIONS",
                             "MODIFICATION_PERMISSIONS",
-                            "Mise à jour des permissions du rôle : " + roleSelectionne.nomRole() + " (" + idsCoches.size() + " autorisations octroyées)"
+                            "Mise à jour des permissions du rôle : " + roleSelectionne.nomRole()
+                                    + " (" + idsCoches.size() + " autorisations octroyées)"
                     );
 
-                    ToastNotification.succes(stage, "Permissions enregistrées avec succès !");
+                    ToastNotification.succes(stage, i18n().t("roles.permissions_saved"));
                 }),
                 erreur -> Platform.runLater(() -> {
                     btnEnregistrerPermissions.setDisable(false);
-                    ToastNotification.erreur(stage, "Échec de l'enregistrement des permissions.");
+                    ToastNotification.erreur(stage, i18n().t("roles.save_error"));
                 }));
     }
 
-    /**
-     * Ouvre la modale FXML pour la création d'un rôle.
-     */
-    // ✅ DANS RolesPermissionsTabController.java
     private void creerNouveauRole() {
-        // Force la récupération directe de l'ID d'école actuel
         String ecoleId = SessionManager.getInstance().getIdEcoleCourante();
 
         if (ecoleId == null || ecoleId.isBlank()) {
             Stage stage = StageHelper.getStage(btnNouveauRole);
-            ToastNotification.avertissement(stage, "Aucune école active. Veuillez vous reconnecter.");
+            ToastNotification.avertissement(stage, i18n().t("roles.no_school_short"));
             return;
         }
 
@@ -258,7 +272,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         RoleModalController controller = ModalUtil.ouvrirModal(
                 getClass(),
                 fxmlPath,
-                "Créer un rôle",
+                i18n().t("roles.modal.create.title"),
                 btnNouveauRole.getScene().getWindow(),
                 480,
                 396.8
@@ -268,36 +282,31 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         }
     }
 
-    /**
-     * Ouvre la modale FXML pour la modification/renommage du rôle sélectionné.
-     */
     private void renommerRoleSelectionne() {
+        if (roleSelectionne == null) return;
 
         String fxmlPath = "/org/erpklassup/erpklassup/view/creer-role-view.fxml";
         RoleModalController controller = ModalUtil.ouvrirModal(
                 getClass(),
                 fxmlPath,
-                "Modifier un rôle",
+                i18n().t("roles.modal.edit.title"),
                 btnNouveauRole.getScene().getWindow(),
                 480,
                 396.8
         );
         if (controller != null) {
             controller.initEdition(idEcoleCourante, roleSelectionne, this::chargerRoles);
-            System.out.println(idEcoleCourante);
         }
     }
 
-    /**
-     * Supprime le rôle actuellement sélectionné.
-     */
     private void supprimerRoleSelectionne() {
         if (roleSelectionne == null) return;
         Stage stage = StageHelper.getStage(btnSupprimerRole);
 
         boolean confirme = AlertUtil.afficherConfirmation(
-                "Supprimer Role",
-                "Supprimer le rôle \"" + roleSelectionne.nomRole() + "\" ? Les utilisateurs concernés perdront cet accès." ,              stage
+                i18n().t("roles.confirm_delete.title"),
+                i18n().t("roles.confirm_delete.message", roleSelectionne.nomRole()),
+                stage
         );
         if (confirme) {
             String nomRoleSupprime = roleSelectionne.nomRole();
@@ -314,9 +323,9 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                                 "Suppression du rôle : " + nomRoleSupprime
                         );
 
-                        ToastNotification.succes(stage, "Le rôle \"" + nomRoleSupprime + "\" a été supprimé.");
+                        ToastNotification.succes(stage, i18n().t("roles.deleted", nomRoleSupprime));
                     }),
-                    erreur -> Platform.runLater(() -> ToastNotification.erreur(stage, "Erreur lors de la suppression du rôle.")));
-        };
+                    erreur -> Platform.runLater(() -> ToastNotification.erreur(stage, i18n().t("roles.delete_error"))));
         }
     }
+}

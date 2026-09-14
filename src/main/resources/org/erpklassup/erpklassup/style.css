@@ -1740,3 +1740,7 @@
 .btn-clear-search:pressed {
     -fx-background-color: rgba(0, 0, 0, 0.10);
 }
+.popup-transparent,
+.popup-transparent .root {
+    -fx-background-color: transparent;
+}

@@ -18,6 +18,7 @@ import org.erpklassup.erpklassup.dto.RoleOption;
 import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.service.UtilisateurService;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.net.URL;
@@ -53,13 +54,11 @@ public class UserCreateController implements Initializable {
     @FXML private Label recapNomLabel, recapTypeLabel, recapIdMetierLabel;
     @FXML private TextField usernameField, emailField;
     @FXML private PasswordField passwordField, confirmPasswordField;
-    @FXML private TextField passwordTextField, confirmPasswordTextField; // Pour le mode afficher mdp
+    @FXML private TextField passwordTextField, confirmPasswordTextField;
     @FXML private Button btnTogglePassword;
     @FXML private Label erreurUsername, erreurEmail, erreurConfirmMdp, forceMdpLabel;
     @FXML private ProgressBar forceMdpProgress;
     @FXML private CheckBox doitChangerMdpCheckBox, emailVerifieCheckBox;
-
-    // NOUVEAU : CheckBox pour mot de passe par défaut
     @FXML private CheckBox useDefaultPasswordCheckBox;
 
     // ===== FXID FOOTER =====
@@ -73,11 +72,16 @@ public class UserCreateController implements Initializable {
     private static final Color COULEUR_INACTIVE = Color.web("#2A3B61");
 
     private int etapeActuelle = 1;
-    private String typeCompteSelectionne = ""; // PERSONNEL, ELEVE, PARENT, PROMOTEUR
+    private String typeCompteSelectionne = "";
     private PersonneDTO personneSelectionnee = null;
     private String idEcoleCourante;
     private Runnable callbackSuccess;
     private boolean mdpVisible = false;
+
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -99,10 +103,18 @@ public class UserCreateController implements Initializable {
     // 1. ÉTAPE 1 (SÉLECTION DU TYPE DE COMPTE)
     // -------------------------------------------------------------
     private void configurerCartesEtape1() {
-        cardPersonnel.setOnMouseClicked(e -> selectionnerType("PERSONNEL", cardPersonnel, "Sélectionnez un membre du personnel actif n'ayant pas encore de compte utilisateur."));
-        cardEleve.setOnMouseClicked(e -> selectionnerType("ELEVE", cardEleve, "Sélectionnez un élève inscrit pour lui ouvrir un accès au portail."));
-        cardParent.setOnMouseClicked(e -> selectionnerType("PARENT", cardParent, "Sélectionnez un parent d'élève pour lui donner accès au suivi."));
-        cardPromoteur.setOnMouseClicked(e -> selectionnerType("PROMOTEUR", cardPromoteur, "Création directe d'un compte Administrateur / Promoteur sans fiche préalable."));
+        cardPersonnel.setOnMouseClicked(e -> selectionnerType(
+                "PERSONNEL", cardPersonnel,
+                i18n().t("user_create.type.personnel.hint")));
+        cardEleve.setOnMouseClicked(e -> selectionnerType(
+                "ELEVE", cardEleve,
+                i18n().t("user_create.type.eleve.hint")));
+        cardParent.setOnMouseClicked(e -> selectionnerType(
+                "PARENT", cardParent,
+                i18n().t("user_create.type.parent.hint")));
+        cardPromoteur.setOnMouseClicked(e -> selectionnerType(
+                "PROMOTEUR", cardPromoteur,
+                i18n().t("user_create.type.promoteur.hint")));
     }
 
     private void selectionnerType(String type, VBox cardTarget, String description) {
@@ -133,7 +145,8 @@ public class UserCreateController implements Initializable {
         tableResultats.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             this.personneSelectionnee = newVal;
             if (newVal != null && infoSelectionLabel != null) {
-                infoSelectionLabel.setText("Sélectionné : " + newVal.getNom() + " " + newVal.getPrenom() + " (" + newVal.getMatricule() + ")");
+                infoSelectionLabel.setText(i18n().t("user_create.selected",
+                        newVal.getNom() + " " + newVal.getPrenom() + " (" + newVal.getMatricule() + ")"));
                 infoSelectionLabel.setVisible(true);
                 infoSelectionLabel.setManaged(true);
             }
@@ -144,31 +157,33 @@ public class UserCreateController implements Initializable {
     }
 
     private void configurerChampsDirects() {
-        roleSystemeCombo.setItems(FXCollections.observableArrayList("ADMINISTRATEUR", "PROMOTEUR", "SUPER_ADMIN"));
+        roleSystemeCombo.setItems(FXCollections.observableArrayList(
+                "ADMINISTRATEUR", "PROMOTEUR", "SUPER_ADMIN"));
         roleSystemeCombo.getSelectionModel().selectFirst();
     }
 
     private void effectuerRechercheAsync() {
         String query = searchPersonneField.getText().trim();
-        tableResultats.setPlaceholder(new Label("Recherche en cours..."));
+        tableResultats.setPlaceholder(new Label(i18n().t("user_create.search.loading")));
 
         Task<ObservableList<PersonneDTO>> task = new Task<>() {
             @Override
             protected ObservableList<PersonneDTO> call() throws Exception {
-                return utilisateurService.rechercherPersonnesSansCompte(idEcoleCourante, typeCompteSelectionne, query);
+                return utilisateurService.rechercherPersonnesSansCompte(
+                        idEcoleCourante, typeCompteSelectionne, query);
             }
         };
 
         task.setOnSucceeded(e -> {
             tableResultats.setItems(task.getValue());
             if (task.getValue().isEmpty()) {
-                tableResultats.setPlaceholder(new Label("Aucune personne disponible trouvée."));
+                tableResultats.setPlaceholder(new Label(i18n().t("user_create.search.empty")));
             }
         });
 
         task.setOnFailed(e -> {
-            tableResultats.setPlaceholder(new Label("Erreur lors de la recherche."));
-            ToastNotification.erreur(getStage(), "Erreur de chargement des fiches.");
+            tableResultats.setPlaceholder(new Label(i18n().t("user_create.search.error")));
+            ToastNotification.erreur(getStage(), i18n().t("user_create.search.error_toast"));
         });
 
         new Thread(task).start();
@@ -188,7 +203,8 @@ public class UserCreateController implements Initializable {
     private void avancerEtape() {
         if (etapeActuelle == 1) {
             if (typeCompteSelectionne.isEmpty()) {
-                ToastNotification.avertissement(getStage(), "Veuillez choisir un type de compte.");
+                ToastNotification.avertissement(getStage(),
+                        i18n().t("user_create.error.type_required"));
                 return;
             }
             preparerEtape2();
@@ -196,11 +212,13 @@ public class UserCreateController implements Initializable {
         } else if (etapeActuelle == 2) {
             if ("PROMOTEUR".equals(typeCompteSelectionne)) {
                 if (nomDirectField.getText().isBlank() || prenomDirectField.getText().isBlank()) {
-                    ToastNotification.avertissement(getStage(), "Veuillez renseigner au moins le nom et le prénom.");
+                    ToastNotification.avertissement(getStage(),
+                            i18n().t("user_create.error.name_required"));
                     return;
                 }
             } else if (personneSelectionnee == null) {
-                ToastNotification.avertissement(getStage(), "Veuillez sélectionner une personne dans la liste.");
+                ToastNotification.avertissement(getStage(),
+                        i18n().t("user_create.error.person_required"));
                 return;
             }
             preparerEtape3();
@@ -226,7 +244,8 @@ public class UserCreateController implements Initializable {
         sectionSaisieDirecte.setManaged(estPromoteur);
 
         if (!estPromoteur) {
-            titreRechercheLabel.setText("Rechercher un " + typeCompteSelectionne.toLowerCase());
+            titreRechercheLabel.setText(i18n().t("user_create.search.title",
+                    typeCompteSelectionne.toLowerCase()));
             tableResultats.getItems().clear();
             personneSelectionnee = null;
             if (infoSelectionLabel != null) infoSelectionLabel.setVisible(false);
@@ -238,21 +257,23 @@ public class UserCreateController implements Initializable {
         String baseUser = "";
         if ("PROMOTEUR".equals(typeCompteSelectionne)) {
             recapNomLabel.setText(nomDirectField.getText().trim() + " " + prenomDirectField.getText().trim());
-            recapTypeLabel.setText("Promoteur / Admin (" + roleSystemeCombo.getValue() + ")");
-            recapIdMetierLabel.setText("Nouveau profil");
+            recapTypeLabel.setText(i18n().t("user_create.recap.promoteur",
+                    roleSystemeCombo.getValue()));
+            recapIdMetierLabel.setText(i18n().t("user_create.recap.new_profile"));
 
-            baseUser = (prenomDirectField.getText().trim().substring(0, 1) + nomDirectField.getText().trim()).toLowerCase().replaceAll("\\s+", "");
+            baseUser = (prenomDirectField.getText().trim().substring(0, 1)
+                    + nomDirectField.getText().trim()).toLowerCase().replaceAll("\\s+", "");
         } else if (personneSelectionnee != null) {
             recapNomLabel.setText(personneSelectionnee.getNom() + " " + personneSelectionnee.getPrenom());
             recapTypeLabel.setText(typeCompteSelectionne);
             recapIdMetierLabel.setText(personneSelectionnee.getMatricule());
 
-            baseUser = (personneSelectionnee.getPrenom().substring(0, 1) + personneSelectionnee.getNom()).toLowerCase().replaceAll("\\s+", "");
+            baseUser = (personneSelectionnee.getPrenom().substring(0, 1)
+                    + personneSelectionnee.getNom()).toLowerCase().replaceAll("\\s+", "");
         }
 
         usernameField.setText(baseUser);
 
-        // Mise à jour du mot de passe par défaut si la case est cochée
         if (useDefaultPasswordCheckBox != null && useDefaultPasswordCheckBox.isSelected()) {
             appliquerMotDePasseParDefaut();
         }
@@ -286,7 +307,8 @@ public class UserCreateController implements Initializable {
         appliquerEtatEtape(circleEtape3, numEtape3, labelEtape3, etapeActuelle >= 3, false);
     }
 
-    private void appliquerEtatEtape(Circle cercle, Label numero, Label libelle, boolean atteinte, boolean completee) {
+    private void appliquerEtatEtape(Circle cercle, Label numero, Label libelle,
+                                    boolean atteinte, boolean completee) {
         cercle.setFill(atteinte ? COULEUR_ACTIVE : COULEUR_INACTIVE);
 
         numero.getStyleClass().removeAll("active", "completed");
@@ -304,16 +326,15 @@ public class UserCreateController implements Initializable {
     // 4. MOT DE PASSE & VALIDEURS
     // -------------------------------------------------------------
     private void configurerMotDePasse() {
-        passwordField.textProperty().addListener((obs, oldVal, newVal) -> calculerForceMotDePasse(newVal));
+        passwordField.textProperty().addListener((obs, oldVal, newVal) ->
+                calculerForceMotDePasse(newVal));
 
-        // Mettre à jour le mot de passe si le nom d'utilisateur change et que la case est cochée
         usernameField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (useDefaultPasswordCheckBox != null && useDefaultPasswordCheckBox.isSelected()) {
                 appliquerMotDePasseParDefaut();
             }
         });
 
-        // Écouteur pour la case à cocher "Mot de passe par défaut"
         if (useDefaultPasswordCheckBox != null) {
             useDefaultPasswordCheckBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
                 if (isSelected) {
@@ -332,20 +353,21 @@ public class UserCreateController implements Initializable {
                 mdpVisible = !mdpVisible;
                 if (mdpVisible) {
                     passwordTextField.setText(passwordField.getText());
-                    passwordTextField.setVisible(true); passwordTextField.setManaged(true);
-                    passwordField.setVisible(false); passwordField.setManaged(false);
+                    passwordTextField.setVisible(true);
+                    passwordTextField.setManaged(true);
+                    passwordField.setVisible(false);
+                    passwordField.setManaged(false);
                 } else {
                     passwordField.setText(passwordTextField.getText());
-                    passwordField.setVisible(true); passwordField.setManaged(true);
-                    passwordTextField.setVisible(false); passwordTextField.setManaged(false);
+                    passwordField.setVisible(true);
+                    passwordField.setManaged(true);
+                    passwordTextField.setVisible(false);
+                    passwordTextField.setManaged(false);
                 }
             });
         }
     }
 
-    /**
-     * Calcule et applique le mot de passe par défaut : MATRICULE + USERNAME
-     */
     private void appliquerMotDePasseParDefaut() {
         String matriculeOuNom = "";
         if ("PROMOTEUR".equals(typeCompteSelectionne)) {
@@ -383,13 +405,13 @@ public class UserCreateController implements Initializable {
         }
 
         if (score < 0.4) {
-            forceMdpLabel.setText("Faible");
+            forceMdpLabel.setText(i18n().t("user_create.password.weak"));
             forceMdpLabel.setStyle("-fx-text-fill: #E5484D; -fx-font-weight: bold;");
         } else if (score < 0.75) {
-            forceMdpLabel.setText("Moyen");
+            forceMdpLabel.setText(i18n().t("user_create.password.medium"));
             forceMdpLabel.setStyle("-fx-text-fill: #F5A524; -fx-font-weight: bold;");
         } else {
-            forceMdpLabel.setText("Fort");
+            forceMdpLabel.setText(i18n().t("user_create.password.strong"));
             forceMdpLabel.setStyle("-fx-text-fill: #16A34A; -fx-font-weight: bold;");
         }
     }
@@ -400,7 +422,6 @@ public class UserCreateController implements Initializable {
     private void enregistrerUtilisateurAsync() {
         String username = usernameField.getText().trim();
 
-        // CORRECTION UNIQUE EMAIL : Si l'email est vide, envoyer null au lieu de ""
         String emailSaisie = emailField.getText().trim();
         String email = emailSaisie.isBlank() ? null : emailSaisie;
 
@@ -408,19 +429,20 @@ public class UserCreateController implements Initializable {
         String confirmMdp = confirmPasswordField.getText();
 
         if (username.isBlank()) {
-            masquerEtAfficherErreur(erreurUsername, "Username requis.");
+            masquerEtAfficherErreur(erreurUsername, i18n().t("user_create.error.username_required"));
             return;
         } else {
             masquerErreur(erreurUsername);
         }
 
         if (password.length() < 6) {
-            ToastNotification.avertissement(getStage(), "Le mot de passe doit faire au moins 6 caractères.");
+            ToastNotification.avertissement(getStage(),
+                    i18n().t("user_create.error.password_too_short"));
             return;
         }
 
         if (!password.equals(confirmMdp)) {
-            masquerEtAfficherErreur(erreurConfirmMdp, "Les mots de passe ne correspondent pas !");
+            masquerEtAfficherErreur(erreurConfirmMdp, i18n().t("user_create.error.password_mismatch"));
             return;
         } else {
             masquerErreur(erreurConfirmMdp);
@@ -428,9 +450,12 @@ public class UserCreateController implements Initializable {
 
         btnCreer.setDisable(true);
 
-        String idLiaison = ("PROMOTEUR".equals(typeCompteSelectionne)) ? null : personneSelectionnee.getMatricule();
-        String nom = ("PROMOTEUR".equals(typeCompteSelectionne)) ? nomDirectField.getText().trim() : personneSelectionnee.getNom();
-        String prenom = ("PROMOTEUR".equals(typeCompteSelectionne)) ? prenomDirectField.getText().trim() : personneSelectionnee.getPrenom();
+        String idLiaison = ("PROMOTEUR".equals(typeCompteSelectionne))
+                ? null : personneSelectionnee.getMatricule();
+        String nom = ("PROMOTEUR".equals(typeCompteSelectionne))
+                ? nomDirectField.getText().trim() : personneSelectionnee.getNom();
+        String prenom = ("PROMOTEUR".equals(typeCompteSelectionne))
+                ? prenomDirectField.getText().trim() : personneSelectionnee.getPrenom();
 
         utilisateurService.creerUtilisateurAsync(
                 idEcoleCourante,
@@ -438,17 +463,19 @@ public class UserCreateController implements Initializable {
                 password,
                 nom,
                 prenom,
-                email, // Transmet null si vide
+                email,
                 typeCompteSelectionne,
                 () -> Platform.runLater(() -> {
-                    auditService.tracerActionAsync("HABILITATIONS", "CREATION_UTILISATEUR", "Compte créé pour : " + username + " (" + typeCompteSelectionne + ")");
-                    ToastNotification.succes(getStage(), "Compte utilisateur créé avec succès !");
+                    auditService.tracerActionAsync("HABILITATIONS", "CREATION_UTILISATEUR",
+                            "Compte créé pour : " + username + " (" + typeCompteSelectionne + ")");
+                    ToastNotification.succes(getStage(), i18n().t("user_create.success"));
                     if (callbackSuccess != null) callbackSuccess.run();
                     fermerFenetre();
                 }),
                 erreur -> Platform.runLater(() -> {
                     btnCreer.setDisable(false);
-                    ToastNotification.erreur(getStage(), "Erreur : " + erreur.getMessage());
+                    ToastNotification.erreur(getStage(),
+                            i18n().t("common.error_detail", erreur.getMessage()));
                 })
         );
     }

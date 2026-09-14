@@ -3,13 +3,14 @@ package org.erpklassup.erpklassup.util;
 import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.scene.paint.Color;
+import javafx.stage.*;
 import org.erpklassup.erpklassup.HelloApplication;
 import org.erpklassup.erpklassup.WindowsTitleBar;
 
@@ -19,32 +20,32 @@ public class ModalUtil {
 
     private static final String APP_BAR_COLOR = "#16213A";
 
+    /** Padding laissé autour du contenu pour laisser respirer l'ombre portée. */
+    private static final double PADDING_OMBRE = 30;
+
+    // ==========================================
+    // MODAL CLASSIQUE (centré, avec décoration)
+    // ==========================================
     /**
-     * Ouvre n'importe quel fichier FXML en utilisant une classe de contexte pour résoudre le chemin.
+     * Ouvre un modal centré, avec décoration Windows.
+     * Utilise I18nManager pour résoudre les %clés du FXML.
      *
-     * @param contextClass La classe appelante (ex: getClass() ou VotreControleur.class)
-     * @param fxmlPath     Le chemin relatif ou absolu vers le FXML
-     * @param titre        Le titre de la fenêtre
-     * @param fenetreParente La fenêtre parente
-     * @param largeur      Largeur de la fenêtre
-     * @param hauteur      Hauteur de la fenêtre
+     * @param contextClass   Classe de contexte pour résoudre le FXML
+     * @param fxmlPath       Chemin du FXML (relatif ou absolu)
+     * @param titre          Titre de la fenêtre
+     * @param fenetreParente Fenêtre parente (propriétaire)
+     * @param largeur        Largeur de la fenêtre
+     * @param hauteur        Hauteur de la fenêtre
      */
-    public static <T> T ouvrirModal(Class<?> contextClass, String fxmlPath, String titre, Window fenetreParente, double largeur, double hauteur) {
+    public static <T> T ouvrirModal(Class<?> contextClass,
+                                    String fxmlPath,
+                                    String titre,
+                                    Window fenetreParente,
+                                    double largeur,
+                                    double hauteur) {
         try {
-            // 1. Recherche via le ClassLoader du contexte
-            URL fxmlUrl = contextClass.getResource(fxmlPath);
-
-            // 2. Recherche secondaire si le premier essai échoue
-            if (fxmlUrl == null) {
-                String cleanPath = fxmlPath.startsWith("/") ? fxmlPath.substring(1) : fxmlPath;
-                fxmlUrl = contextClass.getClassLoader().getResource(cleanPath);
-            }
-
-            if (fxmlUrl == null) {
-                throw new IllegalArgumentException("Fichier FXML introuvable : " + fxmlPath + " (Contexte : " + contextClass.getName() + ")");
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            // ✅ Utilise I18nManager pour créer le loader avec le ResourceBundle
+            FXMLLoader loader = I18nManager.getInstance().creerLoader(contextClass, fxmlPath);
             Parent contenu = loader.load();
 
             Stage stage = new Stage();
@@ -64,7 +65,9 @@ public class ModalUtil {
 
             try {
                 stage.getIcons().add(new Image(HelloApplication.class.getResourceAsStream("logo.png")));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // Pas d'icône → pas grave
+            }
 
             stage.show();
             WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
@@ -72,92 +75,118 @@ public class ModalUtil {
             return loader.getController();
 
         } catch (Exception e) {
-            System.err.println("Erreur lors de l'ouverture du modal FXML : " + fxmlPath);
+            System.err.println("❌ Erreur lors de l'ouverture du modal FXML : " + fxmlPath);
             e.printStackTrace();
             return null;
         }
     }
+
+    // ==========================================
+    // POPUP TRANSPARENTE (sous un nœud)
+    // ==========================================
     /**
-     * Ouvre un modal positionné SOUS un nœud ancêtre (comme une popup).
-     * Utilise le pattern modal mais avec positionnement personnalisé.
+     * Ouvre une popup (Stage transparent, sans décoration) positionnée SOUS un nœud ancêtre.
+     * Supporte les coins arrondis et l'ombre portée grâce à un fond de scène transparent.
+     * Utilise I18nManager pour résoudre les %clés du FXML.
      *
-     * @param contextClass    Classe de contexte pour résoudre le FXML
-     * @param fxmlPath        Chemin du FXML
-     * @param titre           Titre de la fenêtre (souvent vide pour une popup)
-     * @param fenetreParente  Fenêtre parente
-     * @param noeudAncetre    Nœud sous lequel positionner la popup
-     * @param largeur         Largeur
-     * @param hauteur         Hauteur
+     * @param contextClass   Classe de contexte pour résoudre le FXML
+     * @param fxmlPath       Chemin du FXML (relatif ou absolu)
+     * @param titre          Titre de la fenêtre (souvent vide pour une popup)
+     * @param fenetreParente Fenêtre parente (propriétaire)
+     * @param noeudAncetre   Nœud sous lequel positionner la popup
+     * @param largeur        Largeur VISIBLE (sans le padding d'ombre)
+     * @param hauteur        Hauteur VISIBLE (sans le padding d'ombre)
      */
     public static <T> T ouvrirPopupSous(Class<?> contextClass,
                                         String fxmlPath,
                                         String titre,
                                         Window fenetreParente,
-                                        javafx.scene.Node noeudAncetre,
+                                        Node noeudAncetre,
                                         double largeur,
                                         double hauteur) {
         try {
-            // 1. Charger le FXML
-            URL fxmlUrl = contextClass.getResource(fxmlPath);
-            if (fxmlUrl == null) {
-                String cleanPath = fxmlPath.startsWith("/") ? fxmlPath.substring(1) : fxmlPath;
-                fxmlUrl = contextClass.getClassLoader().getResource(cleanPath);
-            }
-            if (fxmlUrl == null) {
-                throw new IllegalArgumentException("FXML introuvable : " + fxmlPath);
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            // ==========================================
+            // 1. Charger le FXML avec le bundle i18n
+            // ==========================================
+            FXMLLoader loader = I18nManager.getInstance().creerLoader(contextClass, fxmlPath);
             Parent contenu = loader.load();
 
-            // 2. Créer le Stage
+            // ==========================================
+            // 2. Créer le Stage transparent
+            // ==========================================
             Stage stage = new Stage();
             stage.setTitle(titre != null ? titre : "");
-            stage.initStyle(StageStyle.UNDECORATED);   // ✅ Pas de barre de titre
-            stage.setAlwaysOnTop(true);                // ✅ Au-dessus des autres fenêtres
+            stage.initStyle(StageStyle.TRANSPARENT);   // ✅ Pas de décoration Windows
+            stage.setAlwaysOnTop(true);
 
             if (fenetreParente != null) {
                 stage.initOwner(fenetreParente);
-                stage.initModality(Modality.WINDOW_MODAL);  // ✅ Bloque les clics sur la fenêtre parente
+                stage.initModality(Modality.WINDOW_MODAL);
             }
 
-            Scene scene = new Scene(contenu, largeur, hauteur);
-            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);  // ✅ Fond transparent
+            // ==========================================
+            // 3. Scene transparente + taille élargie pour l'ombre
+            // ==========================================
+            double sceneWidth = largeur + 2 * PADDING_OMBRE;
+            double sceneHeight = hauteur + 2 * PADDING_OMBRE;
+
+            Scene scene = new Scene(contenu, sceneWidth, sceneHeight);
+
+            // ⚠️ ORDRE CRUCIAL :
+            //   1) setFill AVANT setUserAgentStylesheet
+            //   2) setUserAgentStylesheet peut écraser le fill
+            scene.setFill(Color.TRANSPARENT);
+
             Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
             stage.setScene(scene);
             stage.setResizable(false);
 
-            // 3. Positionner SOUS le nœud ancêtre
+            // ==========================================
+            // 4. Position sous le nœud ancêtre
+            // ==========================================
             if (noeudAncetre != null && noeudAncetre.getScene() != null) {
-                javafx.geometry.Bounds bounds = noeudAncetre.localToScreen(
-                        noeudAncetre.getBoundsInLocal());
+                Bounds bounds = noeudAncetre.localToScreen(noeudAncetre.getBoundsInLocal());
                 if (bounds != null) {
-                    // Aligner à droite du nœud
-                    double x = bounds.getMaxX() - largeur;
-                    double y = bounds.getMaxY() + 8;   // 8px sous le nœud
+                    // Aligner à droite du nœud (compensation du padding gauche)
+                    double x = bounds.getMaxX() - largeur - PADDING_OMBRE;
+                    double y = bounds.getMaxY() - PADDING_OMBRE + 8;
 
-                    // Empêcher la popup de sortir de l'écran
-                    javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
-                    javafx.geometry.Rectangle2D screenBounds = screen.getVisualBounds();
-
-                    if (x < screenBounds.getMinX()) x = screenBounds.getMinX();
-                    if (x + largeur > screenBounds.getMaxX()) x = screenBounds.getMaxX() - largeur;
-                    if (y + hauteur > screenBounds.getMaxY()) y = bounds.getMinY() - hauteur - 8;
+                    // Empêcher la sortie d'écran
+                    Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+                    if (x < screen.getMinX()) {
+                        x = screen.getMinX();
+                    }
+                    if (x + sceneWidth > screen.getMaxX()) {
+                        x = screen.getMaxX() - sceneWidth;
+                    }
+                    if (y + sceneHeight > screen.getMaxY()) {
+                        // Basculer au-dessus du nœud si pas assez de place en dessous
+                        y = bounds.getMinY() - sceneHeight + PADDING_OMBRE - 8;
+                    }
 
                     stage.setX(x);
                     stage.setY(y);
                 }
             }
 
-            // 4. Fermeture automatique quand on clique ailleurs
+            // ==========================================
+            // 5. Fermeture automatique au clic ailleurs
+            // ==========================================
             stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                 if (wasFocused && !isNowFocused) {
                     stage.close();
                 }
             });
 
+            // ==========================================
+            // 6. Afficher + re-forcer la transparence
+            // ==========================================
             stage.show();
+
+            // ✅ Double sécurité : Windows peut remettre un fond après show()
+            stage.getScene().setFill(Color.TRANSPARENT);
+
             return loader.getController();
 
         } catch (Exception e) {
@@ -167,79 +196,3 @@ public class ModalUtil {
         }
     }
 }
-//package org.erpklassup.erpklassup.util;
-//
-//import atlantafx.base.theme.PrimerLight;
-//import javafx.application.Application;
-//import javafx.fxml.FXMLLoader;
-//import javafx.scene.Parent;
-//import javafx.scene.Scene;
-//import javafx.scene.image.Image;
-//import javafx.stage.Modality;
-//import javafx.stage.Stage;
-//import javafx.stage.StageStyle;
-//import javafx.stage.Window;
-//import org.erpklassup.erpklassup.HelloApplication;
-//import org.erpklassup.erpklassup.WindowsTitleBar;
-//
-//import java.io.IOException;
-//import java.net.URL;
-//
-//public class ModalUtil {
-//
-//    private static final String APP_BAR_COLOR = "#16213A";
-//
-//    /**
-//     * Ouvre n'importe quel fichier FXML dans un Stage personnalisé
-//     */
-//    public static <T> T ouvrirModal(String fxmlPath, String titre, Window fenetreParente, double largeur, double hauteur) {
-//        try {
-//            // ✅ 1. Normalisation du chemin FXML
-//            String pathComplet = fxmlPath.startsWith("/") ? fxmlPath : "/view/" + fxmlPath;
-//
-//            // ✅ 2. Chargement via le ClassLoader du thread courant ou de la classe
-//            URL fxmlUrl = ModalUtil.class.getResource(pathComplet);
-//
-//            if (fxmlUrl == null) {
-//                // Recherche secondaire si le chemin direct échoue
-//                fxmlUrl = HelloApplication.class.getClassLoader().getResource(fxmlPath.startsWith("/") ? fxmlPath.substring(1) : fxmlPath);
-//            }
-//
-//            if (fxmlUrl == null) {
-//                throw new IllegalArgumentException("Fichier FXML introuvable au chemin : " + pathComplet);
-//            }
-//
-//            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-//            Parent contenu = loader.load();
-//
-//            Stage stage = new Stage();
-//            stage.setTitle(titre);
-//            stage.initStyle(StageStyle.DECORATED);
-//
-//            if (fenetreParente != null) {
-//                stage.initOwner(fenetreParente);
-//                stage.initModality(Modality.WINDOW_MODAL);
-//            }
-//
-//            Scene scene = new Scene(contenu, largeur, hauteur);
-//            Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
-//
-//            stage.setScene(scene);
-//            stage.setResizable(false);
-//
-//            try {
-//                stage.getIcons().add(new Image(HelloApplication.class.getResourceAsStream("logo.png")));
-//            } catch (Exception ignored) {}
-//
-//            stage.show();
-//            WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
-//
-//            return loader.getController();
-//
-//        } catch (Exception e) {
-//            System.err.println("Erreur lors de l'ouverture du modal FXML : " + fxmlPath);
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//}

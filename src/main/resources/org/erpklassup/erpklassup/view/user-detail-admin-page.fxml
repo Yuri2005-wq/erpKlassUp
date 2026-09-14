@@ -22,81 +22,81 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane prefHeight="581.0" prefWidth="806.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserDetailController">
+<StackPane prefHeight="581.0" prefWidth="806.0" stylesheets="@../style.css"
+           xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserDetailController">
 
     <VBox style="-fx-background-color: #111a2e;">
         <children>
 
-            <!-- ===== EN-TÊTE PROFIL (Avatar + Infos rapides) ===== -->
+            <!-- EN-TÊTE -->
             <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
                 <StackPane>
                     <Circle fill="#F5A524" radius="28" />
                     <Label fx:id="avatarLabel" style="-fx-text-fill: #16213A; -fx-font-size: 16px; -fx-font-weight: bold;" text="TK" />
                 </StackPane>
                 <VBox spacing="3">
-                    <Label fx:id="nomCompletLabel" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="TCHOUA Sandrine" />
-                    <Label fx:id="usernameLabel" styleClass="page-subtitle" text="Tsandrine" />
+                    <Label fx:id="nomCompletLabel" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="—" />
+                    <Label fx:id="usernameLabel" styleClass="page-subtitle" text="—" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
                 <Label fx:id="badgeStatut" styleClass="event-tag, tag-green" text="● Actif" />
                 <Label fx:id="badge2FA" styleClass="event-tag, tag-blue" text="● 2FA" />
             </HBox>
 
-            <!-- ===== TABPANE STYLÉ COMME TON PATTERN ===== -->
+            <!-- TABPANE -->
             <TabPane fx:id="tabPane" style="-fx-background-color: transparent;" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
-                <!-- ===== ONGLET 1 : INFORMATIONS ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Informations">
+                <!-- ONGLET 1 : INFORMATIONS -->
+                <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.info">
                     <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                                <!-- Section : Informations personnelles -->
                                 <VBox spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Informations personnelles" />
+                                        <Label styleClass="card-title" text="%user_detail.info.title" />
                                     </HBox>
 
                                     <HBox spacing="15">
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Nom *" />
+                                            <Label styleClass="field-label" text="%user_detail.info.lastname" />
                                             <TextField fx:id="nomField" styleClass="input" />
                                         </VBox>
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Prénom" />
+                                            <Label styleClass="field-label" text="%user_detail.info.firstname" />
                                             <TextField fx:id="prenomField" styleClass="input" />
                                         </VBox>
                                     </HBox>
 
                                     <HBox spacing="15">
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Username *" />
+                                            <Label styleClass="field-label" text="%user_detail.info.username" />
                                             <TextField fx:id="usernameField" styleClass="input" />
                                         </VBox>
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Email" />
+                                            <Label styleClass="field-label" text="%user_detail.info.email" />
                                             <TextField fx:id="emailField" styleClass="input" />
                                         </VBox>
                                     </HBox>
 
                                     <HBox spacing="15">
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Téléphone" />
+                                            <Label styleClass="field-label" text="%user_detail.info.phone" />
                                             <TextField fx:id="telephoneField" styleClass="input" />
                                         </VBox>
                                         <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                            <Label styleClass="field-label" text="Type d'utilisateur" />
+                                            <Label styleClass="field-label" text="%user_detail.info.type" />
                                             <ComboBox fx:id="typeUserCombo" maxWidth="Infinity" styleClass="combo-box" />
                                         </VBox>
                                     </HBox>
                                 </VBox>
 
-                                <!-- Boutons -->
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
-                                    <Button fx:id="btnAnnulerInfo" styleClass="btn-icon-light" text="Annuler" />
-                                    <Button fx:id="btnEnregistrerInfo" styleClass="button-primary" text="Enregistrer">
+                                    <Button fx:id="btnAnnulerInfo" styleClass="btn-icon-light" text="%common.cancel" />
+                                    <Button fx:id="btnEnregistrerInfo" styleClass="button-primary" text="%common.save">
                                         <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
@@ -105,8 +105,8 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ===== ONGLET 2 : RÔLES ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Rôles">
+                <!-- ONGLET 2 : RÔLES -->
+                <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.roles">
                     <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" prefHeight="422.0" prefWidth="800.0" spacing="20" styleClass="content-area">
@@ -115,16 +115,16 @@
                                 <VBox prefHeight="291.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Rôles de l'utilisateur" />
+                                        <Label styleClass="card-title" text="%user_detail.roles.title" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="roleCountLabel" styleClass="footer-info" text="0 sélectionné(s)" />
+                                        <Label fx:id="roleCountLabel" styleClass="footer-info" text="0" />
                                     </HBox>
 
-                                    <Label styleClass="field-label" text="Sélectionnez les rôles à assigner :" />
+                                    <Label styleClass="field-label" text="%user_detail.roles.hint" />
 
                                     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-box-light">
                                         <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-                                        <TextField fx:id="searchRoleField" promptText="Rechercher un rôle..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                                        <TextField fx:id="searchRoleField" promptText="%user_detail.roles.search" styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
                                     </HBox>
 
                                     <ScrollPane fitToWidth="true" prefHeight="250" styleClass="page-scroll">
@@ -135,7 +135,7 @@
                                 </VBox>
 
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
-                                    <Button fx:id="btnEnregistrerRoles" styleClass="button-primary" text="Enregistrer les rôles">
+                                    <Button fx:id="btnEnregistrerRoles" styleClass="button-primary" text="%user_detail.roles.save">
                                         <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
@@ -144,8 +144,8 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ===== ONGLET 3 : PERMISSIONS ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Permissions d'exception">
+                <!-- ONGLET 3 : PERMISSIONS -->
+                <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.permissions">
                     <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
@@ -154,16 +154,16 @@
                                 <VBox prefHeight="370.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Permissions d'exception" />
+                                        <Label styleClass="card-title" text="%user_detail.permissions.title" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="permCountLabel" styleClass="footer-info" text="0 sélectionnée(s)" />
+                                        <Label fx:id="permCountLabel" styleClass="footer-info" text="0" />
                                     </HBox>
 
-                                    <Label styleClass="field-label" text="Permissions supplémentaires au-delà des rôles :" wrapText="true" />
+                                    <Label styleClass="field-label" text="%user_detail.permissions.hint" wrapText="true" />
 
                                     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-box-light">
                                         <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-                                        <TextField fx:id="searchPermissionField" promptText="Rechercher une permission..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                                        <TextField fx:id="searchPermissionField" promptText="%user_detail.permissions.search" styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
                                     </HBox>
 
                                     <ScrollPane fitToWidth="true" prefHeight="350" styleClass="page-scroll">
@@ -174,7 +174,7 @@
                                 </VBox>
 
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
-                                    <Button fx:id="btnEnregistrerPermissions" styleClass="button-primary" text="Enregistrer les permissions">
+                                    <Button fx:id="btnEnregistrerPermissions" styleClass="button-primary" text="%user_detail.permissions.save">
                                         <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
@@ -183,8 +183,8 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ===== ONGLET 4 : SÉCURITÉ ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Sécurité">
+                <!-- ONGLET 4 : SÉCURITÉ -->
+                <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.security">
                     <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
@@ -193,40 +193,40 @@
                                 <VBox prefHeight="295.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Sécurité du compte" />
+                                        <Label styleClass="card-title" text="%user_detail.security.title" />
                                     </HBox>
 
                                     <HBox alignment="CENTER_LEFT" spacing="20">
                                         <VBox spacing="5">
-                                            <Label styleClass="field-label" text="Compte actif" />
-                                            <ToggleButton fx:id="toggleActif" styleClass="toggle-switch" text="Actif" />
+                                            <Label styleClass="field-label" text="%user_detail.security.account_active" />
+                                            <ToggleButton fx:id="toggleActif" styleClass="toggle-switch" text="%status.active" />
                                         </VBox>
                                         <VBox spacing="5">
-                                            <Label styleClass="field-label" text="Double authentification (2FA)" />
-                                            <ToggleButton onAction="#handleActiver2FA" fx:id="toggle2FA" styleClass="toggle-switch" text="Désactivé" />
+                                            <Label styleClass="field-label" text="%user_detail.security.2fa" />
+                                            <ToggleButton onAction="#handleActiver2FA" fx:id="toggle2FA" styleClass="toggle-switch" text="%user_detail.2fa.badge_disabled" />
                                         </VBox>
                                     </HBox>
                                     <Separator />
 
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-key" iconSize="16" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Réinitialiser le mot de passe" />
+                                        <Label styleClass="card-title" text="%user_detail.security.reset_password" />
                                     </HBox>
 
                                     <HBox spacing="10">
-                                        <Button fx:id="btnEnvoyerLien" styleClass="btn-icon-light" text="Envoyer un lien par email">
+                                        <Button fx:id="btnEnvoyerLien" styleClass="btn-icon-light" text="%user_detail.security.send_link">
                                             <graphic><FontIcon iconLiteral="fth-mail" iconSize="14" /></graphic>
                                         </Button>
-                                        <Button fx:id="btnGenererTemp" styleClass="btn-icon-light" text="Générer un mot de passe temporaire">
+                                        <Button fx:id="btnGenererTemp" styleClass="btn-icon-light" text="%user_detail.security.gen_temp">
                                             <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
                                         </Button>
                                     </HBox>
 
-                                    <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="L'utilisateur doit changer son mot de passe à la prochaine connexion" />
+                                    <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="%user_detail.security.must_change_pwd" />
                                 </VBox>
 
                                 <HBox alignment="CENTER_RIGHT" spacing="10">
-                                    <Button fx:id="btnEnregistrerSecurite" styleClass="button-primary" text="Enregistrer">
+                                    <Button fx:id="btnEnregistrerSecurite" styleClass="button-primary" text="%common.save">
                                         <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
                                     </Button>
                                 </HBox>
@@ -235,8 +235,8 @@
                     </ScrollPane>
                 </Tab>
 
-                <!-- ===== ONGLET 5 : AUDIT / HISTORIQUE ===== -->
-                <Tab closable="false" styleClass="top-tab-btn" text="Historique">
+                <!-- ONGLET 5 : HISTORIQUE -->
+                <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.history">
                     <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="858.0" prefHeight="496.0" prefWidth="800.0" spacing="20" styleClass="content-area">
@@ -245,17 +245,17 @@
                                 <VBox prefHeight="383.0" prefWidth="760.0" spacing="15" styleClass="card">
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <FontIcon iconLiteral="fth-clock" iconSize="18" styleClass="tile-icon" />
-                                        <Label styleClass="card-title" text="Historique de l'utilisateur" />
+                                        <Label styleClass="card-title" text="%user_detail.history.title" />
                                     </HBox>
 
                                     <TableView fx:id="auditTable" styleClass="custom-table" VBox.vgrow="ALWAYS">
                                         <columns>
-                                            <TableColumn fx:id="colDateAudit" prefWidth="150" text="DATE" />
-                                            <TableColumn fx:id="colActionAudit" prefWidth="200" text="ACTION" />
-                                            <TableColumn fx:id="colDetailAudit" prefWidth="164.0" text="DÉTAILS" />
-                                            <TableColumn fx:id="colIpAudit" prefWidth="256.0" text="ADRESSE IP" />
+                                            <TableColumn fx:id="colDateAudit" prefWidth="150" text="%user_detail.history.col.date" />
+                                            <TableColumn fx:id="colActionAudit" prefWidth="200" text="%user_detail.history.col.action" />
+                                            <TableColumn fx:id="colDetailAudit" prefWidth="164.0" text="%user_detail.history.col.details" />
+                                            <TableColumn fx:id="colIpAudit" prefWidth="256.0" text="%user_detail.history.col.ip" />
                                         </columns>
-                                        <placeholder><Label styleClass="table-placeholder" text="Aucun historique" /></placeholder>
+                                        <placeholder><Label styleClass="table-placeholder" text="%user_detail.history.empty" /></placeholder>
                                     </TableView>
                                 </VBox>
                             </VBox>
@@ -267,7 +267,7 @@
 
         </children>
     </VBox>
-   <padding>
-      <Insets bottom="8.0" />
-   </padding>
+    <padding>
+        <Insets bottom="8.0" />
+    </padding>
 </StackPane>

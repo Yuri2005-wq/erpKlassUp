@@ -1,6 +1,6 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
-
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -8,9 +8,8 @@ import org.erpklassup.erpklassup.dto.RoleOption;
 import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.RoleService;
 import org.erpklassup.erpklassup.service.SessionManager;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
-
-import java.util.function.Consumer;
 
 public class RoleModalController {
 
@@ -24,10 +23,16 @@ public class RoleModalController {
 
     private final RoleService roleService = new RoleService();
     private final AuditService auditService = new AuditService();
-    SessionManager session = SessionManager.getInstance();
-    private String idEcole = session.getIdSessionCourante();
+    private final SessionManager session = SessionManager.getInstance();
+
+    private String idEcole;
     private RoleOption roleAEditer; // null si création
     private Runnable onSuccessCallback;
+
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
 
     /**
      * Initialise la modale pour la CRÉATION d'un rôle.
@@ -37,10 +42,10 @@ public class RoleModalController {
         this.roleAEditer = null;
         this.onSuccessCallback = onSuccess;
 
-
-        if (lblTitreModal != null) lblTitreModal.setText("Nouveau Rôle");
-        if (lblSousTitreModal != null) lblSousTitreModal.setText("Définissez les informations de base pour ce rôle.");
-        btnEnregistrer.setText("Créer le rôle");
+        if (lblTitreModal != null) lblTitreModal.setText(i18n().t("role.modal.create.title"));
+        if (lblSousTitreModal != null) lblSousTitreModal.setText(i18n().t("role.modal.create.subtitle"));
+        if (btnEnregistrer != null) btnEnregistrer.setText(i18n().t("role.modal.create.button"));
+        if (chkIsActive != null) chkIsActive.setSelected(true);
     }
 
     /**
@@ -51,57 +56,79 @@ public class RoleModalController {
         this.roleAEditer = role;
         this.onSuccessCallback = onSuccess;
 
-        if (lblTitreModal != null) lblTitreModal.setText("Modifier le Rôle");
-        if (lblSousTitreModal != null) lblSousTitreModal.setText("Ajustez le nom et la description du rôle sélectionné.");
+        if (lblTitreModal != null) lblTitreModal.setText(i18n().t("role.modal.edit.title"));
+        if (lblSousTitreModal != null) lblSousTitreModal.setText(i18n().t("role.modal.edit.subtitle"));
 
-        txtNomRole.setText(role.nomRole());
-        txtDescription.setText(role.description() != null ? role.description() : "");
-        btnEnregistrer.setText("Enregistrer");
+        if (txtNomRole != null) {
+            txtNomRole.setText(role.nomRole() != null ? role.nomRole() : "");
+        }
+        if (txtDescription != null) {
+            txtDescription.setText(role.description() != null ? role.description() : "");
+        }
+        if (btnEnregistrer != null) {
+            btnEnregistrer.setText(i18n().t("common.save"));
+        }
     }
 
     @FXML
     private void handleEnregistrer() {
-        // Ne pas réécraser this.idEcole ici !
-        String nom = txtNomRole.getText() != null ? txtNomRole.getText().trim() : "";
-        String description = txtDescription.getText() != null ? txtDescription.getText().trim() : "";
+        String nom = txtNomRole != null && txtNomRole.getText() != null
+                ? txtNomRole.getText().trim() : "";
+        String description = txtDescription != null && txtDescription.getText() != null
+                ? txtDescription.getText().trim() : "";
+
         Stage stage = (Stage) btnEnregistrer.getScene().getWindow();
 
+        // ✅ Validation
         if (nom.isBlank()) {
-            ToastNotification.avertissement(stage, "Le nom du rôle est obligatoire.");
+            ToastNotification.avertissement(stage, i18n().t("role.error.name_required"));
             return;
         }
 
         if (this.idEcole == null || this.idEcole.isBlank()) {
-            ToastNotification.erreur(stage, "Aucune école sélectionnée.");
+            ToastNotification.erreur(stage, i18n().t("role.error.no_school"));
             return;
         }
 
         btnEnregistrer.setDisable(true);
 
         if (roleAEditer == null) {
+            // ==========================================
             // MODE CRÉATION
+            // ==========================================
             roleService.creerRoleAsync(idEcole, nom, description,
-                    roleCree -> javafx.application.Platform.runLater(() -> {
-                        auditService.tracerActionAsync("HABILITATIONS", "CREATION_ROLE", "Création du rôle : " + nom);
-                        ToastNotification.succes(stage, "Rôle \"" + nom + "\" créé avec succès.");
-                        fermerEtRafrachir();
+                    roleCree -> Platform.runLater(() -> {
+                        auditService.tracerActionAsync(
+                                "HABILITATIONS",
+                                "CREATION_ROLE",
+                                "Création du rôle : " + nom
+                        );
+                        ToastNotification.succes(stage, i18n().t("role.toast.created", nom));
+                        fermerEtRafraichir();
                     }),
-                    erreur -> javafx.application.Platform.runLater(() -> {
+                    erreur -> Platform.runLater(() -> {
                         btnEnregistrer.setDisable(false);
-                        ToastNotification.erreur(stage, "Erreur : " + erreur.getMessage());
+                        ToastNotification.erreur(stage,
+                                i18n().t("common.error_detail", erreur.getMessage()));
                     })
             );
         } else {
+            // ==========================================
             // MODE MODIFICATION
+            // ==========================================
             roleService.renommerRoleAsync(roleAEditer.idRole(), nom, description,
-                    () -> javafx.application.Platform.runLater(() -> {
-                        auditService.tracerActionAsync("HABILITATIONS", "MODIFICATION_ROLE", "Rôle modifié : " + nom);
-                        ToastNotification.succes(stage, "Rôle mis à jour avec succès.");
-                        fermerEtRafrachir();
+                    () -> Platform.runLater(() -> {
+                        auditService.tracerActionAsync(
+                                "HABILITATIONS",
+                                "MODIFICATION_ROLE",
+                                "Rôle modifié : " + nom
+                        );
+                        ToastNotification.succes(stage, i18n().t("role.toast.updated"));
+                        fermerEtRafraichir();
                     }),
-                    erreur -> javafx.application.Platform.runLater(() -> {
+                    erreur -> Platform.runLater(() -> {
                         btnEnregistrer.setDisable(false);
-                        ToastNotification.erreur(stage, "Erreur lors de la modification du rôle.");
+                        ToastNotification.erreur(stage, i18n().t("role.error.update_failed"));
                     })
             );
         }
@@ -113,7 +140,7 @@ public class RoleModalController {
         stage.close();
     }
 
-    private void fermerEtRafrachir() {
+    private void fermerEtRafraichir() {
         if (onSuccessCallback != null) {
             onSuccessCallback.run();
         }

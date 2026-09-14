@@ -6,12 +6,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import org.erpklassup.erpklassup.dao.UtilisateurDAO;
 import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.AuthService;
 import org.erpklassup.erpklassup.service.Security2FAService;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.net.URL;
@@ -34,6 +35,11 @@ public class Setup2FAController implements Initializable {
     private String username;
     private String secret;
     private Consumer<AuthService.ResultatConnexion> onSucces;
+
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -75,7 +81,7 @@ public class Setup2FAController implements Initializable {
         if (qr != null) {
             qrCodeView.setImage(qr);
         } else {
-            afficherErreur("Impossible de générer le QR code. Utilisez la clé manuelle ci-dessous.");
+            afficherErreur(i18n().t("setup2fa.error.qr_generation"));
         }
 
         // 3. Afficher la clé secrète en clair (fallback si le scan échoue)
@@ -86,7 +92,7 @@ public class Setup2FAController implements Initializable {
     private void handleValider() {
         String code = codeField.getText();
         if (code == null || code.isBlank()) {
-            afficherErreur("Veuillez saisir le code à 6 chiffres.");
+            afficherErreur(i18n().t("setup2fa.error.code_required"));
             return;
         }
 
@@ -94,7 +100,7 @@ public class Setup2FAController implements Initializable {
             int codeInt = Integer.parseInt(code.trim());
 
             if (!security2FAService.verifierCodeTOTP(secret, codeInt)) {
-                afficherErreur("Code invalide. Vérifiez l'heure de votre téléphone.");
+                afficherErreur(i18n().t("setup2fa.error.invalid_code"));
                 return;
             }
 
@@ -112,7 +118,7 @@ public class Setup2FAController implements Initializable {
             );
 
             // 4. Toast
-            ToastNotification.succes(getStage(), "2FA activée avec succès !");
+            ToastNotification.succes(getStage(), i18n().t("setup2fa.success"));
 
             // 5. Afficher les codes de secours
             afficherCodesSecours(codesSecours);
@@ -125,9 +131,9 @@ public class Setup2FAController implements Initializable {
             fermer();
 
         } catch (NumberFormatException e) {
-            afficherErreur("Le code doit être numérique.");
+            afficherErreur(i18n().t("setup2fa.error.numeric_code"));
         } catch (Exception e) {
-            afficherErreur("Erreur : " + e.getMessage());
+            afficherErreur(i18n().t("common.error_detail", e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -135,7 +141,7 @@ public class Setup2FAController implements Initializable {
     @FXML
     private void handleAnnuler() {
         // La configuration 2FA est obligatoire — on ne peut pas annuler
-        afficherErreur("La configuration 2FA est obligatoire. Vous ne pouvez pas annuler.");
+        afficherErreur(i18n().t("setup2fa.error.mandatory"));
     }
 
     // ==========================================
@@ -151,16 +157,16 @@ public class Setup2FAController implements Initializable {
         area.setStyle("-fx-font-family: 'Consolas', monospace; -fx-font-size: 14;");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Conservez ces codes en lieu sûr.\n");
-        sb.append("Chacun ne peut être utilisé qu'UNE SEULE FOIS.\n\n");
+        sb.append(i18n().t("setup2fa.codes.intro")).append("\n");
+        sb.append(i18n().t("setup2fa.codes.warning")).append("\n\n");
         for (String c : codes) {
             sb.append("  •  ").append(c).append("\n");
         }
         area.setText(sb.toString());
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Codes de secours 2FA");
-        alert.setHeaderText("Vos codes de secours (à conserver)");
+        alert.setTitle(i18n().t("setup2fa.codes.title"));
+        alert.setHeaderText(i18n().t("setup2fa.codes.header"));
         alert.getDialogPane().setContent(area);
         alert.showAndWait();
     }

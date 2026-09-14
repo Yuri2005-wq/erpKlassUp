@@ -25,6 +25,7 @@ public record UtilisateurLigne(
         return StatutCompte.ACTIF;
     }
 }
+
 //package org.erpklassup.erpklassup.dto;
 //
 //public record UtilisateurLigne(

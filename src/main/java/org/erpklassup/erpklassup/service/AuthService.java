@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import org.erpklassup.erpklassup.dao.*;
 import org.erpklassup.erpklassup.models.TentativeConnexion;
 import org.erpklassup.erpklassup.models.Utilisateur;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 import org.erpklassup.erpklassup.util.TotpUtil;
 
@@ -332,6 +333,8 @@ public class AuthService {
         // Démarrage de la session mémoire
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
+        I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
+
 
         // ✅ Audit APRÈS demarrerSession (pour que la session soit active)
         enregistrerSecurite(username, ipAdresse, userAgent, true, null,
@@ -506,6 +509,8 @@ public class AuthService {
 
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
+        I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
+
 
         afficherToast(stage, () -> ToastNotification.succes(stage, "Bienvenue " + user.getPrenom() + " !"));
 

@@ -2,18 +2,22 @@ package org.erpklassup.erpklassup.controllers.renduView;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ViewRegistry;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Contrôleur principal pour la gestion de l'onglet de configuration (Settings).
  * Il délègue la gestion de la mémoire, de l'état et de l'affichage des sous-vues au {@link ViewRegistry}.
  */
-public class SettingsTabControllers {
+public class SettingsTabControllers implements Initializable {
 
     // Conteneur JavaFX où les sous-vues FXML seront injectées
     @FXML private StackPane tabContentContainer;
@@ -32,11 +36,19 @@ public class SettingsTabControllers {
     // Gestionnaire centralisé des vues (gère le cache LRU, le nettoyage et la sauvegarde d'état)
     private ViewRegistry viewRegistry;
 
+    // ✅ ÉCOUTEUR i18n
+    private final Runnable ecouteurI18n = this::rafraichirTextes;
+
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
+
     /**
      * Initialisation du contrôleur après le chargement du fichier FXML.
      */
-    @FXML
-    public void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
         // 1. Instanciation du ViewRegistry restreint à 3 vues max en mémoire cache RAM
         this.viewRegistry = new ViewRegistry(tabContentContainer, 3);
 
@@ -50,12 +62,13 @@ public class SettingsTabControllers {
             mettreEnValeurBouton(btnTabUtilisateur);
             viewRegistry.afficherVue(tabViewsMap.get(btnTabUtilisateur));
         }
+
+        // ✅ S'abonner aux changements de langue
+        i18n().ecouterChangement(ecouteurI18n);
     }
 
     /**
      * Gestionnaire d'événement déclenché lors du clic sur un onglet de la barre supérieure.
-     *
-     * @param event L'événement d'action généré par le clic sur le bouton
      */
     @FXML
     private void switchTab(ActionEvent event) {
@@ -70,18 +83,28 @@ public class SettingsTabControllers {
         String fxmlPath = tabViewsMap.get(clickedButton);
 
         if (fxmlPath != null) {
-            // Mettre à jour l'apparence visuelle des boutons
             mettreEnValeurBouton(clickedButton);
-
-            // Demander au ViewRegistry d'afficher la vue (gère la sauvegarde de l'ancienne et le chargement de la nouvelle)
             viewRegistry.afficherVue(fxmlPath);
         }
     }
 
     /**
+     * ✅ Rafraîchit les textes des boutons après changement de langue.
+     */
+    private void rafraichirTextes() {
+        if (btnTabUtilisateur != null) {
+            btnTabUtilisateur.setText(i18n().t("settings.tab.users"));
+        }
+        if (btnTabRolePermissions != null) {
+            btnTabRolePermissions.setText(i18n().t("settings.tab.roles"));
+        }
+        if (btnTabAudits != null) {
+            btnTabAudits.setText(i18n().t("settings.tab.audit"));
+        }
+    }
+
+    /**
      * Applique la classe CSS active au bouton sélectionné et retire le style de l'ancien bouton.
-     *
-     * @param boutonActif Le nouveau bouton à mettre en avant
      */
     private void mettreEnValeurBouton(Button boutonActif) {
         if (currentActiveButton != null) {
@@ -99,5 +122,6 @@ public class SettingsTabControllers {
         if (viewRegistry != null) {
             viewRegistry.toutReinitialiser();
         }
+        i18n().arreterEcoute(ecouteurI18n);
     }
 }

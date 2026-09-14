@@ -17,10 +17,10 @@
       prefHeight="620"
       style="-fx-background-color: white; -fx-padding: 30;">
 
-    <Label text="Configuration 2FA"
+    <Label text="%setup2fa.title"
            style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #16213A;"/>
 
-    <Label text="Scannez ce QR code avec Google Authenticator, Authy ou Microsoft Authenticator."
+    <Label text="%setup2fa.instructions"
            wrapText="true"
            maxWidth="380"
            style="-fx-font-size: 12px; -fx-text-fill: #555; -fx-text-alignment: center;"/>
@@ -30,7 +30,7 @@
                fitHeight="200"
                preserveRatio="true"/>
 
-    <Label text="Ou saisissez ce code manuellement :"
+    <Label text="%setup2fa.manual_code"
            style="-fx-font-size: 11px; -fx-text-fill: #777;"/>
 
     <Label fx:id="secretLabel"
@@ -38,7 +38,7 @@
            maxWidth="380"
            style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #16213A; -fx-font-family: 'Consolas', monospace;"/>
 
-    <Label text="Saisissez le code à 6 chiffres affiché par l'application :"
+    <Label text="%setup2fa.enter_code"
            wrapText="true"
            maxWidth="380"
            style="-fx-font-size: 12px; -fx-padding: 8 0 0 0;"/>
@@ -56,7 +56,7 @@
            style="-fx-text-fill: red; -fx-font-size: 12px;"/>
 
     <HBox spacing="10" alignment="CENTER">
-        <Button text="Valider et activer"
+        <Button text="%setup2fa.validate_button"
                 onAction="#handleValider"
                 style="-fx-background-color: #F5A524; -fx-text-fill: #16213A; -fx-font-weight: bold; -fx-padding: 10 24; -fx-background-radius: 6;"/>
     </HBox>

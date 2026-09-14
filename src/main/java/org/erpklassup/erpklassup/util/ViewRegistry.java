@@ -40,66 +40,119 @@ public class ViewRegistry {
         };
     }
 
-    public void afficherVue(String fxmlPath) {
-        if (fxmlPath.equals(cheminVueCourante)) return;
+//    public void afficherVue(String fxmlPath) {
+//        if (fxmlPath.equals(cheminVueCourante)) return;
+//
+//        sauvegarderEtatCourant();
+//
+//        try {
+//            Parent vue;
+//
+//            if (vueCache.containsKey(fxmlPath)) {
+//                vue = vueCache.get(fxmlPath);
+//            } else {
+//                URL ressource = getClass().getResource(fxmlPath);
+//
+//                // ✅ Vérification explicite : ressource introuvable
+//                if (ressource == null) {
+//                    throw new IOException("Ressource FXML introuvable : " + fxmlPath);
+//                }
+//
+//                FXMLLoader loader = new FXMLLoader(ressource);
+//                vue = loader.load();
+//
+//                Object controller = loader.getController();
+//                if (controller != null) {
+//                    controllerCache.put(fxmlPath, controller);
+//                }
+//                vueCache.put(fxmlPath, vue);
+//            }
+//
+//            // Restaurer l'état si disponible
+//            Object controller = controllerCache.get(fxmlPath);
+//            Object etatSauvegarde = stateCache.get(fxmlPath);
+//            if (controller instanceof StatefulController stateful && etatSauvegarde != null) {
+//                stateful.restaurerEtat(etatSauvegarde);
+//            }
+//
+//            // Injecter dans le conteneur avec animation
+//            conteneur.getChildren().clear();
+//
+//            FadeTransition ft = new FadeTransition(Duration.millis(150), vue);
+//            ft.setFromValue(0.0);
+//            ft.setToValue(1.0);
+//
+//            conteneur.getChildren().add(vue);
+//            ft.play();
+//
+//            cheminVueCourante = fxmlPath;
+//
+//        } catch (IOException e) {
+//            System.err.println("❌ Erreur de chargement du FXML : " + fxmlPath);
+//            e.printStackTrace();
+//
+//            // ✅ Fallback visuel : ne pas rester silencieux
+//            Label erreur = new Label("Erreur de chargement : " + fxmlPath
+//                    + "\n" + e.getMessage());
+//            erreur.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-wrap-text: true;");
+//            conteneur.getChildren().clear();
+//            conteneur.getChildren().add(erreur);
+//            cheminVueCourante = null;
+//        }
+//    }
+public void afficherVue(String fxmlPath) {
+    if (fxmlPath.equals(cheminVueCourante)) return;
 
-        sauvegarderEtatCourant();
+    sauvegarderEtatCourant();
 
-        try {
-            Parent vue;
+    try {
+        Parent vue;
 
-            if (vueCache.containsKey(fxmlPath)) {
-                vue = vueCache.get(fxmlPath);
-            } else {
-                URL ressource = getClass().getResource(fxmlPath);
+        if (vueCache.containsKey(fxmlPath)) {
+            vue = vueCache.get(fxmlPath);
+        } else {
+            // ✅ CHANGEMENT : création via I18nManager (bundle inclus)
+            FXMLLoader loader = I18nManager.getInstance().creerLoader(getClass(), fxmlPath);
+            vue = loader.load();
 
-                // ✅ Vérification explicite : ressource introuvable
-                if (ressource == null) {
-                    throw new IOException("Ressource FXML introuvable : " + fxmlPath);
-                }
-
-                FXMLLoader loader = new FXMLLoader(ressource);
-                vue = loader.load();
-
-                Object controller = loader.getController();
-                if (controller != null) {
-                    controllerCache.put(fxmlPath, controller);
-                }
-                vueCache.put(fxmlPath, vue);
+            Object controller = loader.getController();
+            if (controller != null) {
+                controllerCache.put(fxmlPath, controller);
             }
-
-            // Restaurer l'état si disponible
-            Object controller = controllerCache.get(fxmlPath);
-            Object etatSauvegarde = stateCache.get(fxmlPath);
-            if (controller instanceof StatefulController stateful && etatSauvegarde != null) {
-                stateful.restaurerEtat(etatSauvegarde);
-            }
-
-            // Injecter dans le conteneur avec animation
-            conteneur.getChildren().clear();
-
-            FadeTransition ft = new FadeTransition(Duration.millis(150), vue);
-            ft.setFromValue(0.0);
-            ft.setToValue(1.0);
-
-            conteneur.getChildren().add(vue);
-            ft.play();
-
-            cheminVueCourante = fxmlPath;
-
-        } catch (IOException e) {
-            System.err.println("❌ Erreur de chargement du FXML : " + fxmlPath);
-            e.printStackTrace();
-
-            // ✅ Fallback visuel : ne pas rester silencieux
-            Label erreur = new Label("Erreur de chargement : " + fxmlPath
-                    + "\n" + e.getMessage());
-            erreur.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-wrap-text: true;");
-            conteneur.getChildren().clear();
-            conteneur.getChildren().add(erreur);
-            cheminVueCourante = null;
+            vueCache.put(fxmlPath, vue);
         }
+
+        // Restaurer l'état si disponible
+        Object controller = controllerCache.get(fxmlPath);
+        Object etatSauvegarde = stateCache.get(fxmlPath);
+        if (controller instanceof StatefulController stateful && etatSauvegarde != null) {
+            stateful.restaurerEtat(etatSauvegarde);
+        }
+
+        // Injecter dans le conteneur avec animation
+        conteneur.getChildren().clear();
+
+        FadeTransition ft = new FadeTransition(Duration.millis(150), vue);
+        ft.setFromValue(0.0);
+        ft.setToValue(1.0);
+
+        conteneur.getChildren().add(vue);
+        ft.play();
+
+        cheminVueCourante = fxmlPath;
+
+    } catch (Exception e) {
+        System.err.println("❌ Erreur de chargement du FXML : " + fxmlPath);
+        e.printStackTrace();
+
+        Label erreur = new Label("Erreur de chargement : " + fxmlPath
+                + "\n" + e.getMessage());
+        erreur.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-wrap-text: true;");
+        conteneur.getChildren().clear();
+        conteneur.getChildren().add(erreur);
+        cheminVueCourante = null;
     }
+}
 
     @SuppressWarnings("unchecked")
     private void sauvegarderEtatCourant() {
@@ -137,6 +190,31 @@ public class ViewRegistry {
         controllerCache.clear();
         stateCache.clear();
         cheminVueCourante = null;
+    }
+
+    /**
+     * ✅ Force le rechargement d'une vue (utile pour i18n).
+     * Supprime la vue du cache pour qu'elle soit rechargée avec le nouveau bundle.
+     */
+    public void invaliderCache(String fxmlPath) {
+        vueCache.remove(fxmlPath);
+        controllerCache.remove(fxmlPath);
+        stateCache.remove(fxmlPath);
+    }
+
+    /**
+     * ✅ Force le rechargement de la vue courante (i18n).
+     */
+    public void rechargerVueCourante() {
+        if (cheminVueCourante == null) return;
+        String chemin = cheminVueCourante;
+        invaliderCache(chemin);
+        cheminVueCourante = null;   // Force le rechargement
+        afficherVue(chemin);
+    }
+
+    public String getCheminVueCourante() {
+        return cheminVueCourante;
     }
 }
 //package org.erpklassup.erpklassup.util;

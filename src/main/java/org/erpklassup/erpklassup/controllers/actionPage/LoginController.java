@@ -22,6 +22,7 @@ import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.service.AppExecutor;
 import org.erpklassup.erpklassup.service.AuthService;
 import org.erpklassup.erpklassup.service.SessionManager;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ModalUtil;
 import org.erpklassup.erpklassup.util.StageHelper;
 
@@ -269,22 +270,44 @@ public class LoginController {
         );
     }
 
-    private void naviguerVersDashboard() {
-        try {
-            Stage stage = (Stage) btnConnecter.getScene().getWindow();
-            Parent nouvelleRacine = chargerVue("/org/erpklassup/erpklassup/hello-view.fxml").load();
+//    private void naviguerVersDashboard() {
+//        try {
+//            Stage stage = (Stage) btnConnecter.getScene().getWindow();
+//            Parent nouvelleRacine = chargerVue("/org/erpklassup/erpklassup/hello-view.fxml").load();
+//
+//            stage.setResizable(true);
+//            stage.centerOnScreen();
+//            stage.setTitle("KlassUp");
+//            stage.getScene().setRoot(nouvelleRacine);
+//
+//        } catch (IOException ex) {
+//            BoutonChargement.arreter(btnConnecter);
+//            afficherErreur("Impossible de charger le tableau de bord.");
+//            System.err.println("Erreur navigation : " + ex.getMessage());
+//        }
+//    }
+private void naviguerVersDashboard() {
+    try {
+        Stage stage = (Stage) btnConnecter.getScene().getWindow();
 
-            stage.setResizable(true);
-            stage.centerOnScreen();
-            stage.setTitle("KlassUp");
-            stage.getScene().setRoot(nouvelleRacine);
+        FXMLLoader loader = I18nManager.getInstance().creerLoader(
+                getClass(),
+                "/org/erpklassup/erpklassup/hello-view.fxml"
+        );
+        Parent nouvelleRacine = loader.load();
 
-        } catch (IOException ex) {
-            BoutonChargement.arreter(btnConnecter);
-            afficherErreur("Impossible de charger le tableau de bord.");
-            System.err.println("Erreur navigation : " + ex.getMessage());
-        }
+        stage.setResizable(true);
+        stage.centerOnScreen();
+        stage.setTitle("KlassUp");
+        stage.getScene().setRoot(nouvelleRacine);
+
+    } catch (IOException ex) {
+        BoutonChargement.arreter(btnConnecter);
+        afficherErreur("Impossible de charger le tableau de bord.");
+        System.err.println("Erreur navigation : " + ex.getMessage());
+        ex.printStackTrace();
     }
+}
 
     private void chargerStatistiquesGlobales() {
         try (Connection conn = Database.getConnexion()) {

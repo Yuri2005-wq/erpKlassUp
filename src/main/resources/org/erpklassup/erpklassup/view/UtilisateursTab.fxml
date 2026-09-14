@@ -12,24 +12,22 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<?import javafx.scene.layout.StackPane?>
-<VBox spacing="8.0" styleClass="card" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UtilisateursView">
+<VBox spacing="8.0" styleClass="card" stylesheets="@../style.css"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UtilisateursView">
 
     <!-- ===== Barre d'outils ===== -->
     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="rbac-toolbar">
 
-<!--        <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">-->
-<!--            <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />-->
-<!--            <TextField fx:id="searchField" promptText="Rechercher par auteur, action..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />-->
-<!--        </HBox>-->
         <HBox alignment="CENTER_LEFT" maxWidth="340.0" prefWidth="340.0" spacing="8.0" styleClass="search-box-light">
             <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
 
             <StackPane HBox.hgrow="ALWAYS">
-                <TextField fx:id="searchField" promptText="Rechercher par auteur, action..."
+                <TextField fx:id="searchField" promptText="%users.search.placeholder"
                            styleClass="search-field-inner, search-field-with-clear" />
                 <Button fx:id="btnClearSearch" styleClass="btn-clear-search" visible="false"
                         StackPane.alignment="CENTER_RIGHT">
@@ -39,17 +37,16 @@
             </StackPane>
         </HBox>
 
-
-        <ComboBox fx:id="filterRole" prefHeight="36.0" promptText="Rôle" />
-        <ComboBox fx:id="filterStatut" prefHeight="34.0" promptText="Statut" styleClass="combo-box" />
+        <ComboBox fx:id="filterRole" prefHeight="36.0" promptText="%users.filter.all_roles" />
+        <ComboBox fx:id="filterStatut" prefHeight="34.0" promptText="%users.filter.all_status" styleClass="combo-box" />
 
         <Region HBox.hgrow="ALWAYS" />
 
-        <Button fx:id="btnActionsGroupees" prefHeight="0.0" prefWidth="146.0" styleClass="button-primary" text="Actions par lot">
+        <Button fx:id="btnActionsGroupees" prefHeight="0.0" prefWidth="146.0" styleClass="button-primary" text="%users.bulk_actions">
             <graphic><FontIcon iconLiteral="fth-layers" iconSize="14" /></graphic>
         </Button>
 
-        <Button fx:id="btnAjouterUtilisateur" contentDisplay="LEFT" styleClass="button-primary" text="Ajouter un utilisateur">
+        <Button fx:id="btnAjouterUtilisateur" contentDisplay="LEFT" styleClass="button-primary" text="%users.add">
             <graphic><FontIcon iconLiteral="fth-user-plus" iconSize="15" /></graphic>
         </Button>
 
@@ -64,11 +61,11 @@
                 <FontIcon iconLiteral="fth-users" iconSize="11" />
                 <Label fx:id="statTotalLabel" styleClass="stat-number" text="0" />
             </HBox>
-            <Label styleClass="stat-card-label" text="TOTAL" />
-         <styleClass>
-            <String fx:value="stat-card-compact" />
-            <String fx:value="special-container" />
-         </styleClass>
+            <Label styleClass="stat-card-label" text="%users.stats.total" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
         </VBox>
 
         <!-- Card Connectés -->
@@ -77,11 +74,11 @@
                 <FontIcon iconLiteral="fth-wifi" iconSize="11" />
                 <Label fx:id="statConnectesLabel" styleClass="stat-number, stat-success" text="0" />
             </HBox>
-            <Label styleClass="stat-card-label" text="CONNECTÉS" />
-         <styleClass>
-            <String fx:value="stat-card-compact" />
-            <String fx:value="special-container" />
-         </styleClass>
+            <Label styleClass="stat-card-label" text="%users.stats.connected" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
         </VBox>
 
         <!-- Card Actifs -->
@@ -90,11 +87,11 @@
                 <FontIcon iconLiteral="fth-check" iconSize="11" />
                 <Label fx:id="statActifsLabel" styleClass="stat-number, stat-success" text="0" />
             </HBox>
-            <Label styleClass="stat-card-label" text="ACTIFS" />
-         <styleClass>
-            <String fx:value="stat-card-compact" />
-            <String fx:value="special-container" />
-         </styleClass>
+            <Label styleClass="stat-card-label" text="%users.stats.active" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
         </VBox>
 
         <!-- Card Verrouillés -->
@@ -103,11 +100,11 @@
                 <FontIcon iconLiteral="fth-lock" iconSize="11" />
                 <Label fx:id="statVerrouillesLabel" styleClass="stat-number, stat-warning" text="0" />
             </HBox>
-            <Label styleClass="stat-card-label" text="VERROUILLÉS" />
-         <styleClass>
-            <String fx:value="stat-card-compact" />
-            <String fx:value="special-container" />
-         </styleClass>
+            <Label styleClass="stat-card-label" text="%users.stats.locked" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
         </VBox>
 
         <!-- Card Suspendus -->
@@ -116,11 +113,11 @@
                 <FontIcon iconLiteral="fth-slash" iconSize="11" />
                 <Label fx:id="statSuspendusLabel" styleClass="stat-number, stat-danger" text="0" />
             </HBox>
-            <Label styleClass="stat-card-label" text="SUSPENDUS" />
-         <styleClass>
-            <String fx:value="stat-card-compact" />
-            <String fx:value="special-container" />
-         </styleClass>
+            <Label styleClass="stat-card-label" text="%users.stats.suspended" />
+            <styleClass>
+                <String fx:value="stat-card-compact" />
+                <String fx:value="special-container" />
+            </styleClass>
         </VBox>
 
     </HBox>
@@ -133,18 +130,17 @@
                 <graphic><CheckBox fx:id="checkAllUsers" styleClass="remember-checkbox" /></graphic>
             </TableColumn>
 
-            <TableColumn fx:id="colUtilisateur" minWidth="240.0" prefWidth="280.0" text="Utilisateur" />
+            <TableColumn fx:id="colUtilisateur" minWidth="240.0" prefWidth="280.0" text="%users.col.user" />
 
-            <TableColumn fx:id="colRole" minWidth="140.0" prefWidth="150.0" text="Rôle" />
+            <TableColumn fx:id="colRole" minWidth="140.0" prefWidth="150.0" text="%users.col.role" />
 
-            <TableColumn fx:id="colStatut" minWidth="110.0" prefWidth="120.0" text="StatutCompte" />
+            <TableColumn fx:id="colStatut" minWidth="110.0" prefWidth="120.0" text="%users.col.status" />
 
+            <TableColumn fx:id="colSecurite" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" sortable="false" text="%users.col.2fa" />
 
-            <TableColumn fx:id="colSecurite" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" sortable="false" text="2FA" />
+            <TableColumn fx:id="colDerniereConnexion" minWidth="160.0" prefWidth="170.0" text="%users.col.last_connection" />
 
-            <TableColumn fx:id="colDerniereConnexion" minWidth="160.0" prefWidth="170.0" text="Dernière connexion" />
-
-            <TableColumn fx:id="colActions" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" sortable="false" text="Actions" />
+            <TableColumn fx:id="colActions" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" sortable="false" text="%users.col.actions" />
 
         </columns>
         <columnResizePolicy>

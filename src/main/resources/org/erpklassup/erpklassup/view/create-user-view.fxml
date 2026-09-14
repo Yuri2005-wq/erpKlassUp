@@ -21,7 +21,9 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane prefHeight="680.0" prefWidth="695.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserCreateController">
+<StackPane prefHeight="680.0" prefWidth="695.0" stylesheets="@../style.css"
+           xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserCreateController">
 
     <VBox style="-fx-background-color: #111a2e;">
 
@@ -29,43 +31,40 @@
         <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
             <FontIcon iconLiteral="fth-user-plus" iconSize="24" style="-fx-icon-color: #F5A524;" />
             <VBox spacing="3">
-                <Label styleClass="user-detail-title" text="Créer un compte d'accès" />
-                <Label styleClass="page-subtitle-light" text="Lier une fiche métier existante à un compte utilisateur" />
+                <Label styleClass="user-detail-title" text="%user_create.header.title" />
+                <Label styleClass="page-subtitle-light" text="%user_create.header.subtitle" />
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
         </HBox>
 
         <!-- ===== INDICATEUR D'ÉTAPES ===== -->
         <HBox alignment="CENTER" spacing="0" style="-fx-background-color: #16213A; -fx-padding: 15 30;">
-            <!-- Étape 1 -->
             <VBox alignment="CENTER" spacing="5">
                 <StackPane>
                     <Circle fx:id="circleEtape1" radius="18" styleClass="step-circle, active" />
                     <Label fx:id="numEtape1" styleClass="step-num, active" text="1" />
                 </StackPane>
-                <Label fx:id="labelEtape1" styleClass="step-label, active" text="Type de compte" />
+                <Label fx:id="labelEtape1" styleClass="step-label, active" text="%user_create.step1" />
             </VBox>
 
             <Region fx:id="connecteur1" maxHeight="2" minHeight="2" prefHeight="2" prefWidth="80" styleClass="step-connector" />
 
-            <!-- Étape 2 -->
             <VBox alignment="CENTER" spacing="5">
                 <StackPane>
                     <Circle fx:id="circleEtape2" radius="18" styleClass="step-circle" />
                     <Label fx:id="numEtape2" styleClass="step-num" text="2" />
                 </StackPane>
-                <Label fx:id="labelEtape2" styleClass="step-label" text="Liaison" />
+                <Label fx:id="labelEtape2" styleClass="step-label" text="%user_create.step2" />
             </VBox>
 
             <Region fx:id="connecteur2" maxHeight="2" minHeight="2" prefHeight="2" prefWidth="80" styleClass="step-connector" />
 
-            <!-- Étape 3 -->
             <VBox alignment="CENTER" spacing="5">
                 <StackPane>
                     <Circle fx:id="circleEtape3" radius="18" styleClass="step-circle" />
                     <Label fx:id="numEtape3" styleClass="step-num" text="3" />
                 </StackPane>
-                <Label fx:id="labelEtape3" styleClass="step-label" text="Connexion" />
+                <Label fx:id="labelEtape3" styleClass="step-label" text="%user_create.step3" />
             </VBox>
         </HBox>
 
@@ -80,10 +79,10 @@
                     <VBox spacing="15" styleClass="card">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <FontIcon iconLiteral="fth-users" iconSize="18" styleClass="tile-icon" />
-                            <Label styleClass="card-title" text="Sélectionnez le type de compte à créer" />
+                            <Label styleClass="card-title" text="%user_create.type.title" />
                         </HBox>
 
-                        <Label styleClass="field-label" text="Choisissez le profil de l'utilisateur :" wrapText="true" />
+                        <Label styleClass="field-label" text="%user_create.type.hint" wrapText="true" />
 
                         <GridPane hgap="15" vgap="15">
                             <columnConstraints>
@@ -98,11 +97,11 @@
                                         <FontIcon iconLiteral="fth-user" iconSize="18" />
                                     </StackPane>
                                     <VBox spacing="4">
-                                        <Label styleClass="card-title" text="Personnel" />
-                                        <Label styleClass="footer-info" text="Enseignant, Directeur, Secrétaire..." wrapText="true" />
+                                        <Label styleClass="card-title" text="%user_create.type.personnel" />
+                                        <Label styleClass="footer-info" text="%user_create.type.personnel.desc" wrapText="true" />
                                         <HBox alignment="CENTER_LEFT" spacing="4" styleClass="event-tag, tag-green">
                                             <FontIcon iconLiteral="fth-check" iconSize="11" />
-                                            <Label text="Fiche existe déjà" />
+                                            <Label text="%user_create.type.exists" />
                                         </HBox>
                                     </VBox>
                                 </HBox>
@@ -115,11 +114,11 @@
                                         <FontIcon iconLiteral="fth-book" iconSize="18" />
                                     </StackPane>
                                     <VBox spacing="4">
-                                        <Label styleClass="card-title" text="Élève" />
-                                        <Label styleClass="footer-info" text="Accès au portail élève" wrapText="true" />
+                                        <Label styleClass="card-title" text="%user_create.type.eleve" />
+                                        <Label styleClass="footer-info" text="%user_create.type.eleve.desc" wrapText="true" />
                                         <HBox alignment="CENTER_LEFT" spacing="4" styleClass="event-tag, tag-green">
                                             <FontIcon iconLiteral="fth-check" iconSize="11" />
-                                            <Label text="Fiche existe déjà" />
+                                            <Label text="%user_create.type.exists" />
                                         </HBox>
                                     </VBox>
                                 </HBox>
@@ -132,11 +131,11 @@
                                         <FontIcon iconLiteral="fth-heart" iconSize="18" />
                                     </StackPane>
                                     <VBox spacing="4">
-                                        <Label styleClass="card-title" text="Parent" />
-                                        <Label styleClass="footer-info" text="Accès au suivi de son enfant" wrapText="true" />
+                                        <Label styleClass="card-title" text="%user_create.type.parent" />
+                                        <Label styleClass="footer-info" text="%user_create.type.parent.desc" wrapText="true" />
                                         <HBox alignment="CENTER_LEFT" spacing="4" styleClass="event-tag, tag-green">
                                             <FontIcon iconLiteral="fth-check" iconSize="11" />
-                                            <Label text="Fiche existe déjà" />
+                                            <Label text="%user_create.type.exists" />
                                         </HBox>
                                     </VBox>
                                 </HBox>
@@ -149,19 +148,20 @@
                                         <FontIcon iconLiteral="fth-key" iconSize="18" />
                                     </StackPane>
                                     <VBox spacing="4">
-                                        <Label styleClass="card-title" text="Promoteur / Admin" />
-                                        <Label styleClass="footer-info" text="Super admin, Promoteur" wrapText="true" />
+                                        <Label styleClass="card-title" text="%user_create.type.promoteur" />
+                                        <Label styleClass="footer-info" text="%user_create.type.promoteur.desc" wrapText="true" />
                                         <HBox alignment="CENTER_LEFT" spacing="4" styleClass="event-tag, tag-orange">
                                             <FontIcon iconLiteral="fth-alert-triangle" iconSize="11" />
-                                            <Label text="Fiche à créer" />
+                                            <Label text="%user_create.type.to_create" />
                                         </HBox>
                                     </VBox>
                                 </HBox>
                             </VBox>
-                     <rowConstraints>
-                        <RowConstraints />
-                        <RowConstraints />
-                     </rowConstraints>
+
+                            <rowConstraints>
+                                <RowConstraints />
+                                <RowConstraints />
+                            </rowConstraints>
                         </GridPane>
 
                         <!-- Info contextuelle -->
@@ -173,43 +173,40 @@
                 </VBox>
             </ScrollPane>
 
-            <!-- ===== ÉTAPE 2 : LIAISON (Fiche existante OU Saisie directe) ===== -->
+            <!-- ===== ÉTAPE 2 ===== -->
             <ScrollPane fx:id="scrollEtape2" fitToWidth="true" hbarPolicy="NEVER" managed="false" styleClass="page-scroll" visible="false">
                 <VBox fx:id="etape2" maxWidth="700" spacing="20" styleClass="content-area">
                     <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                    <!-- === SOUS-ÉCRAN A : Recherche d'une fiche existante === -->
                     <VBox fx:id="sectionRecherche" spacing="15" styleClass="card">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <FontIcon iconLiteral="fth-search" iconSize="18" styleClass="tile-icon" />
-                            <Label fx:id="titreRechercheLabel" styleClass="card-title" text="Rechercher une fiche existante" />
+                            <Label fx:id="titreRechercheLabel" styleClass="card-title" text="%user_create.search.title.default" />
                         </HBox>
 
-                        <Label fx:id="instructionRechercheLabel" styleClass="field-label" text="Recherchez la personne par nom, prénom ou matricule :" wrapText="true" />
+                        <Label fx:id="instructionRechercheLabel" styleClass="field-label" text="%user_create.search.instruction" wrapText="true" />
 
-                        <!-- Barre de recherche -->
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <HBox alignment="CENTER_LEFT" spacing="8" styleClass="search-box-light" HBox.hgrow="ALWAYS">
                                 <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
-                                <TextField fx:id="searchPersonneField" promptText="Nom, prénom ou matricule..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                                <TextField fx:id="searchPersonneField" promptText="%user_create.search.placeholder" styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
                             </HBox>
-                            <Button fx:id="btnRechercher" styleClass="button-primary" text="Rechercher">
+                            <Button fx:id="btnRechercher" styleClass="button-primary" text="%common.search">
                                 <graphic><FontIcon iconLiteral="fth-search" iconSize="14" /></graphic>
                             </Button>
                         </HBox>
 
-                        <!-- Liste des résultats -->
                         <TableView fx:id="tableResultats" prefHeight="220" styleClass="custom-table">
                             <columns>
-                                <TableColumn fx:id="colMatricule" prefWidth="120" text="MATRICULE" />
-                                <TableColumn fx:id="colNom" prefWidth="150" text="NOM" />
-                                <TableColumn fx:id="colPrenom" prefWidth="150" text="PRÉNOM" />
-                                <TableColumn fx:id="colInfoSup" prefWidth="200" text="INFO SUPPLÉMENTAIRE" />
+                                <TableColumn fx:id="colMatricule" prefWidth="120" text="%user_create.col.matricule" />
+                                <TableColumn fx:id="colNom" prefWidth="150" text="%user_create.col.nom" />
+                                <TableColumn fx:id="colPrenom" prefWidth="150" text="%user_create.col.prenom" />
+                                <TableColumn fx:id="colInfoSup" prefWidth="200" text="%user_create.col.info_sup" />
                             </columns>
                             <placeholder>
                                 <VBox alignment="CENTER" spacing="8">
                                     <FontIcon iconLiteral="fth-search" iconSize="22" styleClass="search-icon-light" />
-                                    <Label styleClass="table-placeholder" text="Recherchez une personne sans compte" />
+                                    <Label styleClass="table-placeholder" text="%user_create.search.placeholder_hint" />
                                 </VBox>
                             </placeholder>
                         </TableView>
@@ -220,31 +217,30 @@
                         </HBox>
                     </VBox>
 
-                    <!-- === SOUS-ÉCRAN B : Saisie directe (Promoteur/Admin) === -->
                     <VBox fx:id="sectionSaisieDirecte" managed="false" spacing="15" styleClass="card" visible="false">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon" />
-                            <Label styleClass="card-title" text="Informations de la personne" />
+                            <Label styleClass="card-title" text="%user_create.direct.title" />
                         </HBox>
 
                         <HBox spacing="15">
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label styleClass="field-label" text="Nom *" />
+                                <Label styleClass="field-label" text="%user_create.field.nom_required" />
                                 <TextField fx:id="nomDirectField" styleClass="input" />
                             </VBox>
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label styleClass="field-label" text="Prénom *" />
+                                <Label styleClass="field-label" text="%user_create.field.prenom_required" />
                                 <TextField fx:id="prenomDirectField" styleClass="input" />
                             </VBox>
                         </HBox>
 
                         <HBox spacing="15">
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label styleClass="field-label" text="Téléphone" />
+                                <Label styleClass="field-label" text="%user_create.field.telephone" />
                                 <TextField fx:id="telephoneDirectField" styleClass="input" />
                             </VBox>
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label styleClass="field-label" text="Rôle système *" />
+                                <Label styleClass="field-label" text="%user_create.field.role_system" />
                                 <ComboBox fx:id="roleSystemeCombo" maxWidth="Infinity" styleClass="combo-box" />
                             </VBox>
                         </HBox>
@@ -252,86 +248,78 @@
                 </VBox>
             </ScrollPane>
 
-            <!-- ===== ÉTAPE 3 : IDENTIFIANTS DE CONNEXION ===== -->
+            <!-- ===== ÉTAPE 3 ===== -->
             <ScrollPane fx:id="scrollEtape3" fitToWidth="true" hbarPolicy="NEVER" managed="false" styleClass="page-scroll" visible="false">
                 <VBox fx:id="etape3" maxWidth="700" spacing="20" styleClass="content-area">
                     <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
 
-                    <!-- Récapitulatif de la liaison -->
                     <VBox fx:id="recapCard" spacing="10" styleClass="card">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <FontIcon iconLiteral="fth-user" iconSize="18" style="-fx-icon-color: #16A34A;" />
-                            <Label styleClass="card-title" text="Personne liée" />
+                            <Label styleClass="card-title" text="%user_create.recap.title" />
                         </HBox>
                         <HBox spacing="30">
                             <VBox spacing="3">
-                                <Label styleClass="footer-info" text="Nom complet" />
+                                <Label styleClass="footer-info" text="%user_create.recap.full_name" />
                                 <Label fx:id="recapNomLabel" styleClass="recap-value" text="—" />
                             </VBox>
                             <VBox spacing="3">
-                                <Label styleClass="footer-info" text="Type" />
+                                <Label styleClass="footer-info" text="%user_create.recap.type" />
                                 <Label fx:id="recapTypeLabel" styleClass="recap-value" text="—" />
                             </VBox>
                             <VBox spacing="3">
-                                <Label styleClass="footer-info" text="Identifiant métier" />
+                                <Label styleClass="footer-info" text="%user_create.recap.metier_id" />
                                 <Label fx:id="recapIdMetierLabel" styleClass="recap-value" text="—" />
                             </VBox>
                         </HBox>
                     </VBox>
 
-                    <!-- Identifiants de connexion -->
                     <VBox spacing="15" styleClass="card">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon" />
-                            <Label styleClass="card-title" text="Identifiants de connexion" />
+                            <Label styleClass="card-title" text="%user_create.credentials.title" />
                         </HBox>
 
-                        <!-- Username -->
                         <VBox spacing="6">
-                            <Label styleClass="field-label" text="Username *" />
-                            <TextField fx:id="usernameField" promptText="Ex: jdupont" styleClass="input" />
+                            <Label styleClass="field-label" text="%user_create.field.username" />
+                            <TextField fx:id="usernameField" promptText="%user_create.field.username.placeholder" styleClass="input" />
                             <Label fx:id="erreurUsername" managed="false" styleClass="field-error" text="" visible="false" />
                         </VBox>
 
-                        <!-- Email -->
                         <VBox spacing="6">
-                            <Label styleClass="field-label" text="Email" />
-                            <TextField fx:id="emailField" promptText="Ex: jean.dupont@ecole.cm" styleClass="input" />
+                            <Label styleClass="field-label" text="%user_create.field.email" />
+                            <TextField fx:id="emailField" promptText="%user_create.field.email.placeholder" styleClass="input" />
                             <Label fx:id="erreurEmail" managed="false" styleClass="field-error" text="" visible="false" />
                         </VBox>
 
-                        <!-- Option Mot de Passe Par Défaut -->
-                        <CheckBox fx:id="useDefaultPasswordCheckBox" styleClass="remember-checkbox" text="Utiliser le mot de passe par défaut (Matricule + Username)" />
+                        <CheckBox fx:id="useDefaultPasswordCheckBox" styleClass="remember-checkbox" text="%user_create.field.use_default_password" />
 
-                        <!-- Mot de passe -->
                         <VBox spacing="6">
-                            <Label styleClass="field-label" text="Mot de passe *" />
+                            <Label styleClass="field-label" text="%user_create.field.password" />
                             <HBox alignment="CENTER_LEFT" spacing="10">
                                 <StackPane HBox.hgrow="ALWAYS">
-                                    <PasswordField fx:id="passwordField" promptText="Minimum 8 caractères" styleClass="input" />
-                                    <TextField fx:id="passwordTextField" managed="false" promptText="Minimum 8 caractères" styleClass="input" visible="false" />
+                                    <PasswordField fx:id="passwordField" promptText="%user_create.field.password.placeholder" styleClass="input" />
+                                    <TextField fx:id="passwordTextField" managed="false" promptText="%user_create.field.password.placeholder" styleClass="input" visible="false" />
                                 </StackPane>
                                 <Button fx:id="btnTogglePassword" styleClass="btn-icon-light">
                                     <graphic><FontIcon iconLiteral="fth-eye" iconSize="14" /></graphic>
                                 </Button>
                             </HBox>
                             <HBox alignment="CENTER_LEFT" spacing="8">
-                                <Label styleClass="footer-info" text="Force :" />
+                                <Label styleClass="footer-info" text="%user_create.field.password_strength" />
                                 <Label fx:id="forceMdpLabel" style="-fx-font-weight: bold;" text="—" />
                                 <ProgressBar fx:id="forceMdpProgress" prefHeight="6" prefWidth="150" styleClass="kpi-progress" visible="false" />
                             </HBox>
                         </VBox>
 
-                        <!-- Confirmation -->
                         <VBox spacing="6">
-                            <Label styleClass="field-label" text="Confirmer le mot de passe *" />
-                            <PasswordField fx:id="confirmPasswordField" promptText="Retapez le mot de passe" styleClass="input" />
+                            <Label styleClass="field-label" text="%user_create.field.confirm_password" />
+                            <PasswordField fx:id="confirmPasswordField" promptText="%user_create.field.confirm_password.placeholder" styleClass="input" />
                             <Label fx:id="erreurConfirmMdp" managed="false" styleClass="field-error" text="" visible="false" />
                         </VBox>
 
-                        <!-- Options supplémentaires -->
-                        <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="L'utilisateur doit changer son mot de passe à la première connexion" />
-                        <CheckBox fx:id="emailVerifieCheckBox" styleClass="remember-checkbox" text="Marquer l'email comme vérifié" />
+                        <CheckBox fx:id="doitChangerMdpCheckBox" styleClass="remember-checkbox" text="%user_create.field.must_change_password" />
+                        <CheckBox fx:id="emailVerifieCheckBox" styleClass="remember-checkbox" text="%user_create.field.email_verified" />
                     </VBox>
                 </VBox>
             </ScrollPane>
@@ -339,17 +327,17 @@
 
         <!-- ===== PIED DE PAGE ===== -->
         <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #16213A; -fx-padding: 15 20;">
-            <Button fx:id="btnPrecedent" managed="false" style="-fx-background-color: white;" styleClass="btn-icon-light" text="Précédent" visible="false">
+            <Button fx:id="btnPrecedent" managed="false" style="-fx-background-color: white;" styleClass="btn-icon-light" text="%common.previous" visible="false">
                 <graphic><FontIcon iconLiteral="fth-arrow-left" iconSize="14" /></graphic>
             </Button>
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnAnnuler" style="-fx-background-color: white;" styleClass="btn-icon-light" text="Annuler">
+            <Button fx:id="btnAnnuler" style="-fx-background-color: white;" styleClass="btn-icon-light" text="%common.cancel">
                 <graphic><FontIcon iconLiteral="fth-x" iconSize="14" /></graphic>
             </Button>
-            <Button fx:id="btnSuivant" contentDisplay="RIGHT" styleClass="button-primary" text="Suivant">
+            <Button fx:id="btnSuivant" contentDisplay="RIGHT" styleClass="button-primary" text="%common.next">
                 <graphic><FontIcon iconLiteral="fth-arrow-right" iconSize="14" /></graphic>
             </Button>
-            <Button fx:id="btnCreer" managed="false" styleClass="button-primary" text="Créer le compte" visible="false">
+            <Button fx:id="btnCreer" managed="false" styleClass="button-primary" text="%user_create.button.create" visible="false">
                 <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
             </Button>
         </HBox>

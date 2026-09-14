@@ -14,7 +14,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.HelloController">
+<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane"
+            xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.erpklassup.erpklassup.HelloController">
+
     <stylesheets>
         <URL value="@style.css" />
     </stylesheets>
@@ -50,14 +53,14 @@
                                 <VBox spacing="2.0">
 
                                     <!-- ===== 1. PILOTAGE ===== -->
-                                    <Label styleClass="nav-section-label" text="PILOTAGE" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.pilotage" />
 
-                                    <Button fx:id="btnDashboard" onAction="#handleDashboardHome" prefWidth="Infinity" styleClass="nav-item, active" text="Tableau de bord">
+                                    <Button fx:id="btnDashboard" onAction="#handleDashboardHome" prefWidth="Infinity" styleClass="nav-item, active" text="%sidebar.dashboard">
                                         <graphic><FontIcon iconLiteral="fth-grid" iconSize="16" /></graphic>
                                     </Button>
 
                                     <!-- ===== 2. VIE SCOLAIRE ===== -->
-                                    <Label styleClass="nav-section-label" text="VIE SCOLAIRE" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.vie_scolaire" />
 
                                     <!-- Menu Élèves avec sous-menu -->
                                     <VBox spacing="1.0">
@@ -65,22 +68,22 @@
                                             <graphic>
                                                 <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">
                                                     <FontIcon iconLiteral="fth-users" iconSize="16" />
-                                                    <Label text="Élèves &amp; Inscriptions" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
+                                                    <Label text="%sidebar.students" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
                                                     <FontIcon fx:id="chevronStudents" iconLiteral="fth-chevron-down" iconSize="12" />
                                                 </HBox>
                                             </graphic>
                                         </Button>
                                         <VBox fx:id="sousMenuStudents" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">
-                                            <Button onAction="#handleNouvelleInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Nouvelle inscription">
+                                            <Button onAction="#handleNouvelleInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.new_inscription">
                                                 <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleListeEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Liste des élèves">
+                                            <Button onAction="#handleListeEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.students_list">
                                                 <graphic><FontIcon iconLiteral="fth-list" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleReinscriptions" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Réinscriptions">
+                                            <Button onAction="#handleReinscriptions" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.reinscriptions">
                                                 <graphic><FontIcon iconLiteral="fth-refresh-cw" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleDossiersEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Dossiers élèves">
+                                            <Button onAction="#handleDossiersEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.students_files">
                                                 <graphic><FontIcon iconLiteral="fth-folder" iconSize="14" /></graphic>
                                             </Button>
                                         </VBox>
@@ -92,31 +95,31 @@
                                             <graphic>
                                                 <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">
                                                     <FontIcon iconLiteral="fth-calendar" iconSize="16" />
-                                                    <Label text="Présences &amp; Assiduité" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
+                                                    <Label text="%sidebar.presences" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
                                                     <FontIcon fx:id="chevronPresences" iconLiteral="fth-chevron-down" iconSize="12" />
                                                 </HBox>
                                             </graphic>
                                         </Button>
                                         <VBox fx:id="sousMenuPresences" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">
-                                            <Button onAction="#handleFeuilleAppel" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Feuille d'appel">
+                                            <Button onAction="#handleFeuilleAppel" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.attendance">
                                                 <graphic><FontIcon iconLiteral="fth-check-square" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleRetards" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Retards &amp; absences">
+                                            <Button onAction="#handleRetards" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.late_absences">
                                                 <graphic><FontIcon iconLiteral="fth-clock" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleStatsAssiduite" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Statistiques">
+                                            <Button onAction="#handleStatsAssiduite" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.attendance_stats">
                                                 <graphic><FontIcon iconLiteral="fth-bar-chart-2" iconSize="14" /></graphic>
                                             </Button>
                                         </VBox>
                                     </VBox>
 
                                     <!-- Menu Classes -->
-                                    <Button fx:id="btnClasses" onAction="#handleClassesMenu" prefWidth="Infinity" styleClass="nav-item" text="Classes &amp; Emplois du temps">
+                                    <Button fx:id="btnClasses" onAction="#handleClassesMenu" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.classes">
                                         <graphic><FontIcon iconLiteral="fth-layers" iconSize="16" /></graphic>
                                     </Button>
 
                                     <!-- ===== 3. PÉDAGOGIE ===== -->
-                                    <Label styleClass="nav-section-label" text="PÉDAGOGIE &amp; ÉVALUATION" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.pedagogie" />
 
                                     <!-- Menu Notes avec sous-menu -->
                                     <VBox spacing="1.0">
@@ -124,89 +127,89 @@
                                             <graphic>
                                                 <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">
                                                     <FontIcon iconLiteral="fth-edit-3" iconSize="16" />
-                                                    <Label text="Notes &amp; Évaluations" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
+                                                    <Label text="%sidebar.notes" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
                                                     <FontIcon fx:id="chevronNotes" iconLiteral="fth-chevron-down" iconSize="12" />
                                                 </HBox>
                                             </graphic>
                                         </Button>
                                         <VBox fx:id="sousMenuNotes" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">
-                                            <Button onAction="#handleSaisieNotes" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Saisie des notes">
+                                            <Button onAction="#handleSaisieNotes" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.notes_entry">
                                                 <graphic><FontIcon iconLiteral="fth-pen-tool" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleBulletins" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Bulletins scolaires">
+                                            <Button onAction="#handleBulletins" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.reports">
                                                 <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleExamens" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Examens &amp; contrôles">
+                                            <Button onAction="#handleExamens" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.exams">
                                                 <graphic><FontIcon iconLiteral="fth-award" iconSize="14" /></graphic>
                                             </Button>
                                         </VBox>
                                     </VBox>
 
                                     <!-- ===== 4. FINANCES ===== -->
-                                    <Label styleClass="nav-section-label" text="FINANCES &amp; CAISSE" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.finances" />
 
                                     <!-- Menu Paiements avec sous-menu -->
                                     <VBox spacing="1.0">
-                                        <Button fx:id="btnPaiement" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item" >
+                                        <Button fx:id="btnPaiement" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item">
                                             <graphic>
                                                 <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">
                                                     <FontIcon iconLiteral="fth-dollar-sign" iconSize="16" />
-                                                    <Label text="Frais &amp; Paiements" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
+                                                    <Label text="%sidebar.payments" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
                                                     <FontIcon fx:id="chevronPaiement" iconLiteral="fth-chevron-down" iconSize="12" />
                                                 </HBox>
                                             </graphic>
                                         </Button>
                                         <VBox fx:id="sousMenuPaiement" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">
-                                            <Button onAction="#handleGuichet" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Guichet paiements">
+                                            <Button onAction="#handleGuichet" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.cash_desk">
                                                 <graphic><FontIcon iconLiteral="fth-credit-card" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleFraisInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Frais d'inscription">
+                                            <Button onAction="#handleFraisInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.registration_fees">
                                                 <graphic><FontIcon iconLiteral="fth-file-plus" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleRecouvrement" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Recouvrements">
+                                            <Button onAction="#handleRecouvrement" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.recovery">
                                                 <graphic><FontIcon iconLiteral="fth-pie-chart" iconSize="14" /></graphic>
                                             </Button>
-                                            <Button onAction="#handleFactures" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Factures &amp; reçus">
+                                            <Button onAction="#handleFactures" prefWidth="Infinity" styleClass="nav-item, sous-item" text="%submenu.invoices">
                                                 <graphic><FontIcon iconLiteral="fth-printer" iconSize="14" /></graphic>
                                             </Button>
                                         </VBox>
                                     </VBox>
 
                                     <!-- Menu Comptabilité -->
-                                    <Button fx:id="btnComptabilite" onAction="#handleComptabilite" prefWidth="Infinity" styleClass="nav-item" text="Comptabilité">
+                                    <Button fx:id="btnComptabilite" onAction="#handleComptabilite" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.accounting">
                                         <graphic><FontIcon iconLiteral="fth-book" iconSize="16" /></graphic>
                                     </Button>
 
                                     <!-- ===== 5. RESSOURCES HUMAINES ===== -->
-                                    <Label styleClass="nav-section-label" text="RESSOURCES HUMAINES" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.rh" />
 
-                                    <Button fx:id="btnPersonnel" onAction="#handlePersonnel" prefWidth="Infinity" styleClass="nav-item" text="Personnel &amp; Enseignants">
+                                    <Button fx:id="btnPersonnel" onAction="#handlePersonnel" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.personnel">
                                         <graphic><FontIcon iconLiteral="fth-user-check" iconSize="16" /></graphic>
                                     </Button>
 
-                                    <Button fx:id="btnPaie" onAction="#handlePaie" prefWidth="Infinity" styleClass="nav-item" text="Gestion des Paies">
+                                    <Button fx:id="btnPaie" onAction="#handlePaie" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.payroll">
                                         <graphic><FontIcon iconLiteral="fth-briefcase" iconSize="16" /></graphic>
                                     </Button>
 
                                     <!-- ===== 6. COMMUNICATION ===== -->
-                                    <Label styleClass="nav-section-label" text="COMMUNICATION" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.communication" />
 
-                                    <Button fx:id="btnMessages" onAction="#handleMessages" prefWidth="Infinity" styleClass="nav-item" text="Messages aux parents">
+                                    <Button fx:id="btnMessages" onAction="#handleMessages" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.messages">
                                         <graphic><FontIcon iconLiteral="fth-message-circle" iconSize="16" /></graphic>
                                     </Button>
 
-                                    <Button fx:id="btnDocuments" onAction="#handleDocuments" prefWidth="Infinity" styleClass="nav-item" text="Documents officiels">
+                                    <Button fx:id="btnDocuments" onAction="#handleDocuments" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.documents">
                                         <graphic><FontIcon iconLiteral="fth-file-text" iconSize="16" /></graphic>
                                     </Button>
 
                                     <!-- ===== 7. SYSTÈME ===== -->
-                                    <Label styleClass="nav-section-label" text="SYSTÈME" />
+                                    <Label styleClass="nav-section-label" text="%sidebar.systeme" />
 
-                                    <Button fx:id="btnSettings" onAction="#handleSettings" prefWidth="Infinity" styleClass="nav-item" text="Paramètres">
+                                    <Button fx:id="btnSettings" onAction="#handleSettings" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.settings">
                                         <graphic><FontIcon iconLiteral="fth-settings" iconSize="16" /></graphic>
                                     </Button>
 
-                                    <Button fx:id="btnUtilisateurs" onAction="#handleUtilisateurs" prefWidth="Infinity" styleClass="nav-item" text="Utilisateurs &amp; Droits">
+                                    <Button fx:id="btnUtilisateurs" onAction="#handleUtilisateurs" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.users">
                                         <graphic><FontIcon iconLiteral="fth-shield" iconSize="16" /></graphic>
                                     </Button>
                                 </VBox>
@@ -214,7 +217,7 @@
                         </ScrollPane>
 
                         <!-- Bouton Déconnexion au bas -->
-                        <Button fx:id="btnLogout" onAction="#handleLogout" prefWidth="Infinity" styleClass="nav-item, logout-item" text="Déconnexion">
+                        <Button fx:id="btnLogout" onAction="#handleLogout" prefWidth="Infinity" styleClass="nav-item, logout-item" text="%sidebar.logout">
                             <graphic><FontIcon iconLiteral="fth-log-out" iconSize="16" /></graphic>
                         </Button>
 
@@ -234,250 +237,3 @@
         </VBox>
     </center>
 </BorderPane>
-
-
-
-
-<!--        <?xml version="1.0" encoding="UTF-8"?>-->
-
-<!--        <?import java.net.URL?>-->
-<!--        <?import javafx.geometry.Insets?>-->
-<!--        <?import javafx.scene.control.Button?>-->
-<!--        <?import javafx.scene.control.Label?>-->
-<!--        <?import javafx.scene.control.ScrollPane?>-->
-<!--        <?import javafx.scene.image.Image?>-->
-<!--        <?import javafx.scene.image.ImageView?>-->
-<!--        <?import javafx.scene.layout.BorderPane?>-->
-<!--        <?import javafx.scene.layout.HBox?>-->
-<!--        <?import javafx.scene.layout.Priority?>-->
-<!--        <?import javafx.scene.layout.Region?>-->
-<!--        <?import javafx.scene.layout.StackPane?>-->
-<!--        <?import javafx.scene.layout.VBox?>-->
-<!--        <?import org.kordamp.ikonli.javafx.FontIcon?>-->
-
-<!--<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.HelloController">-->
-<!--<stylesheets>-->
-<!--    <URL value="@style.css" />-->
-<!--</stylesheets>-->
-
-<!--&lt;!&ndash; ===== Barre de fenêtre personnalisée ===== &ndash;&gt;-->
-<!--<top>-->
-<!--    <fx:include source="view/app-bar.fxml" />-->
-<!--</top>-->
-
-<!--&lt;!&ndash; ===== Sidebar avec sous-menus extensibles ===== &ndash;&gt;-->
-<!--<left>-->
-<!--    <StackPane fx:id="sidebarContainer" minWidth="200.0" prefWidth="280.0" maxWidth="400.0" styleClass="sidebar">-->
-<!--        <children>-->
-<!--            <VBox spacing="8.0">-->
-<!--                <padding>-->
-<!--                    <Insets top="10.0" right="10.0" bottom="20.0" left="12.0" />-->
-<!--                </padding>-->
-<!--                <children>-->
-
-<!--                    &lt;!&ndash; Header / Logo &ndash;&gt;-->
-<!--                    <HBox alignment="CENTER" spacing="12.0" styleClass="sidebar-header">-->
-<!--                        <padding><Insets bottom="15.0" /></padding>-->
-<!--                        <ImageView fitHeight="65.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true">-->
-<!--                            <image>-->
-<!--                                <Image url="@logo.png" />-->
-<!--                            </image>-->
-<!--                        </ImageView>-->
-<!--                    </HBox>-->
-
-<!--                    &lt;!&ndash; Menu avec sous-menus extensibles &ndash;&gt;-->
-<!--                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="page-scroll" VBox.vgrow="ALWAYS">-->
-<!--                        <content>-->
-<!--                            <VBox spacing="2.0">-->
-
-<!--                                &lt;!&ndash; ===== 1. PILOTAGE ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="PILOTAGE" />-->
-
-<!--                                <Button fx:id="btnDashboard" onAction="#handleDashboardHome" prefWidth="Infinity" styleClass="nav-item, active" text="Tableau de bord">-->
-<!--                                    <graphic>-->
-<!--                                        <FontIcon iconLiteral="fth-grid" iconSize="16" />-->
-<!--                                    </graphic>-->
-<!--                                </Button>-->
-
-<!--                                &lt;!&ndash; ===== 2. VIE SCOLAIRE ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="VIE SCOLAIRE" />-->
-
-<!--                                &lt;!&ndash; Menu Élèves avec sous-menu (CORRIGÉ) &ndash;&gt;-->
-<!--                                <VBox spacing="1.0">-->
-<!--                                    <Button fx:id="btnStudents" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item">-->
-<!--                                        <graphic>-->
-<!--                                            <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">-->
-<!--                                                <FontIcon iconLiteral="fth-users" iconSize="16" />-->
-<!--                                                <Label text="Élèves &amp; Inscriptions" HBox.hgrow="ALWAYS" />-->
-<!--                                                <Region HBox.hgrow="ALWAYS" />-->
-<!--                                                <FontIcon fx:id="chevronStudents" iconLiteral="fth-chevron-down" iconSize="12" />-->
-<!--                                            </HBox>-->
-<!--                                        </graphic>-->
-<!--                                    </Button>-->
-<!--                                    <VBox fx:id="sousMenuStudents" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">-->
-<!--                                        <Button onAction="#handleNouvelleInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Nouvelle inscription">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleListeEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Liste des élèves">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-list" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleReinscriptions" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Réinscriptions">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-refresh-cw" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleDossiersEleves" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Dossiers élèves">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-folder" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                    </VBox>-->
-<!--                                </VBox>-->
-
-<!--                                &lt;!&ndash; Menu Présences avec sous-menu (CORRIGÉ) &ndash;&gt;-->
-<!--                                <VBox spacing="1.0">-->
-<!--                                    <Button fx:id="btnPresences" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item">-->
-<!--                                        <graphic>-->
-<!--                                            <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">-->
-<!--                                                <FontIcon iconLiteral="fth-calendar" iconSize="16" />-->
-<!--                                                <Label text="Présences &amp; Assiduité" HBox.hgrow="ALWAYS" />-->
-<!--                                                <Region HBox.hgrow="ALWAYS" />-->
-<!--                                                <FontIcon fx:id="chevronPresences" iconLiteral="fth-chevron-down" iconSize="12" />-->
-<!--                                            </HBox>-->
-<!--                                        </graphic>-->
-<!--                                    </Button>-->
-<!--                                    <VBox fx:id="sousMenuPresences" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">-->
-<!--                                        <Button onAction="#handleFeuilleAppel" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Feuille d'appel">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-check-square" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleRetards" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Retards &amp; absences">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-clock" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleStatsAssiduite" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Statistiques">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-bar-chart-2" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                    </VBox>-->
-<!--                                </VBox>-->
-
-<!--                                &lt;!&ndash; Menu Classes &ndash;&gt;-->
-<!--                                <Button fx:id="btnClasses" onAction="#handleClassesMenu" prefWidth="Infinity" styleClass="nav-item" text="Classes &amp; Emplois du temps">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-layers" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                &lt;!&ndash; ===== 3. PÉDAGOGIE ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="PÉDAGOGIE &amp; ÉVALUATION" />-->
-
-<!--                                &lt;!&ndash; Menu Notes avec sous-menu (CORRIGÉ) &ndash;&gt;-->
-<!--                                <VBox spacing="1.0">-->
-<!--                                    <Button fx:id="btnNotes" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item">-->
-<!--                                        <graphic>-->
-<!--                                            <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">-->
-<!--                                                <FontIcon iconLiteral="fth-edit-3" iconSize="16" />-->
-<!--                                                <Label text="Notes &amp; Évaluations" HBox.hgrow="ALWAYS" />-->
-<!--                                                <Region HBox.hgrow="ALWAYS" />-->
-<!--                                                <FontIcon fx:id="chevronNotes" iconLiteral="fth-chevron-down" iconSize="12" />-->
-<!--                                            </HBox>-->
-<!--                                        </graphic>-->
-<!--                                    </Button>-->
-<!--                                    <VBox fx:id="sousMenuNotes" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">-->
-<!--                                        <Button onAction="#handleSaisieNotes" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Saisie des notes">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-pen-tool" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleBulletins" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Bulletins scolaires">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleExamens" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Examens &amp; contrôles">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-award" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                    </VBox>-->
-<!--                                </VBox>-->
-
-<!--                                &lt;!&ndash; ===== 4. FINANCES ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="FINANCES &amp; CAISSE" />-->
-
-<!--                                &lt;!&ndash; Menu Paiements avec sous-menu (CORRIGÉ) &ndash;&gt;-->
-<!--                                <VBox spacing="1.0">-->
-<!--                                    <Button fx:id="btnPaiement" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item">-->
-<!--                                        <graphic>-->
-<!--                                            <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">-->
-<!--                                                <FontIcon iconLiteral="fth-dollar-sign" iconSize="16" />-->
-<!--                                                <Label text="Frais &amp; Paiements" HBox.hgrow="ALWAYS" />-->
-<!--                                                <Region HBox.hgrow="ALWAYS" />-->
-<!--                                                <FontIcon fx:id="chevronPaiement" iconLiteral="fth-chevron-down" iconSize="12" />-->
-<!--                                            </HBox>-->
-<!--                                        </graphic>-->
-<!--                                    </Button>-->
-<!--                                    <VBox fx:id="sousMenuPaiement" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">-->
-<!--                                        <Button onAction="#handleGuichet" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Guichet paiements">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-credit-card" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleFraisInscription" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Frais d'inscription">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-file-plus" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleRecouvrement" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Recouvrements">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-pie-chart" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                        <Button onAction="#handleFactures" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Factures &amp; reçus">-->
-<!--                                            <graphic><FontIcon iconLiteral="fth-printer" iconSize="14" /></graphic>-->
-<!--                                        </Button>-->
-<!--                                    </VBox>-->
-<!--                                </VBox>-->
-
-<!--                                &lt;!&ndash; Menu Comptabilité &ndash;&gt;-->
-<!--                                <Button fx:id="btnComptabilite" onAction="#handleComptabilite" prefWidth="Infinity" styleClass="nav-item" text="Comptabilité">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-book" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                &lt;!&ndash; ===== 5. RESSOURCES HUMAINES ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="RESSOURCES HUMAINES" />-->
-
-<!--                                <Button fx:id="btnPersonnel" onAction="#handlePersonnel" prefWidth="Infinity" styleClass="nav-item" text="Personnel &amp; Enseignants">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-user-check" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                <Button fx:id="btnPaie" onAction="#handlePaie" prefWidth="Infinity" styleClass="nav-item" text="Gestion des Paies">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-briefcase" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                &lt;!&ndash; ===== 6. COMMUNICATION ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="COMMUNICATION" />-->
-
-<!--                                <Button fx:id="btnMessages" onAction="#handleMessages" prefWidth="Infinity" styleClass="nav-item" text="Messages aux parents">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-message-circle" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                <Button fx:id="btnDocuments" onAction="#handleDocuments" prefWidth="Infinity" styleClass="nav-item" text="Documents officiels">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-file-text" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                &lt;!&ndash; ===== 7. SYSTÈME ===== &ndash;&gt;-->
-<!--                                <Label styleClass="nav-section-label" text="SYSTÈME" />-->
-
-<!--                                <Button fx:id="btnSettings" onAction="#handleSettings" prefWidth="Infinity" styleClass="nav-item" text="Paramètres">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-settings" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-
-<!--                                <Button fx:id="btnUtilisateurs" onAction="#handleUtilisateurs" prefWidth="Infinity" styleClass="nav-item" text="Utilisateurs &amp; Droits">-->
-<!--                                    <graphic><FontIcon iconLiteral="fth-shield" iconSize="16" /></graphic>-->
-<!--                                </Button>-->
-<!--                            </VBox>-->
-<!--                        </content>-->
-<!--                    </ScrollPane>-->
-
-<!--                    &lt;!&ndash; Bouton Déconnexion au bas &ndash;&gt;-->
-<!--                    <Button fx:id="btnLogout" onAction="#handleLogout" prefWidth="Infinity" styleClass="nav-item, logout-item" text="Déconnexion">-->
-<!--                        <graphic><FontIcon iconLiteral="fth-log-out" iconSize="16" /></graphic>-->
-<!--                    </Button>-->
-
-<!--                </children>-->
-<!--            </VBox>-->
-
-<!--            &lt;!&ndash; Poignée de redimensionnement à droite &ndash;&gt;-->
-<!--            <Region fx:id="resizeHandle" prefWidth="6.0" minWidth="6.0" maxWidth="6.0" StackPane.alignment="CENTER_RIGHT" styleClass="sidebar-resize-handle" />-->
-<!--        </children>-->
-<!--    </StackPane>-->
-<!--</left>-->
-
-<!--&lt;!&ndash; ===== Zone de contenu centrale ===== &ndash;&gt;-->
-<!--<center>-->
-<!--    <VBox style="-fx-background-color: -color-bg-subtle;">-->
-<!--        <StackPane fx:id="contentArea" prefHeight="713.0" prefWidth="1020.0" VBox.vgrow="ALWAYS" />-->
-<!--    </VBox>-->
-<!--</center>-->
-<!--</BorderPane>-->
