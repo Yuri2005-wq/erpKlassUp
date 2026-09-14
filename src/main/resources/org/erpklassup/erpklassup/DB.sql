@@ -1,16 +1,3 @@
--- ==============================================================
--- BASE DE DONNÉES ERP SCOLAIRE - VERSION FINALE COMPLÈTE
--- Compatible avec synchronisation Offline-First (JavaFX <-> Cloud)
--- Engine : InnoDB | Encodage : utf8mb4_unicode_ci
---
--- ✅ Unicité "soft-delete aware" : chaque contrainte UNIQUE sensible au
--- soft-delete repose sur une colonne générée VIRTUAL qui ne porte la
--- valeur métier que lorsque deleted_at IS NULL, et vaut NULL sinon.
--- Deux lignes NULL n'entrent jamais en conflit dans un index UNIQUE :
--- une ligne archivée ne bloque donc plus la recréation d'un même
--- code/matricule/username actif.
--- ==============================================================
-
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ==============================================================
@@ -342,7 +329,7 @@ CREATE TABLE IF NOT EXISTS TentativeConnexion (
 CREATE TABLE IF NOT EXISTS Personnel (
                                          idPersonnel VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
-    idUtilisateur VARCHAR(50) NULL UNIQUE,
+    idUtilisateur VARCHAR(50) NULL,
     matriculeInterne VARCHAR(50) NOT NULL,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100),
@@ -364,6 +351,7 @@ CREATE TABLE IF NOT EXISTS Personnel (
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     matriculeInterne_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN matriculeInterne END) VIRTUAL,
+    idUtilisateur_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idUtilisateur END) VIRTUAL,
     PRIMARY KEY (idPersonnel),
     UNIQUE KEY uq_personnel_matricule_actif (matriculeInterne_actif, idEcole),
     INDEX idx_pers_sync (idEcole, updated_at, version),
@@ -472,7 +460,7 @@ CREATE TABLE IF NOT EXISTS AffectationMatiere (
 CREATE TABLE IF NOT EXISTS Eleve (
                                      idEleve VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
-    idUtilisateur VARCHAR(50) NULL UNIQUE,
+    idUtilisateur VARCHAR(50) NULL,
     matricule VARCHAR(50) NOT NULL,
     nom VARCHAR(50) NOT NULL,
     prenom VARCHAR(50) NOT NULL,
@@ -491,6 +479,7 @@ CREATE TABLE IF NOT EXISTS Eleve (
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     updated_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     matricule_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN matricule END) VIRTUAL,
+    idUtilisateur_actif VARCHAR(50) GENERATED ALWAYS AS (CASE WHEN deleted_at IS NULL THEN idUtilisateur END) VIRTUAL,
     PRIMARY KEY (idEleve),
     UNIQUE KEY uq_eleve_matricule_actif (matricule_actif, idEcole),
     INDEX idx_eleve_sync (idEcole, updated_at, version),
@@ -505,7 +494,7 @@ CREATE TABLE IF NOT EXISTS Eleve (
 CREATE TABLE IF NOT EXISTS Parent (
                                       idParent VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
-    idUtilisateur VARCHAR(50) NULL UNIQUE,
+    idUtilisateur VARCHAR(50) NULL,
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100),
     sexe VARCHAR(10),
@@ -856,3 +845,7 @@ CREATE TABLE IF NOT EXISTS LogsAudit (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+DROP PROCEDURE IF EXISTS SoftDeleteUtilisateur;
+

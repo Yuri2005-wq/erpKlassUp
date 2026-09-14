@@ -80,22 +80,17 @@ public class ModalUtil {
             return null;
         }
     }
-
-    // ==========================================
-    // POPUP TRANSPARENTE (sous un nœud)
-    // ==========================================
     /**
-     * Ouvre une popup (Stage transparent, sans décoration) positionnée SOUS un nœud ancêtre.
-     * Supporte les coins arrondis et l'ombre portée grâce à un fond de scène transparent.
-     * Utilise I18nManager pour résoudre les %clés du FXML.
+     * Ouvre un modal IDENTIQUE à ouvrirModal, MAIS positionné en HAUT À DROITE
+     * de l'écran (ou du nœud ancêtre si fourni).
      *
      * @param contextClass   Classe de contexte pour résoudre le FXML
-     * @param fxmlPath       Chemin du FXML (relatif ou absolu)
-     * @param titre          Titre de la fenêtre (souvent vide pour une popup)
-     * @param fenetreParente Fenêtre parente (propriétaire)
-     * @param noeudAncetre   Nœud sous lequel positionner la popup
-     * @param largeur        Largeur VISIBLE (sans le padding d'ombre)
-     * @param hauteur        Hauteur VISIBLE (sans le padding d'ombre)
+     * @param fxmlPath       Chemin du FXML
+     * @param titre          Titre de la fenêtre
+     * @param fenetreParente Fenêtre parente
+     * @param noeudAncetre   Nœud de référence (peut être null → utilise l'écran)
+     * @param largeur        Largeur du modal
+     * @param hauteur        Hauteur du modal
      */
     public static <T> T ouvrirPopupSous(Class<?> contextClass,
                                         String fxmlPath,
@@ -112,12 +107,11 @@ public class ModalUtil {
             Parent contenu = loader.load();
 
             // ==========================================
-            // 2. Créer le Stage transparent
+            // 2. Créer le Stage DÉCORÉ (identique à ouvrirModal)
             // ==========================================
             Stage stage = new Stage();
-            stage.setTitle(titre != null ? titre : "");
-            stage.initStyle(StageStyle.TRANSPARENT);   // ✅ Pas de décoration Windows
-            stage.setAlwaysOnTop(true);
+            stage.setTitle(titre);
+            stage.initStyle(StageStyle.DECORATED);
 
             if (fenetreParente != null) {
                 stage.initOwner(fenetreParente);
@@ -125,67 +119,61 @@ public class ModalUtil {
             }
 
             // ==========================================
-            // 3. Scene transparente + taille élargie pour l'ombre
+            // 3. Scene normale (identique à ouvrirModal)
             // ==========================================
-            double sceneWidth = largeur + 2 * PADDING_OMBRE;
-            double sceneHeight = hauteur + 2 * PADDING_OMBRE;
-
-            Scene scene = new Scene(contenu, sceneWidth, sceneHeight);
-
-            // ⚠️ ORDRE CRUCIAL :
-            //   1) setFill AVANT setUserAgentStylesheet
-            //   2) setUserAgentStylesheet peut écraser le fill
-            scene.setFill(Color.TRANSPARENT);
-
+            Scene scene = new Scene(contenu, largeur, hauteur);
             Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
             stage.setScene(scene);
             stage.setResizable(false);
 
+            try {
+                stage.getIcons().add(new Image(
+                        HelloApplication.class.getResourceAsStream("logo.png")));
+            } catch (Exception ignored) { }
+
             // ==========================================
-            // 4. Position sous le nœud ancêtre
+            // 4. Positionnement en HAUT À DROITE
             // ==========================================
+            // Marge de 20px depuis le bord droit de l'écran
+            final double MARGE_ECRAN = 20;
+
+            Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+
+            double x;
+            double y;
+
             if (noeudAncetre != null && noeudAncetre.getScene() != null) {
+                // Aligner sur le nœud ancêtre (ex: bloc profil dans l'app-bar)
                 Bounds bounds = noeudAncetre.localToScreen(noeudAncetre.getBoundsInLocal());
                 if (bounds != null) {
-                    // Aligner à droite du nœud (compensation du padding gauche)
-                    double x = bounds.getMaxX() - largeur - PADDING_OMBRE;
-                    double y = bounds.getMaxY() - PADDING_OMBRE + 8;
-
-                    // Empêcher la sortie d'écran
-                    Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-                    if (x < screen.getMinX()) {
-                        x = screen.getMinX();
-                    }
-                    if (x + sceneWidth > screen.getMaxX()) {
-                        x = screen.getMaxX() - sceneWidth;
-                    }
-                    if (y + sceneHeight > screen.getMaxY()) {
-                        // Basculer au-dessus du nœud si pas assez de place en dessous
-                        y = bounds.getMinY() - sceneHeight + PADDING_OMBRE - 8;
-                    }
-
-                    stage.setX(x);
-                    stage.setY(y);
+                    // En haut à droite : le modal s'aligne sous le nœud, à droite
+                    x = bounds.getMaxX() - largeur;
+                    y = bounds.getMaxY() + 8;
+                } else {
+                    x = screen.getMaxX() - largeur - MARGE_ECRAN;
+                    y = screen.getMinY() + MARGE_ECRAN;
                 }
+            } else {
+                // Pas de nœud ancêtre → coin haut droit de l'écran
+                x = screen.getMaxX() - largeur - MARGE_ECRAN;
+                y = screen.getMinY() + MARGE_ECRAN;
             }
 
-            // ==========================================
-            // 5. Fermeture automatique au clic ailleurs
-            // ==========================================
-            stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-                if (wasFocused && !isNowFocused) {
-                    stage.close();
-                }
-            });
+            // Empêcher la sortie d'écran
+            if (x < screen.getMinX()) x = screen.getMinX();
+            if (x + largeur > screen.getMaxX()) x = screen.getMaxX() - largeur;
+            if (y < screen.getMinY()) y = screen.getMinY();
+            if (y + hauteur > screen.getMaxY()) y = screen.getMaxY() - hauteur;
+
+            stage.setX(x);
+            stage.setY(y);
 
             // ==========================================
-            // 6. Afficher + re-forcer la transparence
+            // 5. Afficher + couleur de la barre de titre
             // ==========================================
             stage.show();
-
-            // ✅ Double sécurité : Windows peut remettre un fond après show()
-            stage.getScene().setFill(Color.TRANSPARENT);
+            WindowsTitleBar.setTitleBarColor(stage, APP_BAR_COLOR);
 
             return loader.getController();
 

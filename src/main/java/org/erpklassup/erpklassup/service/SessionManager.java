@@ -32,6 +32,8 @@ public class SessionManager {
     private final Set<String> codesPermissions = ConcurrentHashMap.newKeySet();
     private final Map<String, String> mappingActions = new ConcurrentHashMap<>();
     private final List<Runnable> ecouteursPermissions = new CopyOnWriteArrayList<>();
+    private final List<Runnable> ecouteursChangementUtilisateur = new CopyOnWriteArrayList<>();
+
 
     private final SessionUtilisateurDAO sessionUtilisateurDAO = new SessionUtilisateurDAO();
 
@@ -319,5 +321,17 @@ public class SessionManager {
      */
     public void setOnInactiviteDetectee(Runnable callback) {
         this.onInactiviteDetectee = callback;
+    }
+
+    public void notifierChangementUtilisateur() {
+        for (Runnable ecouteur : ecouteursChangementUtilisateur) {
+            Platform.runLater(() -> {
+                try {
+                    ecouteur.run();
+                } catch (Exception e) {
+                    System.err.println("Erreur écouteur changement utilisateur : " + e.getMessage());
+                }
+            });
+        }
     }
 }

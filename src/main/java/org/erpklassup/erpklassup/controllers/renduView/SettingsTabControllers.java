@@ -4,9 +4,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ViewRegistry;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -21,11 +23,13 @@ public class SettingsTabControllers implements Initializable {
 
     // Conteneur JavaFX où les sous-vues FXML seront injectées
     @FXML private StackPane tabContentContainer;
-
+    @FXML private Label lblPageCourante;
     // Boutons de navigation (TopBar)
     @FXML private Button btnTabUtilisateur;
     @FXML private Button btnTabRolePermissions;
     @FXML private Button btnTabAudits;
+    @FXML private FontIcon iconTitleShield;
+
 
     // Mappage associant chaque bouton FXML au chemin de sa vue FXML correspondante
     private final Map<Button, String> tabViewsMap = new HashMap<>();
@@ -61,7 +65,9 @@ public class SettingsTabControllers implements Initializable {
         if (btnTabUtilisateur != null) {
             mettreEnValeurBouton(btnTabUtilisateur);
             viewRegistry.afficherVue(tabViewsMap.get(btnTabUtilisateur));
+            mettreAJourTitrePage(btnTabUtilisateur);
         }
+
 
         // ✅ S'abonner aux changements de langue
         i18n().ecouterChangement(ecouteurI18n);
@@ -85,6 +91,7 @@ public class SettingsTabControllers implements Initializable {
         if (fxmlPath != null) {
             mettreEnValeurBouton(clickedButton);
             viewRegistry.afficherVue(fxmlPath);
+            mettreAJourTitrePage(clickedButton);
         }
     }
 
@@ -123,5 +130,22 @@ public class SettingsTabControllers implements Initializable {
             viewRegistry.toutReinitialiser();
         }
         i18n().arreterEcoute(ecouteurI18n);
+    }
+
+    private void mettreAJourTitrePage(Button boutonActif) {
+        if (lblPageCourante == null) return;
+
+        String cle;
+        if (boutonActif == btnTabUtilisateur) {
+            cle = "settings.page.title.users";
+        } else if (boutonActif == btnTabRolePermissions) {
+            cle = "settings.page.title.roles";
+        } else if (boutonActif == btnTabAudits) {
+            cle = "settings.page.title.audit";
+        } else {
+            cle = "settings.page.title";
+        }
+
+        lblPageCourante.setText(i18n().t(cle));
     }
 }

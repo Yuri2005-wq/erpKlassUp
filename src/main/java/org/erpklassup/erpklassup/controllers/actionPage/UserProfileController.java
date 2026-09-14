@@ -22,6 +22,7 @@ import org.erpklassup.erpklassup.service.PasswordService;
 import org.erpklassup.erpklassup.service.Security2FAService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.util.AlertUtil;
+import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.net.URL;
@@ -38,6 +39,7 @@ public class UserProfileController implements Initializable {
     @FXML private Label usernameLabel;
     @FXML private Label badgeStatut;
     @FXML private VBox popupContainer;
+    @FXML private Button btnFermer;
 
     // ==========================================
     // ONGLET 1 : MES INFORMATIONS
@@ -50,7 +52,6 @@ public class UserProfileController implements Initializable {
     @FXML private ComboBox<String> fuseauCombo;
     @FXML private Button btnAnnulerInfo;
     @FXML private Button btnEnregistrerInfo;
-    @FXML private Button btnFermer;
 
     // ==========================================
     // ONGLET 2 : SÉCURITÉ - MOT DE PASSE
@@ -114,6 +115,11 @@ public class UserProfileController implements Initializable {
     private Utilisateur utilisateurCourant;
     private String tempSecret2FA;
 
+    // ✅ Raccourci i18n
+    private I18nManager i18n() {
+        return I18nManager.getInstance();
+    }
+
     // ==========================================
     // INITIALISATION
     // ==========================================
@@ -129,18 +135,15 @@ public class UserProfileController implements Initializable {
         configurerEvenements();
         masquerElementsNonUtilises();
         Platform.runLater(this::appliquerClipArrondi);
-
     }
 
     private void masquerElementsNonUtilises() {
-        if (forceMdpProgress != null) {
-            forceMdpProgress.setVisible(false);
-        }
-        if (forceMdpLabel != null) {
-            forceMdpLabel.setText("—");
-        }
+        if (forceMdpProgress != null) forceMdpProgress.setVisible(false);
+        if (forceMdpLabel != null) forceMdpLabel.setText("—");
         if (badgeStatut != null && utilisateurCourant != null) {
-            badgeStatut.setText(utilisateurCourant.isEstActif() ? "● Actif" : "● Inactif");
+            badgeStatut.setText(utilisateurCourant.isEstActif()
+                    ? "● " + i18n().t("status.active")
+                    : "● " + i18n().t("status.inactive"));
         }
     }
 
@@ -161,24 +164,21 @@ public class UserProfileController implements Initializable {
     @FXML
     private void handleFermer() {
         Stage stage = getStage();
-        if (stage != null) {
-            stage.close();
-        }
+        if (stage != null) stage.close();
     }
 
-
+    // ==========================================
+    // CONVERSIONS LANGUE / FUSEAU
+    // ==========================================
     private String convertirLangueEnCode(String libelle) {
         if (libelle == null) return "FR";
         return switch (libelle) {
-            case "Français" -> "FR";
-            case "English"  -> "EN";
-            default         -> "FR";
+            case "Français", "French" -> "FR";
+            case "English", "Anglais" -> "EN";
+            default -> "FR";
         };
     }
 
-    /**
-     * Convertit un libellé affiché ("UTC+01:00 (Afrique Centrale)") en code BDD ("Africa/Douala").
-     */
     private String convertirFuseauEnCode(String libelle) {
         if (libelle == null) return "Africa/Douala";
         return switch (libelle) {
@@ -188,8 +188,55 @@ public class UserProfileController implements Initializable {
         };
     }
 
+    private String convertirCodeEnLangue(String code) {
+        if (code == null) return i18n().t("user_profile.langue.fr");
+        return switch (code) {
+            case "EN" -> i18n().t("user_profile.langue.en");
+            default   -> i18n().t("user_profile.langue.fr");
+        };
+    }
 
+    private String convertirCodeEnFuseau(String code) {
+        if (code == null) return i18n().t("user_profile.fuseau.africa");
+        return switch (code) {
+            case "UTC" -> i18n().t("user_profile.fuseau.utc");
+            default    -> i18n().t("user_profile.fuseau.africa");
+        };
+    }
 
+    // ==========================================
+    // CHARGEMENT / SAUVEGARDE PROFIL
+    // ==========================================
+    private void chargerDonneesProfil() {
+        if (utilisateurCourant == null) return;
+
+        nomCompletLabel.setText(utilisateurCourant.getNomComplet());
+        usernameLabel.setText("@" + utilisateurCourant.getUsername());
+        avatarLabel.setText(obtenirInitiales(utilisateurCourant.getNomComplet()));
+
+        nomField.setText(utilisateurCourant.getNom());
+        prenomField.setText(utilisateurCourant.getPrenom());
+        emailField.setText(utilisateurCourant.getEmail());
+        telephoneField.setText(utilisateurCourant.getTelephone());
+
+        // ✅ ComboBox Langue
+        if (langueCombo != null) {
+            langueCombo.setItems(FXCollections.observableArrayList(
+                    i18n().t("user_profile.langue.fr"),
+                    i18n().t("user_profile.langue.en")
+            ));
+            langueCombo.setValue(convertirCodeEnLangue(utilisateurCourant.getLanguePreference()));
+        }
+
+        // ✅ ComboBox Fuseau
+        if (fuseauCombo != null) {
+            fuseauCombo.setItems(FXCollections.observableArrayList(
+                    i18n().t("user_profile.fuseau.africa"),
+                    i18n().t("user_profile.fuseau.utc")
+            ));
+            fuseauCombo.setValue(convertirCodeEnFuseau(utilisateurCourant.getFuseauHoraire()));
+        }
+    }
 
     private void enregistrerInformations() {
         if (utilisateurCourant == null) return;
@@ -199,7 +246,7 @@ public class UserProfileController implements Initializable {
         utilisateurCourant.setEmail(safeText(emailField));
         utilisateurCourant.setTelephone(safeText(telephoneField));
 
-        // ✅ AJOUT : lire les ComboBox
+        // ✅ Lire les ComboBox
         if (langueCombo != null && langueCombo.getValue() != null) {
             utilisateurCourant.setLanguePreference(convertirLangueEnCode(langueCombo.getValue()));
         }
@@ -215,64 +262,22 @@ public class UserProfileController implements Initializable {
             }
         };
 
+        saveTask.setOnSucceeded(evt -> {
+            ToastNotification.succes(getStage(), i18n().t("user_profile.info.saved"));
+            // ✅ Notifie l'app-bar pour rafraîchir les textes
+            SessionManager.getInstance().notifierChangementUtilisateur();
+        });
 
-        saveTask.setOnSucceeded(evt ->
-                ToastNotification.succes(getStage(), "Informations mises à jour avec succès !"));
         saveTask.setOnFailed(evt -> ToastNotification.erreur(getStage(),
-                "Erreur lors de la mise à jour."));
+                i18n().t("user_profile.info.save_error")));
 
         AppExecutor.get().submit(saveTask);
     }
 
-    private void chargerDonneesProfil() {
-        if (utilisateurCourant == null) return;
-
-        nomCompletLabel.setText(utilisateurCourant.getNomComplet());
-        usernameLabel.setText("@" + utilisateurCourant.getUsername());
-        avatarLabel.setText(obtenirInitiales(utilisateurCourant.getNomComplet()));
-
-        nomField.setText(utilisateurCourant.getNom());
-        prenomField.setText(utilisateurCourant.getPrenom());
-        emailField.setText(utilisateurCourant.getEmail());
-        telephoneField.setText(utilisateurCourant.getTelephone());
-
-        // ✅ ComboBox Langue
-        if (langueCombo != null) {
-            langueCombo.setItems(FXCollections.observableArrayList("Français", "English"));
-            langueCombo.setValue(convertirCodeEnLangue(utilisateurCourant.getLanguePreference()));
-        }
-
-        // ✅ ComboBox Fuseau
-        if (fuseauCombo != null) {
-            fuseauCombo.setItems(FXCollections.observableArrayList(
-                    "UTC+01:00 (Afrique Centrale)", "UTC+00:00 (GMT)"));
-            fuseauCombo.setValue(convertirCodeEnFuseau(utilisateurCourant.getFuseauHoraire()));
-        }
-    }
-
-    private String convertirCodeEnLangue(String code) {
-        if (code == null) return "Français";
-        return switch (code) {
-            case "EN" -> "English";
-            default   -> "Français";
-        };
-    }
-
-    private String convertirCodeEnFuseau(String code) {
-        if (code == null) return "UTC+01:00 (Afrique Centrale)";
-        return switch (code) {
-            case "UTC" -> "UTC+00:00 (GMT)";
-            default    -> "UTC+01:00 (Afrique Centrale)";
-        };
-    }
-
-    /**
-     * Convertit un libellé affiché ("Français") en code BDD ("FR").
-     */
-
-
+    // ==========================================
+    // ÉVÉNEMENTS
+    // ==========================================
     private void configurerEvenements() {
-        // Onglet 1 - Informations
         if (btnEnregistrerInfo != null) {
             btnEnregistrerInfo.setOnAction(e -> enregistrerInformations());
         }
@@ -280,32 +285,17 @@ public class UserProfileController implements Initializable {
             btnAnnulerInfo.setOnAction(e -> chargerDonneesProfil());
         }
 
-        // Onglet 2 - Mot de passe
         if (btnChangerMdp != null) {
             btnChangerMdp.setOnAction(e -> changerMotDePasse());
         }
 
-        // Onglet 2 - 2FA
-        if (btnActiver2FA != null) {
-            btnActiver2FA.setOnAction(e -> initierActivation2FA());
-        }
-        if (btnCopierCle != null) {
-            btnCopierCle.setOnAction(e -> copierCleSecrete());
-        }
-        if (btnConfirmer2FA != null) {
-            btnConfirmer2FA.setOnAction(e -> validerEtActiver2FA());
-        }
-        if (btnAnnuler2FA != null) {
-            btnAnnuler2FA.setOnAction(e -> annulerActivation2FA());
-        }
-        if (btnDesactiver2FA != null) {
-            btnDesactiver2FA.setOnAction(e -> desactiver2FA());
-        }
-        if (btnAfficherCodesSecours != null) {
-            btnAfficherCodesSecours.setOnAction(e -> afficherModalCodesSecours());
-        }
+        if (btnActiver2FA != null) btnActiver2FA.setOnAction(e -> initierActivation2FA());
+        if (btnCopierCle != null) btnCopierCle.setOnAction(e -> copierCleSecrete());
+        if (btnConfirmer2FA != null) btnConfirmer2FA.setOnAction(e -> validerEtActiver2FA());
+        if (btnAnnuler2FA != null) btnAnnuler2FA.setOnAction(e -> annulerActivation2FA());
+        if (btnDesactiver2FA != null) btnDesactiver2FA.setOnAction(e -> desactiver2FA());
+        if (btnAfficherCodesSecours != null) btnAfficherCodesSecours.setOnAction(e -> afficherModalCodesSecours());
 
-        // Modal codes secours
         if (btnFermerModalCodes != null && modalCodesSecours != null) {
             btnFermerModalCodes.setOnAction(e -> {
                 modalCodesSecours.setVisible(false);
@@ -314,21 +304,22 @@ public class UserProfileController implements Initializable {
         }
         if (btnImprimerCodes != null) {
             btnImprimerCodes.setOnAction(e ->
-                    ToastNotification.info(getStage(), "Fonction d'impression en cours..."));
+                    ToastNotification.info(getStage(), i18n().t("user_profile.codes.print_soon")));
         }
     }
 
     // ==========================================
     // LOGIQUE 2FA
     // ==========================================
-
     private void mettreAJourAffichage2FA() {
         if (utilisateurCourant == null) return;
 
         boolean estActive = utilisateurCourant.isDeuxFacteursActive();
 
         if (statut2FALabel != null) {
-            statut2FALabel.setText(estActive ? "Activée" : "Non activée");
+            statut2FALabel.setText(estActive
+                    ? i18n().t("user_profile.2fa.status_enabled")
+                    : i18n().t("user_profile.2fa.status_disabled"));
             statut2FALabel.setStyle(estActive
                     ? "-fx-font-weight: bold; -fx-text-fill: #10B981;"
                     : "-fx-font-weight: bold; -fx-text-fill: #94A3B8;");
@@ -353,11 +344,9 @@ public class UserProfileController implements Initializable {
     private void initierActivation2FA() {
         if (utilisateurCourant == null) return;
 
-        // 1. Générer la clé secrète
         tempSecret2FA = security2FAService.genererCleSecrete();
         cleSecreteField.setText(tempSecret2FA);
 
-        // 2. Générer + afficher le QR code
         Image qr = security2FAService.genererQrCode(
                 utilisateurCourant.getUsername(),
                 "KlassUp",
@@ -368,10 +357,9 @@ public class UserProfileController implements Initializable {
             qrCodeImageView.setImage(qr);
         } else {
             ToastNotification.avertissement(getStage(),
-                    "QR code non disponible — utilisez la clé manuelle.");
+                    i18n().t("user_profile.2fa.qr_unavailable"));
         }
 
-        // 3. Basculer l'affichage
         box2FADesactive.setVisible(false);
         box2FADesactive.setManaged(false);
 
@@ -381,9 +369,7 @@ public class UserProfileController implements Initializable {
         box2FAActive.setVisible(false);
         box2FAActive.setManaged(false);
 
-        if (codeVerification2FAField != null) {
-            codeVerification2FAField.requestFocus();
-        }
+        if (codeVerification2FAField != null) codeVerification2FAField.requestFocus();
     }
 
     private void copierCleSecrete() {
@@ -392,7 +378,7 @@ public class UserProfileController implements Initializable {
         ClipboardContent content = new ClipboardContent();
         content.putString(cleSecreteField.getText());
         clipboard.setContent(content);
-        ToastNotification.info(getStage(), "Clé secrète copiée dans le presse-papier !");
+        ToastNotification.info(getStage(), i18n().t("user_profile.2fa.key_copied"));
     }
 
     private void validerEtActiver2FA() {
@@ -403,7 +389,7 @@ public class UserProfileController implements Initializable {
                 ? codeVerification2FAField.getText().trim() : "";
 
         if (codeSaisi.length() != 6) {
-            ToastNotification.erreur(getStage(), "Veuillez saisir un code à 6 chiffres.");
+            ToastNotification.erreur(getStage(), i18n().t("user_profile.2fa.code_required"));
             return;
         }
 
@@ -411,21 +397,17 @@ public class UserProfileController implements Initializable {
             int codeInt = Integer.parseInt(codeSaisi);
 
             if (!security2FAService.verifierCodeTOTP(tempSecret2FA, codeInt)) {
-                ToastNotification.erreur(getStage(),
-                        "Code invalide. Vérifiez l'heure de votre téléphone.");
+                ToastNotification.erreur(getStage(), i18n().t("user_profile.2fa.invalid_code"));
                 return;
             }
 
             Task<List<String>> task2FA = new Task<>() {
                 @Override
                 protected List<String> call() {
-                    // 1. Activer la 2FA en BDD
                     utilisateurDAO.activer2FA(
                             utilisateurCourant.getIdUtilisateur(),
                             tempSecret2FA
                     );
-
-                    // 2. Générer + enregistrer les codes HACHÉS
                     return security2FAService.genererCodesSecours(
                             utilisateurCourant.getIdUtilisateur(), 8
                     );
@@ -438,7 +420,7 @@ public class UserProfileController implements Initializable {
                 codeVerification2FAField.clear();
 
                 mettreAJourAffichage2FA();
-                ToastNotification.succes(getStage(), "Double authentification activée !");
+                ToastNotification.succes(getStage(), i18n().t("user_profile.2fa.enabled"));
 
                 afficherCodesSecours(task2FA.getValue());
             });
@@ -446,24 +428,20 @@ public class UserProfileController implements Initializable {
             task2FA.setOnFailed(evt -> {
                 Throwable ex = task2FA.getException();
                 ToastNotification.erreur(getStage(),
-                        "Erreur : " + (ex != null ? ex.getMessage() : "inconnue"));
+                        i18n().t("common.error_detail", ex != null ? ex.getMessage() : "?"));
             });
 
             AppExecutor.get().submit(task2FA);
 
         } catch (NumberFormatException e) {
-            ToastNotification.erreur(getStage(), "Le code doit être numérique.");
+            ToastNotification.erreur(getStage(), i18n().t("user_profile.2fa.numeric_required"));
         }
     }
 
     private void annulerActivation2FA() {
         tempSecret2FA = null;
-        if (codeVerification2FAField != null) {
-            codeVerification2FAField.clear();
-        }
-        if (qrCodeImageView != null) {
-            qrCodeImageView.setImage(null);
-        }
+        if (codeVerification2FAField != null) codeVerification2FAField.clear();
+        if (qrCodeImageView != null) qrCodeImageView.setImage(null);
         mettreAJourAffichage2FA();
     }
 
@@ -471,8 +449,8 @@ public class UserProfileController implements Initializable {
         if (utilisateurCourant == null) return;
 
         boolean confirmation = AlertUtil.afficherConfirmation(
-                "Désactivation de la 2FA",
-                "Voulez-vous vraiment désactiver la double authentification ?",
+                i18n().t("user_profile.2fa.disable.title"),
+                i18n().t("user_profile.2fa.disable.confirm"),
                 getStage()
         );
 
@@ -490,12 +468,11 @@ public class UserProfileController implements Initializable {
             utilisateurCourant.setDeuxFacteursActive(false);
             utilisateurCourant.setSecret2FA(null);
             mettreAJourAffichage2FA();
-            ToastNotification.avertissement(getStage(),
-                    "Double authentification désactivée.");
+            ToastNotification.avertissement(getStage(), i18n().t("user_profile.2fa.disabled"));
         });
 
         taskDesactiver.setOnFailed(evt -> ToastNotification.erreur(getStage(),
-                "Erreur lors de la désactivation."));
+                i18n().t("user_profile.2fa.disable_error")));
 
         AppExecutor.get().submit(taskDesactiver);
     }
@@ -504,10 +481,8 @@ public class UserProfileController implements Initializable {
         if (utilisateurCourant == null) return;
 
         boolean confirmation = AlertUtil.afficherConfirmation(
-                "Codes de secours",
-                "Vos anciens codes de secours ne peuvent plus être affichés (ils sont hachés).\n\n"
-                        + "Voulez-vous générer un NOUVEAU lot de 8 codes ?\n"
-                        + "Les anciens seront supprimés.",
+                i18n().t("user_profile.codes.title"),
+                i18n().t("user_profile.codes.confirm"),
                 getStage()
         );
 
@@ -523,12 +498,12 @@ public class UserProfileController implements Initializable {
         };
 
         task.setOnSucceeded(evt -> {
-            ToastNotification.succes(getStage(), "Nouveaux codes générés.");
+            ToastNotification.succes(getStage(), i18n().t("user_profile.codes.generated"));
             afficherCodesSecours(task.getValue());
         });
 
         task.setOnFailed(evt -> ToastNotification.erreur(getStage(),
-                "Erreur lors de la génération."));
+                i18n().t("user_profile.codes.error")));
 
         AppExecutor.get().submit(task);
     }
@@ -542,11 +517,8 @@ public class UserProfileController implements Initializable {
     }
 
     // ==========================================
-    // MODIFICATION DE PROFIL
+    // MOT DE PASSE
     // ==========================================
-
-
-
     private void changerMotDePasse() {
         if (utilisateurCourant == null) return;
 
@@ -556,18 +528,17 @@ public class UserProfileController implements Initializable {
 
         if (ancienMdp == null || nouveauMdp == null || confirmMdp == null
                 || ancienMdp.isEmpty() || nouveauMdp.isEmpty() || confirmMdp.isEmpty()) {
-            ToastNotification.erreur(getStage(), "Tous les champs sont obligatoires.");
+            ToastNotification.erreur(getStage(), i18n().t("user_profile.password.all_required"));
             return;
         }
 
         if (!nouveauMdp.equals(confirmMdp)) {
-            ToastNotification.erreur(getStage(),
-                    "Le nouveau mot de passe et la confirmation ne correspondent pas.");
+            ToastNotification.erreur(getStage(), i18n().t("user_profile.password.mismatch"));
             return;
         }
 
         if (!PasswordService.verifier(ancienMdp, utilisateurCourant.getPasswordHash())) {
-            ToastNotification.erreur(getStage(), "Mot de passe actuel incorrect.");
+            ToastNotification.erreur(getStage(), i18n().t("user_profile.password.wrong_current"));
             return;
         }
 
@@ -590,11 +561,11 @@ public class UserProfileController implements Initializable {
             ancienMdpField.clear();
             nouveauMdpField.clear();
             confirmMdpField.clear();
-            ToastNotification.succes(getStage(), "Mot de passe modifié avec succès !");
+            ToastNotification.succes(getStage(), i18n().t("user_profile.password.changed"));
         });
 
         changeMdpTask.setOnFailed(evt -> ToastNotification.erreur(getStage(),
-                "Erreur lors du changement de mot de passe."));
+                i18n().t("user_profile.password.change_error")));
 
         return changeMdpTask;
     }
@@ -602,7 +573,6 @@ public class UserProfileController implements Initializable {
     // ==========================================
     // HELPERS
     // ==========================================
-
     private String safeText(TextField field) {
         if (field == null || field.getText() == null) return "";
         return field.getText().trim();
@@ -621,6 +591,4 @@ public class UserProfileController implements Initializable {
         }
         return nomComplet.substring(0, Math.min(2, nomComplet.length())).toUpperCase();
     }
-
-
 }

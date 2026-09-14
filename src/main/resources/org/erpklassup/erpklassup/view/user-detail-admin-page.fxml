@@ -22,11 +22,9 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane prefHeight="581.0" prefWidth="806.0" stylesheets="@../style.css"
-           xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserDetailController">
+<StackPane prefHeight="601.0" prefWidth="806.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.UserDetailController">
 
-    <VBox style="-fx-background-color: #111a2e;">
+    <VBox prefHeight="549.0" prefWidth="806.0" style="-fx-background-color: #111a2e;">
         <children>
 
             <!-- EN-TÊTE -->
@@ -45,11 +43,11 @@
             </HBox>
 
             <!-- TABPANE -->
-            <TabPane fx:id="tabPane" style="-fx-background-color: transparent;" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="tabPane" prefHeight="473.0" prefWidth="806.0" style="-fx-background-color: transparent;" styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
                 <!-- ONGLET 1 : INFORMATIONS -->
                 <Tab closable="false" styleClass="top-tab-btn" text="%user_detail.tab.info">
-                    <ScrollPane fitToWidth="true" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
+                    <ScrollPane fitToWidth="true" prefHeight="470.0" prefWidth="806.0" style="-fx-background-color: #F4F6FA;" styleClass="page-scroll">
                         <content>
                             <VBox maxWidth="800" spacing="20" styleClass="content-area">
                                 <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
@@ -203,7 +201,7 @@
                                         </VBox>
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="%user_detail.security.2fa" />
-                                            <ToggleButton onAction="#handleActiver2FA" fx:id="toggle2FA" styleClass="toggle-switch" text="%user_detail.2fa.badge_disabled" />
+                                            <ToggleButton fx:id="toggle2FA" onAction="#handleActiver2FA" styleClass="toggle-switch" text="%user_detail.2fa.badge_disabled" />
                                         </VBox>
                                     </HBox>
                                     <Separator />
