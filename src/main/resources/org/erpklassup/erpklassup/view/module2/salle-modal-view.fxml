@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="560.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.SalleModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== En-tête ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon fx:id="iconModal" iconLiteral="fth-home" iconSize="40" styleClass="icon-orange" />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label fx:id="lblTitreModal" text="Nouvelle salle" textFill="#1E293B">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSousTitreModal" text="Renseignez les informations de la salle" textFill="#64748B">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Separator />
+
+        <!-- ===== Formulaire ===== -->
+        <VBox spacing="16.0">
+            <children>
+
+                <!-- Ligne 1 : Code + Bâtiment -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Code salle *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtCode" promptText="ex: B12, LABO-A" styleClass="input" />
+                                <Label fx:id="errCode" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Bâtiment" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtBatiment" promptText="ex: Bâtiment A" styleClass="input" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Nom complet -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Nom complet *" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNom" promptText="ex: Salle 12, Laboratoire de Physique" styleClass="input" />
+                        <Label fx:id="errNom" managed="false" styleClass="field-error" visible="false" />
+                    </children>
+                </VBox>
+
+                <!-- Ligne 2 : Type + Capacité -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Type de salle *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboType" maxWidth="Infinity" promptText="Sélectionner un type..." styleClass="special-combo" />
+                                <Label fx:id="errType" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox minWidth="140.0" prefWidth="140.0" spacing="6.0">
+                            <children>
+                                <Label text="Capacité max *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtCapacite" promptText="50" styleClass="input" />
+                                <Label fx:id="errCapacite" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Statut d'occupation -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-padding: 12;">
+                    <children>
+                        <FontIcon fx:id="iconOccupation" iconLiteral="fth-lock" iconSize="16" styleClass="icon-green" />
+                        <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label fx:id="lblOccupationTitre" text="Salle libre" textFill="#16213A">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblOccupationDesc" text="La salle est actuellement disponible" textFill="#64748B">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <ToggleButton fx:id="toggleOccupee" styleClass="switch-button" />
+                    </children>
+                </HBox>
+
+                <!-- Erreur globale -->
+                <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+            </children>
+        </VBox>
+
+        <!-- ===== Actions ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

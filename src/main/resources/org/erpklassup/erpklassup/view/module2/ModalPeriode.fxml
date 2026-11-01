@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="520.0" spacing="18.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.PeriodeModalController">
+
+    <padding><Insets bottom="24.0" left="28.0" right="28.0" top="24.0" /></padding>
+
+    <children>
+
+        <!-- ═══════════ EN-TÊTE ═══════════ -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <FontIcon fx:id="iconModal" iconLiteral="fth-calendar" iconSize="40" styleClass="icon-orange" />
+            <VBox spacing="4.0">
+                <Label fx:id="lblTitreModal" text="Nouvelle période" textFill="#1E293B">
+                    <font><Font name="System Bold" size="18.0" /></font>
+                </Label>
+                <Label fx:id="lblSousTitreModal" text="Renseignez les informations de la période" textFill="#64748B">
+                    <font><Font size="12.0" /></font>
+                </Label>
+            </VBox>
+        </HBox>
+
+        <Separator />
+
+        <!-- ═══════════ FORMULAIRE ═══════════ -->
+        <VBox spacing="14.0">
+
+            <!-- Type de période -->
+            <VBox fx:id="boxType" spacing="6.0">
+                <Label text="Type de période *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <HBox spacing="10.0">
+                    <ToggleButton fx:id="btnTypeTrimestre" maxWidth="Infinity" styleClass="type-toggle" text="Trimestre" HBox.hgrow="ALWAYS">
+                        <graphic><FontIcon iconLiteral="fth-layers" iconSize="14" /></graphic>
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </ToggleButton>
+                    <ToggleButton fx:id="btnTypeSequence" maxWidth="Infinity" styleClass="type-toggle" text="Séquence" HBox.hgrow="ALWAYS">
+                        <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </ToggleButton>
+                </HBox>
+            </VBox>
+
+            <!-- Code + Ordre (2 colonnes) -->
+            <HBox spacing="12.0">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Code *" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <TextField fx:id="champCode" promptText="ex: T1, SEQ1" styleClass="input" />
+                    <Label fx:id="errCode" managed="false" styleClass="field-error" visible="false" />
+                </VBox>
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Ordre d'affichage" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <TextField fx:id="champOrdre" promptText="1" styleClass="input" />
+                    <Label fx:id="errOrdre" managed="false" styleClass="field-error" visible="false" />
+                </VBox>
+            </HBox>
+
+            <!-- Libellé -->
+            <VBox spacing="6.0">
+                <Label text="Libellé *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="champLibelle" promptText="ex: Trimestre 1, Séquence 2..." styleClass="input" />
+                <Label fx:id="errLibelle" managed="false" styleClass="field-error" visible="false" />
+            </VBox>
+
+            <!-- Dates début / fin -->
+            <HBox spacing="12.0">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Date de début *" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <DatePicker fx:id="champDateDebut" maxWidth="Infinity" styleClass="date-picker-custom" />
+                    <Label fx:id="errDateDebut" managed="false" styleClass="field-error" visible="false" />
+                </VBox>
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Date de fin *" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <DatePicker fx:id="champDateFin" maxWidth="Infinity" styleClass="date-picker-custom" />
+                    <Label fx:id="errDateFin" managed="false" styleClass="field-error" visible="false" />
+                </VBox>
+            </HBox>
+
+            <!-- Poids (uniquement sous-période) -->
+            <VBox fx:id="boxPoids" managed="false" spacing="6.0" visible="false">
+                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                    <Label text="Poids d'agrégation" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <FontIcon iconLiteral="fth-info" iconSize="12" styleClass="icon-muted">
+                            <Tooltip text="Coefficient utilisé pour calculer la moyenne dans la période parente" />
+                    </FontIcon>
+                </HBox>
+                <TextField fx:id="champPoids" promptText="1.00" styleClass="input" />
+                <Label fx:id="errPoids" managed="false" styleClass="field-error" visible="false" />
+            </VBox>
+
+            <!-- Statut (édition uniquement) -->
+            <VBox fx:id="boxStatut" managed="false" spacing="6.0" visible="false">
+                <Label text="Statut" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #F8FAFC; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8;">
+                    <FontIcon fx:id="icoStatut" iconLiteral="fth-unlock" iconSize="20" styleClass="icon-success" />
+                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblStatutTitre" text="Période ouverte" textFill="#1E293B">
+                            <font><Font name="System Bold" size="12.0" /></font>
+                        </Label>
+                        <Label fx:id="lblStatutDesc" text="La saisie des notes est autorisée." textFill="#64748B" wrapText="true">
+                            <font><Font size="11.0" /></font>
+                        </Label>
+                    </VBox>
+                    <Button fx:id="btnBasculerStatut" onAction="#handleBasculerStatut" styleClass="btn-icon-light" text="Clôturer">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <!-- Erreur globale -->
+            <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+        </VBox>
+
+        <!-- ═══════════ ACTIONS ═══════════ -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Button fx:id="btnSupprimer" managed="false" onAction="#handleSupprimer" styleClass="btn-danger-icon" text="Supprimer" visible="false">
+                <graphic><FontIcon iconLiteral="fth-trash-2" iconSize="12" /></graphic>
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+            <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                <graphic><FontIcon iconLiteral="fth-save" iconSize="12" /></graphic>
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+        </HBox>
+
+    </children>
+</VBox>

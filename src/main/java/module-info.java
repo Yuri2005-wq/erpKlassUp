@@ -11,6 +11,7 @@ module org.erpklassup.erpklassup {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.feather;
+    requires org.kordamp.ikonli.fontawesome5;
 
     // Consommation des services Ikonli
     uses org.kordamp.ikonli.IkonHandler;
@@ -32,6 +33,9 @@ module org.erpklassup.erpklassup {
     requires com.google.zxing.javase;
     requires org.apache.commons.codec;
     requires javafx.swing;
+    requires com.fasterxml.jackson.databind;
+    requires quartz;
+    requires net.bytebuddy;
 
     exports org.erpklassup.erpklassup;
     exports org.erpklassup.erpklassup.util;
@@ -41,4 +45,22 @@ module org.erpklassup.erpklassup {
     opens org.erpklassup.erpklassup.controllers.actionPage to javafx.fxml;
     opens org.erpklassup.erpklassup.controllers.renduView to javafx.fxml;
     opens org.erpklassup.erpklassup.util to javafx.fxml;
+
+    exports org.erpklassup.erpklassup.controllers.renduView.module2;
+    exports org.erpklassup.erpklassup.controllers.actionPage.module2;
+
+    exports org.erpklassup.erpklassup.controllers.actionPage.GRH;
+
+
+    exports org.erpklassup.erpklassup.controllers.renduView.RH;
+    opens org.erpklassup.erpklassup.controllers.renduView.module2 to javafx.fxml;
+
+    opens org.erpklassup.erpklassup.controllers.renduView.RH to javafx.fxml;
+
+
+    opens  org.erpklassup.erpklassup.controllers.actionPage.module2 to javafx.fxml;
+    opens  org.erpklassup.erpklassup.controllers.actionPage.GRH to javafx.fxml;
+
+    exports org.erpklassup.erpklassup.util.grh;
+    opens org.erpklassup.erpklassup.util.grh to javafx.fxml;
 }

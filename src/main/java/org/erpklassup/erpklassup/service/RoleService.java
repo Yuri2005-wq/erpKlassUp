@@ -6,6 +6,7 @@ import org.erpklassup.erpklassup.dao.RolePermissionDAO;
 import org.erpklassup.erpklassup.dto.PermissionOption;
 import org.erpklassup.erpklassup.dto.RoleOption;
 import org.erpklassup.erpklassup.models.Role;
+import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,9 @@ public class RoleService extends ServiceAsyncBase {
 
     public void listerRolesAsync(String idEcole, Consumer<List<RoleOption>> onSucces, Consumer<Throwable> onErreur) {
         executer(() -> roleDAO.listerParEcole(idEcole), onSucces, onErreur);
+    }
+    public List<RoleOption> listerRoles(String idEcole) {
+        return roleDAO.listerParEcole(idEcole);
     }
 
     public void listerPermissionsAsync(Consumer<List<PermissionOption>> onSucces, Consumer<Throwable> onErreur) {

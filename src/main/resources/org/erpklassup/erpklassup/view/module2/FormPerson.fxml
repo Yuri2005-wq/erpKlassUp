@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefHeight="720.0" prefWidth="620.0" spacing="0.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.rh.PersonnelModalController">
+    <!--  ============================================================
+             EN-TÊTE
+             ============================================================  -->
+    <HBox alignment="CENTER_LEFT" spacing="14.0">
+        <padding>
+            <Insets bottom="18.0" left="28.0" right="28.0" top="24.0" />
+        </padding>
+        <children>
+            <FontIcon fx:id="iconModal" iconLiteral="fth-user-plus" iconSize="28" styleClass="icon-orange" text="" />
+            <VBox spacing="3.0">
+                <children>
+                    <Label fx:id="lblTitreModal" text="Nouvel employé" textFill="#1E293B">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+                    <Label fx:id="lblSousTitreModal" text="Renseignez les informations de l'employé" textFill="#64748B">
+                        <font>
+                            <Font size="12.0" />
+                        </font>
+                    </Label>
+                </children>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+        </children>
+    </HBox>
+    <Separator />
+    <!--  ============================================================
+             FORMULAIRE SCROLLABLE
+             ============================================================  -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="20.0">
+                <padding>
+                    <Insets bottom="20.0" left="28.0" right="28.0" top="20.0" />
+                </padding>
+                <children>
+                    <!--  ============ SECTION : IDENTITÉ ============  -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <FontIcon iconLiteral="fth-user" iconSize="14" styleClass="icon-orange" />
+                            <Label text="IDENTITÉ" textFill="#94A3B8">
+                                <font>
+                                    <Font name="System Bold" size="11.0" />
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <!--  Avatar + Nom/Prénom  -->
+                    <HBox alignment="TOP_LEFT" spacing="16.0">
+                        <children>
+                            <!--  Avatar  -->
+                            <StackPane prefHeight="90.0" prefWidth="90.0" style="-fx-background-color: #F1F5F9; -fx-background-radius: 45;">
+                                <children>
+                                    <Circle fill="#E2E8F0" radius="45" />
+                                    <FontIcon iconLiteral="fth-user" iconSize="38" styleClass="icon-orange" />
+                                    <Button onAction="#handleChoisirPhoto" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 6;" styleClass="btn-icon-light" StackPane.alignment="BOTTOM_RIGHT">
+                                        <graphic>
+                                            <FontIcon iconLiteral="fth-camera" iconSize="14" styleClass="icon-orange" />
+                                        </graphic>
+                                    </Button>
+                                </children>
+                            </StackPane>
+                            <!--  Nom + Prénom  -->
+                            <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <HBox spacing="12.0">
+                                        <children>
+                                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                                <children>
+                                                    <Label text="Nom *" textFill="#334155">
+                                                        <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                        </font>
+                                                    </Label>
+                                                    <TextField fx:id="txtNom" promptText="ex: DUPONT" styleClass="input" />
+                                                    <Label fx:id="errNom" managed="false" styleClass="field-error" visible="false" />
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                                <children>
+                                                    <Label text="Prénom *" textFill="#334155">
+                                                        <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                        </font>
+                                                    </Label>
+                                                    <TextField fx:id="txtPrenom" promptText="ex: Jean" styleClass="input" />
+                                                    <Label fx:id="errPrenom" managed="false" styleClass="field-error" visible="false" />
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Genre + Date naissance  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Genre" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="comboGenre" maxWidth="Infinity" styleClass="combo-box" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Date de naissance" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <DatePicker fx:id="dateNaissance" maxWidth="Infinity" styleClass="date-picker-custom" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Pièce d'identité  -->
+                    <VBox spacing="6.0">
+                        <children>
+                            <Label text="Pièce d'identité (CNI / Passeport)" textFill="#334155">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="txtPieceIdentite" promptText="ex: 1234567890" styleClass="input" />
+                        </children>
+                    </VBox>
+                    <!--  ============ SECTION : CONTACTS ============  -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <FontIcon iconLiteral="fth-phone" iconSize="14" styleClass="icon-orange" />
+                            <Label text="CONTACTS" textFill="#94A3B8">
+                                <font>
+                                    <Font name="System Bold" size="11.0" />
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <!--  Téléphone + Email  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Téléphone *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtTelephone" promptText="ex: +237 6XX XX XX XX" styleClass="input" />
+                                    <Label fx:id="errTelephone" managed="false" styleClass="field-error" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Email" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtEmail" promptText="ex: nom@ecole.com" styleClass="input" />
+                                    <Label fx:id="errEmail" managed="false" styleClass="field-error" visible="false" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Adresse  -->
+                    <VBox spacing="6.0">
+                        <children>
+                            <Label text="Adresse" textFill="#334155">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <TextArea fx:id="txtAdresse" prefRowCount="2" promptText="Adresse complète" styleClass="input" wrapText="true" />
+                        </children>
+                    </VBox>
+                    <!--  Contact d'urgence  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Contact d'urgence" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtContactUrgence" promptText="Nom du contact" styleClass="input" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Tél. urgence" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtTelephoneUrgence" promptText="+237..." styleClass="input" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  ============ SECTION : POSTE ============  -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <FontIcon iconLiteral="fth-briefcase" iconSize="14" styleClass="icon-orange" />
+                            <Label text="POSTE" textFill="#94A3B8">
+                                <font>
+                                    <Font name="System Bold" size="11.0" />
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <!--  Catégorie + Poste  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Catégorie *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="comboCategorie" maxWidth="Infinity" styleClass="special-combo" />
+                                    <Label fx:id="errCategorie" managed="false" styleClass="field-error" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Poste *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtPoste" promptText="ex: Professeur de Mathématiques" styleClass="input" />
+                                    <Label fx:id="errPoste" managed="false" styleClass="field-error" visible="false" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Spécialité  -->
+                    <VBox spacing="6.0">
+                        <children>
+                            <Label text="Spécialité" textFill="#334155">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="txtSpecialite" promptText="ex: Mathématiques, SVT, Anglais..." styleClass="input" />
+                        </children>
+                    </VBox>
+                    <!--  ============ SECTION : CONTRAT ============  -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <FontIcon iconLiteral="fth-file-text" iconSize="14" styleClass="icon-orange" />
+                            <Label text="CONTRAT" textFill="#94A3B8">
+                                <font>
+                                    <Font name="System Bold" size="11.0" />
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <!--  Type contrat + Statut  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Type de contrat *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="comboTypeContrat" maxWidth="Infinity" styleClass="special-combo" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Statut *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="comboStatut" maxWidth="Infinity" styleClass="special-combo" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Dates embauche + fin  -->
+                    <HBox spacing="12.0">
+                        <children>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Date d'embauche *" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <DatePicker fx:id="dateEmbauche" maxWidth="Infinity" styleClass="date-picker-custom" />
+                                    <Label fx:id="errDateEmbauche" managed="false" styleClass="field-error" visible="false" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Date de fin (CDD)" textFill="#334155">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <DatePicker fx:id="dateFinContrat" maxWidth="Infinity" styleClass="date-picker-custom" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                    <!--  Salaire de base  -->
+                    <VBox spacing="6.0">
+                        <children>
+                            <Label text="Salaire de base (FCFA)" textFill="#334155">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="txtSalaireBase" promptText="ex: 150000" styleClass="input" />
+                        </children>
+                    </VBox>
+                    <!--  ============ SECTION : NOTES ============  -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <children>
+                            <FontIcon iconLiteral="fth-edit-3" iconSize="14" styleClass="icon-orange" />
+                            <Label text="NOTES INTERNES" textFill="#94A3B8">
+                                <font>
+                                    <Font name="System Bold" size="11.0" />
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <VBox spacing="6.0">
+                        <children>
+                            <TextArea fx:id="txtNotes" prefRowCount="3" promptText="Notes internes sur l'employé..." styleClass="input" wrapText="true" />
+                        </children>
+                    </VBox>
+                    <!--  Erreur globale  -->
+                    <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+    <!--  ============================================================
+             ACTIONS
+             ============================================================  -->
+    <Separator />
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <padding>
+            <Insets bottom="24.0" left="28.0" right="28.0" top="18.0" />
+        </padding>
+        <children>
+            <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
+            </Button>
+            <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
+                <graphic>
+                    <FontIcon iconLiteral="fth-save" iconSize="14" styleClass="icon-on-primary" />
+                </graphic>
+            </Button>
+        </children>
+    </HBox>
+</VBox>

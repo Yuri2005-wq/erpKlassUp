@@ -225,4 +225,65 @@ public class SessionUtilisateurDAO {
             System.err.println("❌ Erreur nettoyerSessionsObsoletes : " + e.getMessage());
         }
     }
+
+    /** Cherche l'idSession d'une éventuelle session encore active pour ce compte. */
+    public Optional<String> trouverIdSessionActive(String idUtilisateur) {
+        String sql = """
+        SELECT idSession FROM SessionUtilisateur
+        WHERE idUtilisateur = ? AND estRevoque = 0 AND dateDeconnexion IS NULL
+          AND dateExpirationRefresh > NOW()
+        LIMIT 1
+        """;
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idUtilisateur);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return Optional.of(rs.getString("idSession"));
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur trouverIdSessionActive : " + e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    /** Révoque une session précise (utilisé pour "kicker" l'ancienne connexion). */
+    public boolean revoquerSession(String idSession, String motif) {
+        String sql = """
+        UPDATE SessionUtilisateur
+        SET estRevoque = 1, dateDeconnexion = NOW(), motifDeconnexion = ?
+        WHERE idSession = ?
+        """;
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, motif);
+            stmt.setString(2, idSession);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur revoquerSession : " + e.getMessage());
+            return false;
+        }
+    }
+
+    /** Vérifie qu'une session précise est toujours valide — utilisé par le polling client. */
+    public boolean estSessionValide(String idSession) {
+        String sql = """
+        SELECT estRevoque, dateDeconnexion, dateExpirationRefresh
+        FROM SessionUtilisateur WHERE idSession = ?
+        """;
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idSession);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) return false; // session introuvable = invalide
+                boolean revoquee = rs.getBoolean("estRevoque");
+                boolean deconnectee = rs.getTimestamp("dateDeconnexion") != null;
+                Timestamp expiration = rs.getTimestamp("dateExpirationRefresh");
+                boolean expiree = expiration != null && expiration.before(new Timestamp(System.currentTimeMillis()));
+                return !revoquee && !deconnectee && !expiree;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur estSessionValide : " + e.getMessage());
+            return true; // fail-open : une erreur réseau ne doit jamais déconnecter par erreur
+        }
+    }
 }

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<ScrollPane fitToWidth="true" prefHeight="850.0" prefWidth="1200.0" styleClass="root-pane" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.EcoleController">
+
+    <VBox spacing="20" styleClass="content-area">
+        <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+
+        <!-- ============================================================
+             EN-TÊTE
+             ============================================================ -->
+        <VBox spacing="6" />
+
+        <!-- ============================================================
+             CORPS : LOGO (gauche) + INFORMATIONS (droite)
+             ============================================================ -->
+        <HBox alignment="TOP_LEFT" spacing="20">
+
+            <!-- ====================================================
+                 CÔTÉ GAUCHE : LOGO
+                 ==================================================== -->
+            <VBox maxHeight="570.0" maxWidth="490.0" prefHeight="570.0" prefWidth="483.0" spacing="20" styleClass="card" HBox.hgrow="NEVER">
+
+                <!-- Titre -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <StackPane style="-fx-padding: 8; -fx-background-radius: 8;" styleClass="icon-orange">
+                        <FontIcon iconLiteral="fth-image" iconSize="16" />
+                    </StackPane>
+                    <Label styleClass="card-title" text="Logo de l'École" />
+                </HBox>
+
+                <Separator />
+
+                <!-- Aperçu du logo -->
+                <VBox alignment="CENTER" spacing="16" VBox.vgrow="ALWAYS">
+
+                    <StackPane style="-fx-background-color: #F8FAFC;                                       -fx-background-radius: 12;                                       -fx-border-color: #E2E8F0;                                       -fx-border-radius: 12; -fx-border-style: dashed;                                       -fx-border-width: 2;                                       -fx-min-width: 240; -fx-min-height: 240;                                       -fx-max-width: 240; -fx-max-height: 240;">
+                        <ImageView fx:id="imgLogoApercu" fitHeight="200" fitWidth="200" preserveRatio="true" />
+
+                        <VBox fx:id="logoPlaceholder" alignment="CENTER" spacing="8">
+                            <FontIcon iconLiteral="fth-image" iconSize="48" styleClass="icon-grayClair" />
+                            <Label style="-fx-text-fill: #94A3B8; -fx-font-size: 12px;" text="Aucun logo" />
+                        </VBox>
+                    </StackPane>
+
+                    <VBox alignment="CENTER" spacing="4">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #16213A;" text="Emblème officiel" />
+                        <Label style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;" text="PNG transparent • 512 × 512 px recommandé" />
+                    </VBox>
+
+                    <Button onAction="#handleChoisirLogo" style="-fx-padding: 10 24;" styleClass="btn-icon-light" text="Choisir un logo">
+                        <graphic><FontIcon iconLiteral="fth-upload" iconSize="14" /></graphic>
+                    </Button>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Separator />
+
+                <!-- Info -->
+                <HBox alignment="TOP_LEFT" spacing="10" style="-fx-background-color: #FEF3E2;                              -fx-padding: 12; -fx-background-radius: 8;">
+                    <FontIcon iconLiteral="fth-info" iconSize="14" styleClass="icon-gray" />
+                    <Label style="-fx-text-fill: #92400E; -fx-font-size: 11.5px;" text="Ces informations figureront sur les bulletins, reçus et documents officiels." wrapText="true" HBox.hgrow="ALWAYS" />
+                </HBox>
+            </VBox>
+
+            <!-- ====================================================
+                 CÔTÉ DROIT : INFORMATIONS
+                 ==================================================== -->
+            <VBox spacing="15" HBox.hgrow="ALWAYS">
+
+                <!-- Indicateur de mode -->
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #F1F5F9;                              -fx-padding: 10 14; -fx-background-radius: 8;">
+                    <FontIcon iconLiteral="fth-info" iconSize="16" styleClass="icon-blue" />
+                    <Label fx:id="labelMessageStatut" style="-fx-text-fill: #334155; -fx-font-size: 12px; -fx-font-weight: 600;" text="Chargement..." wrapText="true" HBox.hgrow="ALWAYS" />
+                </HBox>
+
+                <!-- ============================================
+                     CARD : IDENTITÉ LÉGALE
+                     ============================================ -->
+                <VBox spacing="14" styleClass="card">
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fth-home" iconSize="14" styleClass="icon-orange" />
+                        <Label style="-fx-font-weight: 800; -fx-text-fill: #F5A524; -fx-font-size: 12px;" text="IDENTITÉ LÉGALE DE L'ÉTABLISSEMENT" />
+                    </HBox>
+                    <Separator style="-fx-background-color: #FEF3E2;" />
+
+                    <!-- Nom officiel -->
+                    <VBox spacing="5">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Nom officiel de l'école *" />
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                            <FontIcon iconLiteral="fth-home" iconSize="14" styleClass="icon-grayClair" />
+                            <TextField fx:id="txtNomEcole" promptText="Ex : École Primaire Bilingue Digital" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Agrément + Arrêté -->
+                    <HBox spacing="12">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Numéro d'agrément *" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-file-text" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtAgrement" promptText="Ex : MINEDUB/N°1024/A" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Arrêté d'ouverture" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-file" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtNumeroArrete" promptText="Ex : N°25/PA/MINEDUB/SG/DESP" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Code + Promoteur -->
+                    <HBox spacing="12">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Code école" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-hash" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtCodeEcole" promptText="Ex : DPS-001" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Promoteur / Fondateur" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-user" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtPromoteur" promptText="Ex : M. Jean MBARGA" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- ============================================
+                     CARD : LOCALISATION & ADMINISTRATION
+                     ============================================ -->
+                <VBox spacing="14" styleClass="card">
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fth-map-pin" iconSize="14" styleClass="icon-grayClair" />
+                        <Label style="-fx-font-weight: 800; -fx-text-fill: #F5A524; -fx-font-size: 12px;" text="LOCALISATION &amp; ADMINISTRATION" />
+                    </HBox>
+                    <Separator style="-fx-background-color: #FEF3E2;" />
+
+                    <!-- Adresse -->
+                    <VBox spacing="5">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Adresse physique *" />
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                            <FontIcon iconLiteral="fth-map-pin" iconSize="14" styleClass="icon-gray" />
+                            <TextField fx:id="txtAdresse" promptText="Ex : Quartier Bastos, Rue 1.024, Yaoundé" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Région + Sous-système -->
+                    <HBox spacing="12">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Région *" />
+                            <ComboBox fx:id="comboRegion" maxWidth="Infinity" promptText="Sélectionner la région" styleClass="combo-box" />
+                        </VBox>
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Sous-système scolaire *" />
+                            <ComboBox fx:id="comboSousSysteme" maxWidth="Infinity" promptText="Sélectionner le sous-système" styleClass="combo-box" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Inspection -->
+                    <VBox spacing="5">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Inspection de référence" />
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                            <FontIcon iconLiteral="fth-briefcase" iconSize="14" styleClass="icon-gray" />
+                            <TextField fx:id="txtInspectionRef" promptText="Ex : Inspection d'Arrondissement de Yaoundé IV" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+                    <!-- Délégation -->
+                    <VBox spacing="5">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Délégation départementale" />
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                            <FontIcon iconLiteral="fth-home" iconSize="14" styleClass="icon-gray" />
+                            <TextField fx:id="txtDelegationDept" promptText="Ex : Délégation Départementale du Mfoundi" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- ============================================
+                     CARD : CONTACTS OFFICIELS
+                     ============================================ -->
+                <VBox spacing="14" styleClass="card">
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fth-phone" iconSize="14" styleClass="icon-blue" />
+                        <Label style="-fx-font-weight: 800; -fx-text-fill: #F5A524; -fx-font-size: 12px;" text="CONTACTS OFFICIELS" />
+                    </HBox>
+                    <Separator style="-fx-background-color: #FEF3E2;" />
+
+                    <!-- Téléphone + Téléphone secondaire -->
+                    <HBox spacing="12">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Téléphone principal *" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-phone" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtTelephone" promptText="Ex : +237 699 99 99 99" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Téléphone secondaire" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-phone" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtTelephoneSecondaire" promptText="Ex : +237 222 33 44 55" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Email + Site web -->
+                    <HBox spacing="12">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Email officiel" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-mail" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtEmail" promptText="Ex : contact@ecole.com" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Site internet" />
+                            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                                <FontIcon iconLiteral="fth-globe" iconSize="14" styleClass="icon-gray" />
+                                <TextField fx:id="txtSiteWeb" promptText="Ex : www.ecole.com" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- ============================================
+                     CARD : INFORMATIONS COMPLÉMENTAIRES
+                     ============================================ -->
+                <VBox spacing="14" styleClass="card">
+
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <FontIcon iconLiteral="fth-award" iconSize="14" styleClass="icon-blue" />
+                        <Label style="-fx-font-weight: 800; -fx-text-fill: #3B82F6; -fx-font-size: 12px;" text="INFORMATIONS COMPLÉMENTAIRES" />
+                    </HBox>
+                    <Separator style="-fx-background-color: #DBEAFE;" />
+
+                    <VBox spacing="5">
+                        <Label style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" text="Devise / Slogan de l'école" />
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="input">
+                            <FontIcon iconLiteral="fth-award" iconSize="14" styleClass="icon-gray" />
+                            <TextField fx:id="txtDevise" promptText="Ex : Discipline - Travail - Réussite" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <!-- ============================================
+                     BOUTONS D'ACTION
+                     ============================================ -->
+                <HBox alignment="CENTER_RIGHT" spacing="12">
+                    <Button fx:id="btnAnnuler" onAction="#handleAnnuler" style="-fx-padding: 10 20;" styleClass="btn-icon-light" text="Annuler" />
+
+                    <Button onAction="#handleReinitialiser" style="-fx-padding: 10 20;" styleClass="btn-icon-light" text="Réinitialiser">
+                        <graphic><FontIcon iconLiteral="fth-refresh-ccw" iconSize="14" /></graphic>
+                    </Button>
+
+                    <Button fx:id="btnEnregistrer" onAction="#handleEnregistrerInfos" style="-fx-padding: 10 25;" styleClass="button-primary" text="Enregistrer">
+                        <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</ScrollPane>

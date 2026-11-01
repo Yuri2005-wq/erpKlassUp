@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.FichePersonnelController" spacing="14">
+    <padding>
+        <Insets bottom="14"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label text="Soldes et demandes de congé" styleClass="carte-titre"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Nouvelle demande" styleClass="btn-primaire" >
+            <graphic><FontIcon iconLiteral="fth-plus-circle"/></graphic>
+        </Button>
+    </HBox>
+
+    <VBox styleClass="fiche-card, carte-table">
+        <HBox styleClass="carte-entete">
+            <Label text="Soldes de l'année" styleClass="carte-titre"/>
+        </HBox>
+        <TableView fx:id="tableSoldes" styleClass="fiche-table" fixedCellSize="42" prefHeight="190" minHeight="190">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucun droit à congé défini"/>
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colSoldeType" text="Type de congé" prefWidth="220" sortable="false"/>
+                <TableColumn fx:id="colAcquis" text="Acquis (j)" prefWidth="100" sortable="false"
+                             style="-fx-alignment: CENTER-RIGHT;"/>
+                <TableColumn fx:id="colPris" text="Pris (j)" prefWidth="100" sortable="false"
+                             style="-fx-alignment: CENTER-RIGHT;"/>
+                <TableColumn fx:id="colRestant" text="Restant (j)" prefWidth="100" sortable="false"
+                             style="-fx-alignment: CENTER-RIGHT;"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <VBox styleClass="fiche-card, carte-table" VBox.vgrow="ALWAYS">
+        <HBox styleClass="carte-entete">
+            <Label text="Historique des demandes" styleClass="carte-titre"/>
+        </HBox>
+        <TableView fx:id="tableDemandes" styleClass="fiche-table" fixedCellSize="42" VBox.vgrow="ALWAYS">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucune demande de congé"/>
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colDemType" text="Type de congé" prefWidth="200" sortable="false"/>
+                <TableColumn fx:id="colDu" text="Du" prefWidth="110" sortable="false"/>
+                <TableColumn fx:id="colAu" text="Au" prefWidth="110" sortable="false"/>
+                <TableColumn fx:id="colJours" text="Jours" prefWidth="70" sortable="false"
+                             style="-fx-alignment: CENTER-RIGHT;"/>
+                <TableColumn fx:id="colDemStatut" text="Statut" prefWidth="110" sortable="false"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

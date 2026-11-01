@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="500.0" spacing="18.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.MatiereModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- En-tête -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon iconLiteral="fth-book" iconSize="40" styleClass="icon-orange" />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label fx:id="lblTitreModal" text="Nouvelle matière" textFill="#1E293B">
+                            <font><Font name="System Bold" size="18.0" /></font>
+                        </Label>
+                        <Label fx:id="lblSousTitreModal" text="Renseignez les informations de la matière" textFill="#64748B">
+                            <font><Font size="12.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Separator />
+
+        <!-- Formulaire -->
+        <VBox spacing="14.0">
+
+            <HBox spacing="12.0">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Code *" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <TextField fx:id="txtCode" promptText="ex: SVT, PC, MATH" styleClass="input" />
+                </VBox>
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Ordre d'affichage" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <TextField fx:id="txtOrdre" promptText="0" styleClass="input" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="6.0">
+                <Label text="Nom de la matière *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="txtNom" promptText="ex: Sciences de la Vie et de la Terre" styleClass="input" />
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Domaine" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="txtDomaine" promptText="ex: Sciences, Lettres..." styleClass="input" />
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Matière parente (optionnel)" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <ComboBox fx:id="comboMatiereParente" maxWidth="Infinity" styleClass="combo-box" />
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Groupe de matières" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <ComboBox fx:id="comboGroupe" maxWidth="Infinity" styleClass="combo-box" />
+            </VBox>
+
+        </VBox>
+
+        <!-- Actions -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+            <ButtonBar>
+               <buttons>
+                      <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                          <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                      </Button>
+               </buttons>
+            </ButtonBar>
+                <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <graphic><FontIcon iconLiteral="fth-save" /></graphic>
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

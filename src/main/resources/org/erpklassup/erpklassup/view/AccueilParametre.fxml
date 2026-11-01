@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.Double?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="accueilRoot" prefHeight="700.0" prefWidth="1000.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.SettingsAccueilController">
+
+    <VBox style="-fx-background-color: #F4F5FA;">
+        <children>
+
+            <!-- ===== ENTÊTE DE PAGE ===== -->
+            <VBox spacing="6" style="-fx-padding: 32 36 24 36;">
+                <Label style="-fx-text-fill: #1C2440; -fx-font-size: 26px; -fx-font-weight: bold;" text="Paramètres" />
+                <Label maxWidth="560" style="-fx-text-fill: #6B7395; -fx-font-size: 13.5px;" text="Configuration des entités de base, des règles financières et du système. Choisis une catégorie pour accéder à ses réglages." wrapText="true" />
+            </VBox>
+
+            <!-- ===== GRILLE DES CATÉGORIES ===== -->
+            <ScrollPane fitToWidth="true" style="-fx-background: #F4F5FA; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                <FlowPane fx:id="grilleCategories" hgap="20" style="-fx-padding: 0 36 36 36;" vgap="20">
+
+                    <!-- Carte : Configuration pédagogique -->
+                    <VBox fx:id="cardPedagogique" prefWidth="280" spacing="14" styleClass="settings-category-card">
+                        <StackPane maxHeight="46" maxWidth="46" prefHeight="46" prefWidth="46" style="-fx-padding: 8;" styleClass="category-icon-peach">
+                            <FontIcon iconColor="#E0921A" iconLiteral="fth-home" iconSize="20" />
+                        </StackPane>
+
+                        <Label maxWidth="230" styleClass="category-card-title" text="Configuration pédagogique" wrapText="true" />
+                        <Label maxWidth="230" styleClass="category-card-desc" text="Structure académique de l'établissement." wrapText="true" />
+
+                        <FlowPane hgap="6" vgap="6">
+                            <Label styleClass="category-tag" text="Niveaux" />
+                            <Label styleClass="category-tag" text="Classes" />
+                            <Label styleClass="category-tag" text="Salles" />
+                            <Label styleClass="category-tag" text="Matières" />
+                            <Label styleClass="category-tag" text="+3" />
+                        </FlowPane>
+
+                        <Line endX="230" startX="0" stroke="#E2E5F0" strokeWidth="1">
+                            <strokeDashArray>
+                                <Double fx:value="4.0" />
+                                <Double fx:value="4.0" />
+                            </strokeDashArray>
+                        </Line>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label styleClass="category-card-count" text="7 sections" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="category-card-open" text="Ouvrir →" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Carte : Configuration financière -->
+                    <VBox fx:id="cardFinance" prefWidth="280" spacing="14" styleClass="settings-category-card">
+                        <StackPane maxHeight="46" maxWidth="46" prefHeight="46" prefWidth="46" style="-fx-padding: 8;" styleClass="category-icon-peach">
+                            <FontIcon iconColor="#E0921A" iconLiteral="fth-dollar-sign" iconSize="20" />
+                        </StackPane>
+
+                        <Label maxWidth="230" styleClass="category-card-title" text="Configuration financière" wrapText="true" />
+                        <Label maxWidth="230" styleClass="category-card-desc" text="Frais, tranches et règles de facturation." wrapText="true" />
+
+                        <FlowPane hgap="6" vgap="6">
+                            <Label styleClass="category-tag" text="Frais inscription" />
+                            <Label styleClass="category-tag" text="Frais tenue" />
+                            <Label styleClass="category-tag" text="Tranches" />
+                        </FlowPane>
+
+                        <Line endX="230" startX="0" stroke="#E2E5F0" strokeWidth="1">
+                            <strokeDashArray>
+                                <Double fx:value="4.0" />
+                                <Double fx:value="4.0" />
+                            </strokeDashArray>
+                        </Line>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label styleClass="category-card-count" text="3 sections" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="category-card-open" text="Ouvrir →" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Carte : Système -->
+                    <VBox fx:id="cardSysteme" prefWidth="280" spacing="14" styleClass="settings-category-card">
+                        <StackPane maxHeight="46" maxWidth="46" prefHeight="46" prefWidth="46" styleClass="category-icon-blue">
+                            <FontIcon iconColor="#3B5BDB" iconLiteral="fth-monitor" iconSize="20" />
+                        </StackPane>
+
+                        <Label maxWidth="230" styleClass="category-card-title" text="Système" wrapText="true" />
+                        <Label maxWidth="230" styleClass="category-card-desc" text="Comptes, rôles et droits d'accès." wrapText="true" />
+
+                        <FlowPane hgap="6" vgap="6">
+                            <Label styleClass="category-tag" text="Utilisateurs" />
+                            <Label styleClass="category-tag" text="Rôles &amp; droits" />
+                        </FlowPane>
+
+                        <Line endX="230" startX="0" stroke="#E2E5F0" strokeWidth="1">
+                            <strokeDashArray>
+                                <Double fx:value="4.0" />
+                                <Double fx:value="4.0" />
+                            </strokeDashArray>
+                        </Line>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label styleClass="category-card-count" text="2 sections" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label styleClass="category-card-open" text="Ouvrir →" />
+                        </HBox>
+                    </VBox>
+
+                </FlowPane>
+            </ScrollPane>
+
+        </children>
+    </VBox>
+</StackPane>

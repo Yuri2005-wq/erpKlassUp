@@ -1,8 +1,9 @@
 package org.erpklassup.erpklassup.enums;
 
+// Sexe.java
 public enum Sexe {
-    MASCULIN("Masculin"),
-    FEMININ("Féminin");
+    MASCULIN("MASCULIN"),
+    FEMININ("FÉMININ");
 
     private final String libelle;
 
@@ -10,16 +11,8 @@ public enum Sexe {
         this.libelle = libelle;
     }
 
-    public String getLibelle() { return libelle; }
-
-    public static Sexe fromString(String valeur) {
-        if (valeur == null) return MASCULIN;
-        for (Sexe sexe : values()) {
-            if (sexe.name().equalsIgnoreCase(valeur)) {
-                return sexe;
-            }
-        }
-        return MASCULIN;
+    public String getLibelle() {
+        return libelle;
     }
 
     @Override

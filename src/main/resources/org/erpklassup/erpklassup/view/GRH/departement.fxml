@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+    Écran "Départements" — module GRH.
+    Liste hiérarchisée (parent/enfant), filtres par type et responsable,
+    pagination côté serveur. La création / édition passe par
+    DepartementModal.fxml (voir DepartementController).
+-->
+
+<StackPane fx:id="rootStack" styleClass="content-area" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.DepartementController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <!-- Barre d'outils : recherche, filtres, actions -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+<!--                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />-->
+<!--                <TextField fx:id="fieldRecherche" promptText="Rechercher un département..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />-->
+
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
+
+                <StackPane HBox.hgrow="ALWAYS">
+                    <TextField fx:id="fieldRecherche" promptText="Rechercher un département" styleClass="search-field-inner, search-field-with-clear" />
+                    <Button fx:id="btnClearSearch" styleClass="btn-clear-search" visible="false" StackPane.alignment="CENTER_RIGHT">
+                        <graphic><FontIcon iconLiteral="fth-x" iconSize="11" /></graphic>
+                        <StackPane.margin><Insets right="4.0" /></StackPane.margin>
+                    </Button>
+                </StackPane>
+            </HBox>
+
+            <ComboBox fx:id="filtreType" promptText="Type" styleClass="combo-box" />
+            <ComboBox fx:id="filtreResponsable" promptText="Responsable" styleClass="combo-box" />
+            <ComboBox fx:id="filtreStatut" promptText="Statut" styleClass="combo-box" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Action secondaire : vue arborescente (regroupe par parent) -->
+            <Button fx:id="btnVueHierarchique" styleClass="btn-icon-light">
+                <graphic>
+                    <HBox alignment="CENTER" spacing="6">
+                        <children>
+                            <FontIcon iconLiteral="fas-sitemap" iconSize="12" styleClass="icon-orange" />
+                            <Label text="Hiérarchie" />
+                        </children>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- Action secondaire : réorganiser / réaffecter les responsables -->
+            <Button fx:id="btnReaffecterResponsables" styleClass="btn-icon-light">
+                <graphic>
+                    <HBox alignment="CENTER" spacing="6">
+                        <children>
+                            <FontIcon iconLiteral="fth-users" iconSize="12" styleClass="icon-orange" />
+                            <Label text="Responsables" />
+                        </children>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- Action primaire : création -->
+            <Button fx:id="btnNouveauDepartement" onAction="#onNouveauDepartement" styleClass="button-primary" text="Nouveau département">
+                <graphic>
+                    <FontIcon iconLiteral="fth-plus-circle" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Tableau principal -->
+        <TableView fx:id="tableDepartements" prefHeight="402.0" prefWidth="1006.0" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+            <placeholder>
+                <Label styleClass="table-placeholder" text="Aucun département enregistré pour cette école" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colDeptLibelle" prefWidth="200.0" text="Libellé" />
+                <TableColumn fx:id="colDeptParent" prefWidth="170.0" text="Rattaché à" />
+                <TableColumn fx:id="colDeptType" prefWidth="113.60003662109375" text="Type" />
+                <TableColumn fx:id="colDeptResponsable" prefWidth="196.79998779296875" text="Responsable" />
+                <TableColumn fx:id="colDeptEffectif" prefWidth="106.4" text="Effectif" />
+                <TableColumn fx:id="colDeptStatut" prefWidth="60.0" text="Statut" />
+                <TableColumn fx:id="colDeptActions" prefWidth="187.99996337890616" text="Actions" />
+            </columns>
+        </TableView>
+
+        <!-- Pied : compteur + pagination -->
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="lblFooterDepartements" styleClass="footer-info" text="0 département" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="paginationDepartements" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+            <padding>
+                <Insets bottom="-10.0" top="-10.0" />
+            </padding>
+            <VBox.margin>
+                <Insets bottom="-15.0" top="-15.0" />
+            </VBox.margin>
+        </HBox>
+    </VBox>
+
+</StackPane>

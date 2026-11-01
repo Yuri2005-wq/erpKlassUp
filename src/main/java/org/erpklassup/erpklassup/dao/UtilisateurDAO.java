@@ -269,7 +269,7 @@ public class UtilisateurDAO {
         String sqlPage = """
     SELECT u.idUtilisateur, u.username, u.nom, u.prenom, u.email, u.telephone,
            u.typeUtilisateur, u.doitChangerMotDePasse,
-           u.estActif, u.compteVerrouille, u.deuxFacteursActive,
+           u.estActif, u.compteVerrouille, u.deuxFacteursActive, u.doitConfigurer2FA,
            (SELECT GROUP_CONCAT(DISTINCT r.nomRole ORDER BY r.nomRole SEPARATOR ', ')
               FROM UtilisateurRole ur INNER JOIN Role r ON r.idRole = ur.idRole
               WHERE ur.idUtilisateur = u.idUtilisateur AND ur.estActive = 1) AS roles,
@@ -433,6 +433,7 @@ public class UtilisateurDAO {
             return false;
         }
     }
+
     public boolean finaliserSetup2FA(String idUtilisateur, String secret2FA) {
         String sql = "UPDATE Utilisateur SET secret2FA = ?, deuxFacteursActive = 1, doitConfigurer2FA = 0, updated_at = CURRENT_TIMESTAMP(3) WHERE idUtilisateur = ?";
         try (Connection conn = Database.getConnexion();
@@ -465,9 +466,11 @@ public class UtilisateurDAO {
                 rs.getString("roles"),
                 rs.getString("photoPath"),
                 rs.getBoolean("estActif"),
+
                 rs.getBoolean("compteVerrouille"),
                 rs.getBoolean("deuxFacteursActive"),
-                derniereConnexionTs != null ? derniereConnexionTs.toLocalDateTime() : null
+                derniereConnexionTs != null ? derniereConnexionTs.toLocalDateTime() : null,
+                rs.getBoolean("doitConfigurer2FA")
         );
     }
 

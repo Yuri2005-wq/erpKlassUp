@@ -201,27 +201,27 @@
     -fx-effect: none !important;
 }
 
-/* Commutateur à bascule custom */
-.custom-toggle-button {
-    -fx-background-color: #F87171;
-    -fx-background-radius: 30;
-    -fx-min-width: 55;
-    -fx-max-width: 55;
-    -fx-min-height: 26;
-    -fx-max-height: 26;
-    -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 5 0 5;
-    -fx-cursor: hand;
-}
+/*!* Commutateur à bascule custom *!*/
+/*.custom-toggle-button {*/
+/*    -fx-background-color: #E2E8F0;*/
+/*    -fx-background-radius: 30;*/
+/*    -fx-min-width: 55;*/
+/*    -fx-max-width: 55;*/
+/*    -fx-min-height: 26;*/
+/*    -fx-max-height: 26;*/
+/*    -fx-alignment: CENTER_LEFT;*/
+/*    -fx-padding: 0 5 0 5;*/
+/*    -fx-cursor: hand;*/
+/*}*/
 
-.custom-toggle-button .switch-bille {
-    -fx-fill: #F6F6F6;
-}
+/*.custom-toggle-button .switch-bille {*/
+/*    -fx-fill: #F6F6F6;*/
+/*}*/
 
-.custom-toggle-button:selected {
-    -fx-background-color: #10B981;
-    -fx-alignment: CENTER_RIGHT;
-}
+/*.custom-toggle-button:selected {*/
+/*    -fx-background-color:  #F5A524;*/
+/*    -fx-alignment: CENTER_RIGHT;*/
+/*}*/
 
 /* =============== 4. APP BAR, SIDEBAR & CONTRÔLES DE FENÊTRE ============= */
 
@@ -524,7 +524,7 @@
 
 /* Bouton icône ghost pour toolbar claire (filtres avancés, etc.) */
 .btn-icon-light {
-    -fx-background-color: transparent;
+    -fx-background-color: white;
     -fx-border-color: #E2E8F0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
@@ -1739,7 +1739,772 @@
 .btn-clear-search:pressed {
     -fx-background-color: rgba(0, 0, 0, 0.10);
 }
-.popup-transparent,
-.popup-transparent .root {
+
+
+/* style.css */
+.icon-orange {
+    -fx-icon-color: #F5A524;
+}
+
+.icon-blue {
+    -fx-icon-color: #3B82F6;
+}
+
+.icon-green {
+    -fx-icon-color: #16A34A;
+}
+
+.icon-red {
+    -fx-icon-color: #E5484D;
+}
+
+.icon-gray {
+    -fx-icon-color: #64748B;
+}
+
+.icon-grayClair {
+    -fx-icon-color: #CBD5E1;
+}
+
+/* ============================================================
+   VUE CARTES — SALLES (Version v2 — propre et organisée)
+   ============================================================ */
+
+.salles-flow-pane {
     -fx-background-color: transparent;
+    -fx-padding: 8;
+    -fx-hgap: 20;
+    -fx-vgap: 20;
+}
+
+/* ---------- Carte ---------- */
+.salle-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(16, 24, 40, 0.08), 14, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.salle-card:hover {
+    -fx-border-color: #F5A524;
+    -fx-effect: dropshadow(gaussian, rgba(245, 165, 36, 0.22), 20, 0, 0, 6);
+    -fx-translate-y: -3;
+}
+
+/* ---------- Bande supérieure ---------- */
+.salle-card-stripe-top {
+    -fx-min-height: 6;
+    -fx-max-height: 6;
+    -fx-background-radius: 12 12 0 0;
+}
+
+/* ---------- Header ---------- */
+.salle-card-header {
+    -fx-padding: 16 18 12 18;
+}
+
+/* ---------- Icône type ---------- */
+.salle-card-icon-container {
+    -fx-alignment: CENTER;
+}
+
+/* ---------- Textes ---------- */
+.salle-card-code {
+    -fx-text-fill: #16213A;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.salle-card-nom {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+}
+
+/* ---------- Body ---------- */
+.salle-card-body-v2 {
+    -fx-padding: 12 18 12 18;
+}
+
+.salle-card-batiment-v2 {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+.salle-card-info-v2 {
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+/* ---------- Footer ---------- */
+.salle-card-footer {
+    -fx-padding: 10 14 12 18;
+}
+
+/* ---------- Badge statut ---------- */
+.salle-card-badge {
+    -fx-background-radius: 6;
+    -fx-padding: 4 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.salle-card-badge-libre {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #16A34A;
+}
+
+.salle-card-badge-occupee {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #E5484D;
+}
+
+/* ---------- Bouton icône du footer ---------- */
+.salle-card-icon-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6;
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-max-width: 32;
+    -fx-max-height: 32;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
+
+.salle-card-icon-btn:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+/* ---------- Separator discret ---------- */
+.salle-card .separator .line {
+    -fx-border-color: #F1F5F9;
+    -fx-border-width: 1 0 0 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== À ajouter à style.css — accueil des Paramètres (thème clair) ===== */
+
+.settings-category-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #E7E9F2;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 22;
+    -fx-cursor: hand;
+}
+.settings-category-card:hover {
+    -fx-border-color: #F5A623;
+}
+
+.category-icon-peach {
+    -fx-background-color: #FEF2DF;
+    -fx-background-radius: 10;
+}
+.category-icon-blue {
+    -fx-background-color: #E8EBF7;
+    -fx-background-radius: 10;
+}
+
+.category-card-title {
+    -fx-text-fill: #1C2440;
+    -fx-font-size: 16.5px;
+    -fx-font-weight: bold;
+}
+.category-card-desc {
+    -fx-text-fill: #6B7395;
+    -fx-font-size: 13px;
+}
+
+.category-tag {
+    -fx-background-color: #F4F5FA;
+    -fx-border-color: #E7E9F2;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 4 10 4 10;
+    -fx-text-fill: #6B7395;
+    -fx-font-size: 11.5px;
+}
+
+.category-card-count {
+    -fx-text-fill: #6B7395;
+    -fx-font-size: 12px;
+}
+.category-card-open {
+    -fx-text-fill: #1C2440;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ===== Bouton retour à l'accueil (bandeau de titre des catégories) ===== */
+
+.btn-retour-accueil {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6 8 6 8;
+    -fx-cursor: hand;
+}
+.btn-retour-accueil:hover {
+    -fx-background-color: #1E2A47;
+}
+
+
+/* ===== À ajouter à style.css — fil d'Ariane de l'AppBar ===== */
+.breadcrumb-box        { -fx-padding: 0 4 0 8; }
+.breadcrumb-parent     { -fx-text-fill: #94A3B8; -fx-font-size: 12px; -fx-font-weight: 500; }
+.breadcrumb-section    { -fx-text-fill: #FFFFFF; -fx-font-size: 13.5px; -fx-font-weight: 700; }
+.breadcrumb-sub        { -fx-text-fill: #94A3B8; -fx-font-size: 13px; -fx-font-weight: 500; }
+.breadcrumb-separator  { -fx-text-fill: #64748B; -fx-font-size: 15px; -fx-padding: 0 2; }
+
+
+/* ============================================================
+   TOGGLE BUTTON — Style switch (iOS-like)
+   ============================================================ */
+
+.switch-button {
+    -fx-background-color: #E2E8F0;
+    -fx-background-radius: 20;
+    -fx-padding: 2;
+    -fx-min-width: 50;
+    -fx-min-height: 26;
+    -fx-max-width: 50;
+    -fx-max-height: 26;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: GRAPHIC_ONLY;
+}
+
+.switch-button:selected {
+    -fx-background-color: #F5A524;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.switch-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.switch-button .switch-bille {
+    -fx-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 3, 0, 0, 1);
+}
+
+/* ============================================================
+   BADGE ANNÉE ACTIVE — AppBar
+   ============================================================ */
+
+.annee-active-badge {
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.annee-active-badge:hover {
+    -fx-background-color: rgba(245, 165, 36, 0.12);
+}
+
+.annee-active-text {
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+}
+
+/* Point coloré selon le statut de l'année */
+.annee-active-dot {
+    -fx-fill: #16A34A;   /* Vert = EN_COURS + estCourante */
+}
+
+/* Variantes selon le statut */
+.annee-active-dot.statut-preparation {
+    -fx-fill: #F5A524;   /* Orange = PREPARATION */
+}
+
+.annee-active-dot.statut-cloturee {
+    -fx-fill: #94A3B8;   /* Gris = CLOTUREE */
+}
+
+.annee-active-dot.statut-archivee {
+    -fx-fill: #E5484D;   /* Rouge = ARCHIVEE */
+}
+
+.annee-active-dot.statut-inactive {
+    -fx-fill: #CBD5E1;   /* Gris très clair = aucune année */
+}
+
+/* Chips type dans le modal */
+.type-toggle {
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-background-color: #F4F4F5;
+    -fx-text-fill: #3F3F46;
+}
+.type-toggle:selected {
+    -fx-background-color: #F5A524;
+    -fx-text-fill: white;
+}
+.type-toggle:selected .ikonli-font-icon {
+    -fx-icon-color: #1C2440;
+}
+
+.error-label {
+    -fx-text-fill: #E5484D;
+    -fx-font-size: 11px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.fiche-page {
+    -kl-navy: #111A2E;
+    -kl-navy-2: #18233B;
+    -kl-orange: #F5A524;
+    -kl-orange-hover: #E4950F;
+    -kl-bg: #F3F5FA;
+    -kl-carte: #FFFFFF;
+    -kl-bordure: #DCE2EE;
+    -kl-ligne: #EEF1F7;
+    -kl-texte: #1F2A44;
+    -kl-muted: #8A94A8;
+    -kl-nav-texte: #A9B3C9;
+
+    -fx-background-color: -kl-bg;
+    -fx-font-size: 13px;
+    -fx-text-fill: -kl-texte;
+}
+
+.fiche-page .label {
+    -fx-text-fill: -kl-texte;
+}
+
+/* ---------- Cartes ---------- */
+
+.fiche-card {
+    -fx-background-color: -kl-carte;
+    -fx-background-radius: 8;
+    -fx-border-color: -kl-bordure;
+    -fx-border-radius: 8;
+    -fx-padding: 14 16 14 16;
+}
+
+.fiche-card.carte-table {
+    -fx-padding: 1;
+}
+
+.carte-entete {
+    -fx-padding: 12 16 12 16;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.carte-titre {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- En-tête de fiche ---------- */
+
+.fiche-avatar {
+    -fx-min-width: 56;
+    -fx-pref-width: 56;
+    -fx-max-width: 56;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+    -fx-background-color: -kl-navy;
+    -fx-background-radius: 28;
+}
+
+.fiche-page .fiche-avatar-texte {
+    -fx-text-fill: -kl-orange;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.fiche-nom {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.fiche-page .fiche-meta {
+    -fx-text-fill: -kl-muted;
+}
+
+.metrique {
+    -fx-padding: 0 12 0 12;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.fiche-page .metrique-libelle {
+    -fx-text-fill: -kl-muted;
+    -fx-font-size: 11px;
+}
+
+.metrique-valeur {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Champs en lecture seule ---------- */
+
+.champ {
+    -fx-spacing: 3;
+}
+
+.fiche-page .champ-libelle {
+    -fx-text-fill: -kl-muted;
+    -fx-font-size: 11px;
+}
+
+.champ-valeur {
+    -fx-font-size: 13px;
+}
+
+/* ---------- Boutons ---------- */
+
+.btn-primaire,
+.btn-secondaire,
+.btn-ghost {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.btn-primaire {
+    -fx-background-color: -kl-orange;
+    -fx-text-fill: #1A1200;
+    -fx-font-weight: bold;
+}
+
+.btn-primaire:hover {
+    -fx-background-color: -kl-orange-hover;
+}
+
+.btn-primaire .ikonli-font-icon {
+    -fx-icon-color: #1A1200;
+}
+
+.btn-secondaire {
+    -fx-background-color: -kl-carte;
+    -fx-border-color: -kl-bordure;
+    -fx-text-fill: -kl-texte;
+}
+
+.btn-secondaire:hover {
+    -fx-background-color: #F7F9FD;
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -kl-muted;
+}
+
+.btn-ghost:hover {
+    -fx-background-color: #E8ECF5;
+}
+
+.btn-secondaire .ikonli-font-icon,
+.btn-ghost .ikonli-font-icon {
+    -fx-icon-color: -kl-texte;
+}
+
+.btn-icone {
+    -fx-background-color: -kl-carte;
+    -fx-border-color: -kl-bordure;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+    -fx-max-width: 28;
+    -fx-max-height: 28;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-icone:hover {
+    -fx-background-color: #FFF6E5;
+    -fx-border-color: -kl-orange;
+}
+
+.btn-icone .ikonli-font-icon {
+    -fx-icon-color: -kl-texte;
+    -fx-icon-size: 14;
+}
+
+/* ---------- Badges ---------- */
+
+.badge {
+    -fx-padding: 2 9 2 9;
+    -fx-background-radius: 999;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.badge-succes { -fx-background-color: #E3F5EA; }
+.badge-alerte { -fx-background-color: #FFF3D6; }
+.badge-danger { -fx-background-color: #FCE7E7; }
+.badge-info   { -fx-background-color: #E6EEFB; }
+.badge-violet { -fx-background-color: #EFE6FA; }
+.badge-neutre { -fx-background-color: #ECEFF5; }
+
+.fiche-page .badge-succes { -fx-text-fill: #1B6B3A; }
+.fiche-page .badge-alerte { -fx-text-fill: #8A5A00; }
+.fiche-page .badge-danger { -fx-text-fill: #9B2C2C; }
+.fiche-page .badge-info   { -fx-text-fill: #1F4B8F; }
+.fiche-page .badge-violet { -fx-text-fill: #5B2E91; }
+.fiche-page .badge-neutre { -fx-text-fill: #4B566E; }
+
+/* ---------- Onglets ---------- */
+
+.fiche-tabs {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-tab-min-height: 40;
+    -fx-tab-max-height: 40;
+}
+
+.fiche-tabs > .tab-header-area {
+    -fx-padding: 0;
+}
+
+.fiche-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: -kl-navy;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 14 0 14;
+    -fx-cursor: hand;
+}
+
+.fiche-tabs > .tab-header-area > .tab-header-background {
+    -fx-background-color: -kl-navy;
+}
+
+.fiche-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -kl-navy-2;
+    -fx-border-color: transparent transparent -kl-orange transparent;
+}
+
+.fiche-tabs .tab .tab-label {
+    -fx-text-fill: -kl-nav-texte;
+    -fx-font-size: 13px;
+}
+
+.fiche-tabs .tab:hover .tab-label {
+    -fx-text-fill: white;
+}
+
+.fiche-tabs .tab:selected .tab-label {
+    -fx-text-fill: -kl-orange;
+}
+
+.fiche-tabs .tab .ikonli-font-icon {
+    -fx-icon-color: -kl-nav-texte;
+    -fx-icon-size: 15;
+}
+
+.fiche-tabs .tab:selected .ikonli-font-icon {
+    -fx-icon-color: -kl-orange;
+}
+
+.fiche-tabs > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 14 0 0 0;
+}
+
+.fiche-tabs .tab-header-area .headers-region .tab .focus-indicator {
+    -fx-opacity: 0;
+}
+
+/* ---------- Défilement ---------- */
+
+.fiche-scroll,
+.fiche-scroll > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* ---------- Tableaux ---------- */
+
+.fiche-table {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.fiche-table .column-header-background {
+    -fx-background-color: -kl-navy;
+    -fx-pref-height: 34;
+}
+
+.fiche-table .column-header,
+.fiche-table .filler {
+    -fx-background-color: -kl-navy;
+    -fx-size: 34;
+    -fx-border-color: transparent;
+}
+
+.fiche-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.fiche-table .column-drag-header {
+    -fx-background-color: -kl-navy-2;
+}
+
+.fiche-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent -kl-ligne transparent;
+    -fx-cell-size: 42;
+}
+
+.fiche-table .table-row-cell:odd {
+    -fx-background-color: #FAFBFE;
+}
+
+.fiche-table .table-row-cell:filled:hover {
+    -fx-background-color: #FFF9EC;
+}
+
+.fiche-table .table-row-cell:filled:selected {
+    -fx-background-color: #FFF3D6;
+}
+
+.fiche-table .table-cell {
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 0 10 0 12;
+    -fx-text-fill: -kl-texte;
+    -fx-border-color: transparent;
+}
+
+.fiche-table .table-cell:filled:selected {
+    -fx-text-fill: -kl-texte;
+}
+
+.fiche-table:focused {
+    -fx-background-color: transparent;
+}
+
+.fiche-table .placeholder .label {
+    -fx-text-fill: -kl-muted;
+}
+
+/* ---------- Erreur et chargement ---------- */
+
+.bandeau-erreur {
+    -fx-background-color: #FCE7E7;
+    -fx-border-color: #F2B8B8;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 8 12 8 12;
+}
+
+.fiche-page .bandeau-erreur .label {
+    -fx-text-fill: #9B2C2C;
+}
+
+.bandeau-erreur .ikonli-font-icon {
+    -fx-icon-color: #9B2C2C;
+}
+
+.voile {
+    -fx-background-color: rgba(243, 245, 250, 0.72);
+}
+
+
+/* ============================================================
+   SCOPING — Coins arrondis pour la TabPane de l'écran
+   "Structure Académique" UNIQUEMENT.
+
+   La classe .tabs-arrondis-structure est posée uniquement sur
+   la TabPane de cet écran (fichier tableauBordGrh.fxml).
+   Aucun autre écran n'est affecté.
+
+   Elle s'ajoute à .top-tab-pane : elle hérite donc de tous les
+   styles de base (bandeau navy, hover onglets, sélection orange)
+   et ne fait qu'ajouter les arrondis.
+   ============================================================ */
+
+/* 1. Conteneur global : transparent, clip aux coins */
+.top-tab-pane.tabs-arrondis-structure {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-radius: 8 8 0 0;
+    -fx-padding: 0;
+}
+
+/* 2. Le FOND NAVY — c'est ici que l'arrondi se joue.
+   On écrase la règle globale uniquement pour cette classe. */
+.top-tab-pane.tabs-arrondis-structure > .tab-header-area > .tab-header-background {
+    -fx-background-color: #16213A;
+    -fx-background-radius: 8 8 0 0;   /* ← coins supérieurs arrondis */
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: null;
+}
+
+/* 3. La zone de contenu : fond blanc + coins arrondis bas,
+   pour matcher le tableau en dessous. */
+.top-tab-pane.tabs-arrondis-structure > .tab-content-area {
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 8 8;
+    -fx-border-width: 0;
+}
+
+/* 4. Neutralise le liseré gris de Modena (sécurité) */
+.top-tab-pane.tabs-arrondis-structure > .tab-header-area {
+    -fx-background-color: transparent;
+}
+
+.top-tab-pane.tabs-arrondis-structure > .tab-header-area > .headers-region {
+    -fx-background-color: transparent;
+    -fx-effect: null;
 }

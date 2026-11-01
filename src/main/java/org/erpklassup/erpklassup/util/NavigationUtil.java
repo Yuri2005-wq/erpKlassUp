@@ -76,4 +76,51 @@ public final class NavigationUtil {
             appliquerNouvelleScene.run();
         }
     }
+
+
+
+    public static void retournerBord(Stage currentStage) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                NavigationUtil.class.getResource("/org/erpklassup/erpklassup/hello-view.fxml"));
+        Parent loginRoot = loader.load();
+
+        Scene loginScene = new Scene(loginRoot, 1500, 950);
+
+        Scene sceneActuelle = currentStage.getScene();
+        Parent rootActuel = sceneActuelle != null ? sceneActuelle.getRoot() : null;
+
+        Runnable appliquerNouvelleScene = () -> {
+            // ✅ sortir du mode maximisé AVANT de fixer la taille,
+            // sinon setWidth/setHeight sont silencieusement ignorés par Windows
+            if (currentStage.isMaximized()) {
+                currentStage.setMaximized(false);
+            }
+
+            currentStage.setScene(loginScene);
+            currentStage.setWidth(1000);
+            currentStage.setHeight(640);
+            currentStage.setResizable(false);
+            currentStage.setTitle("KlassUp - Connexion");
+            currentStage.centerOnScreen();
+
+            WindowsTitleBar.setTitleBarColor(currentStage, "#16213A");
+
+            loginRoot.setOpacity(0);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(220), loginRoot);
+            fadeIn.setFromValue(0);
+            fadeIn.setToValue(1);
+            fadeIn.play();
+        };
+
+        if (rootActuel != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), rootActuel);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+            fadeOut.setOnFinished(e -> appliquerNouvelleScene.run());
+            fadeOut.play();
+        } else {
+            appliquerNouvelleScene.run();
+        }
+    }
 }

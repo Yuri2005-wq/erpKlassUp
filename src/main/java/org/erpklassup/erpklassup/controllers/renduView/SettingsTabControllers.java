@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import org.erpklassup.erpklassup.util.BreadcrumbManager;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ViewRegistry;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -16,88 +17,90 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur principal pour la gestion de l'onglet de configuration (Settings).
- * Il délègue la gestion de la mémoire, de l'état et de l'affichage des sous-vues au {@link ViewRegistry}.
+ * Contrôleur principal pour la gestion de l'onglet de configuration Système
+ * (Utilisateurs, Rôles & Permissions, Journal d'audit). Il délègue la gestion
+ * de la mémoire, de l'état et de l'affichage des sous-vues au {@link ViewRegistry}.
  */
 public class SettingsTabControllers implements Initializable {
 
-    // Conteneur JavaFX où les sous-vues FXML seront injectées
     @FXML private StackPane tabContentContainer;
     @FXML private Label lblPageCourante;
-    // Boutons de navigation (TopBar)
+    @FXML private Label lblCategorieCourante;
     @FXML private Button btnTabUtilisateur;
     @FXML private Button btnTabRolePermissions;
     @FXML private Button btnTabAudits;
+    @FXML private Button btnRetourAccueil;
     @FXML private FontIcon iconTitleShield;
 
-
-    // Mappage associant chaque bouton FXML au chemin de sa vue FXML correspondante
     private final Map<Button, String> tabViewsMap = new HashMap<>();
-
-    // Référence vers le bouton actuellement sélectionné pour la mise en valeur CSS
     private Button currentActiveButton = null;
-
-    // Gestionnaire centralisé des vues (gère le cache LRU, le nettoyage et la sauvegarde d'état)
     private ViewRegistry viewRegistry;
-
-    // ✅ ÉCOUTEUR i18n
     private final Runnable ecouteurI18n = this::rafraichirTextes;
 
-    // ✅ Raccourci i18n
+    // Fourni par le shell des Paramètres après chargement de cette vue.
+    private Runnable onRetourAccueil;
+
     private I18nManager i18n() {
         return I18nManager.getInstance();
     }
 
-    /**
-     * Initialisation du contrôleur après le chargement du fichier FXML.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 1. Instanciation du ViewRegistry restreint à 3 vues max en mémoire cache RAM
         this.viewRegistry = new ViewRegistry(tabContentContainer, 3);
 
-        // 2. Enregistrement des routes FXML associées aux boutons
         tabViewsMap.put(btnTabUtilisateur, "/org/erpklassup/erpklassup/view/UtilisateursTab.fxml");
         tabViewsMap.put(btnTabRolePermissions, "/org/erpklassup/erpklassup/view/RolesPermissionsTab.fxml");
         tabViewsMap.put(btnTabAudits, "/org/erpklassup/erpklassup/view/JournalAuditTab.fxml");
 
-        // 3. Activation et affichage de la première vue par défaut (Utilisateurs)
         if (btnTabUtilisateur != null) {
             mettreEnValeurBouton(btnTabUtilisateur);
             viewRegistry.afficherVue(tabViewsMap.get(btnTabUtilisateur));
             mettreAJourTitrePage(btnTabUtilisateur);
+            BreadcrumbManager.getInstance().definirSousSection(btnTabUtilisateur.getText());
+
         }
 
+        if (lblCategorieCourante != null) {
+            lblCategorieCourante.setText(i18n().t("settings.categorie.systeme"));
+        }
 
-        // ✅ S'abonner aux changements de langue
         i18n().ecouterChangement(ecouteurI18n);
     }
 
-    /**
-     * Gestionnaire d'événement déclenché lors du clic sur un onglet de la barre supérieure.
-     */
     @FXML
     private void switchTab(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
-
-        // Évite tout rechargement inutile si l'utilisateur clique sur l'onglet déjà actif
         if (clickedButton == currentActiveButton) {
             return;
         }
 
-        // Récupération du chemin FXML associé au bouton cliqué
         String fxmlPath = tabViewsMap.get(clickedButton);
-
         if (fxmlPath != null) {
             mettreEnValeurBouton(clickedButton);
             viewRegistry.afficherVue(fxmlPath);
             mettreAJourTitrePage(clickedButton);
+            BreadcrumbManager.getInstance().definirSousSection(clickedButton.getText());
         }
     }
 
     /**
-     * ✅ Rafraîchit les textes des boutons après changement de langue.
+     * Déclenché par le bouton "Retour à l'accueil" du bandeau de titre.
      */
+    @FXML
+    private void retournerAccueil(ActionEvent event) {
+        if (onRetourAccueil != null) {
+            onRetourAccueil.run();
+        }
+    }
+
+    /**
+     * Appelé par le shell juste après le chargement de cette vue, pour lui
+     * fournir la logique de retour vers l'accueil des Paramètres.
+     */
+    public void setOnRetourAccueil(Runnable callback) {
+        this.onRetourAccueil = callback;
+    }
+
     private void rafraichirTextes() {
         if (btnTabUtilisateur != null) {
             btnTabUtilisateur.setText(i18n().t("settings.tab.users"));
@@ -108,23 +111,19 @@ public class SettingsTabControllers implements Initializable {
         if (btnTabAudits != null) {
             btnTabAudits.setText(i18n().t("settings.tab.audit"));
         }
+        if (lblCategorieCourante != null) {
+            lblCategorieCourante.setText(i18n().t("settings.categorie.systeme"));
+        }
     }
 
-    /**
-     * Applique la classe CSS active au bouton sélectionné et retire le style de l'ancien bouton.
-     */
     private void mettreEnValeurBouton(Button boutonActif) {
         if (currentActiveButton != null) {
             currentActiveButton.getStyleClass().remove("active-top-tab");
         }
-
         boutonActif.getStyleClass().add("active-top-tab");
         currentActiveButton = boutonActif;
     }
 
-    /**
-     * Nettoie les ressources en mémoire lors de la fermeture complète du composant parent.
-     */
     public void fermer() {
         if (viewRegistry != null) {
             viewRegistry.toutReinitialiser();
@@ -133,7 +132,7 @@ public class SettingsTabControllers implements Initializable {
     }
 
     private void mettreAJourTitrePage(Button boutonActif) {
-        if (lblPageCourante == null) return;
+//        if (lblPageCourante == null) return;
 
         String cle;
         if (boutonActif == btnTabUtilisateur) {
@@ -146,6 +145,6 @@ public class SettingsTabControllers implements Initializable {
             cle = "settings.page.title";
         }
 
-        lblPageCourante.setText(i18n().t(cle));
+        BreadcrumbManager.getInstance().definirSousSection(btnTabUtilisateur.getText());
     }
 }

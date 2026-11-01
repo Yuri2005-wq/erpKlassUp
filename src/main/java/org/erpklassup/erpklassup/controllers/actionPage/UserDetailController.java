@@ -1,5 +1,7 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -10,8 +12,10 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import javafx.util.Duration;
 import org.erpklassup.erpklassup.dao.UtilisateurDAO;
 import org.erpklassup.erpklassup.dao.UtilisateurPermissionDAO;
 import org.erpklassup.erpklassup.dto.AuditLigne;
@@ -26,6 +30,7 @@ import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.RoleService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.service.UtilisateurService;
+import org.erpklassup.erpklassup.util.AlertUtil;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
@@ -33,6 +38,9 @@ import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerCasseTitre;
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerMajuscules;
 
 @SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class UserDetailController implements Initializable {
@@ -97,6 +105,8 @@ public class UserDetailController implements Initializable {
     private String idEcoleCourante;
     private UtilisateurLigne utilisateurCourant;
     private Runnable callbackRefresh;
+    private boolean blocageListener2FA = false;
+
 
     private final List<CheckBox> listeCheckBoxRoles = new ArrayList<>();
     private final Map<String, CheckBox> casesParIdPermission = new LinkedHashMap<>();
@@ -124,6 +134,12 @@ public class UserDetailController implements Initializable {
         configurerTableAudit();
         configurerPagination();
 
+        forcerMajuscules(nomField);
+        forcerCasseTitre(prenomField);
+
+        configurerToggleSwitch(toggleActif);
+        configurerToggleSwitch(toggle2FA);
+
         // ✅ S'abonner aux changements de langue
         i18n().ecouterChangement(ecouteurI18n);
     }
@@ -150,7 +166,6 @@ public class UserDetailController implements Initializable {
             chargerPermissionsOrganisees();
             chargerSecurite();
             chargerHistorique();
-            rafraichirUtilisateurDepuisBDD(utilisateurCourant.idUtilisateur());
         }
     }
 
@@ -184,7 +199,9 @@ public class UserDetailController implements Initializable {
                     user.isEstActif(),
                     user.isCompteVerrouille(),
                     user.isDeuxFacteursActive(),
-                    utilisateurCourant.derniereConnexion()
+                    utilisateurCourant.derniereConnexion(),
+                    user.isDoitConfigurer2FA()
+
             );
 
             this.utilisateurCourant = frais;
@@ -211,39 +228,135 @@ public class UserDetailController implements Initializable {
     // 1. EN-TÊTE & PROFIL
     // ==========================================
 
-    @FXML
-    private void handleActiver2FA() {
-        if (utilisateurCourant == null) {
-            ToastNotification.erreur(getStage(), i18n().t("user_detail.error.no_user_selected"));
+//    @FXML
+//    private void handleActiver2FA() {
+//        if (utilisateurCourant == null) {
+//            ToastNotification.erreur(getStage(), i18n().t("user_detail.error.no_user_selected"));
+//            return;
+//        }
+//
+//        String id = utilisateurCourant.idUtilisateur();
+//        String username = utilisateurCourant.username();
+//
+//        boolean veutActiver2FA = toggle2FA.isSelected();
+//
+//        if (veutActiver2FA) {
+//            utilisateurService.forcerActivation2FAAsync(
+//                    id,
+//                    () -> Platform.runLater(() -> {
+//                        if (toggle2FA.isSelected() == true) {
+//                            ToastNotification.succes(getStage(), i18n().t("user_detail.2fa.forced"));
+//
+//                            auditService.tracerActionAsync(
+//                                    "SECURITE",
+//                                    "ACTIVATION_OBLIGATOIRE_2FA",
+//                                    "Activation de l'obligation 2FA pour : " + username
+//                            );
+//                            chargerHistorique();
+//                            notifierChangement();
+//                        }else {
+//                            String message = "Seul l'utilisateur Concerné doit pourvoir desactiver le 2FA";
+//
+//                            AlertUtil.afficherInformation(
+//                                    "Activaction 2FA",
+//                                    message,
+//                                    getStage());
+//                            // ❌ Pas de bascule — l'action est bloquée
+//                        }
+//
+//                    }),
+//                    erreur -> Platform.runLater(() -> {
+//                        ToastNotification.erreur(getStage(),
+//                                i18n().t("user_detail.2fa.error", erreur.getMessage()));
+//                    })
+//            );
+//        }
+//
+//    }
+    /* ==========================================================
+   GESTION DU TOGGLE 2FA (côté Admin)
+   ==========================================================
+   Règles métier :
+   1. ACTIVER : l'admin peut forcer l'activation MAIS l'opération
+      est irréversible. L'utilisateur devra terminer la configuration
+      à sa prochaine connexion. On demande confirmation.
+
+   2. DÉSACTIVER : seul l'utilisateur concerné peut désactiver sa 2FA.
+      L'admin ne peut PAS le faire. On l'informe et on bloque.
+   ========================================================== */
+@FXML
+private void handleActiver2FA() {
+    if (utilisateurCourant == null) {
+        ToastNotification.erreur(getStage(), i18n().t("user_detail.error.no_user_selected"));
+        return;
+    }
+
+    final String id       = utilisateurCourant.idUtilisateur();
+    final String username = utilisateurCourant.username();
+
+    final boolean veutActiver = toggle2FA.isSelected();
+
+    /* ---------- CAS 1 : ACTIVER ---------- */
+    if (veutActiver) {
+
+        boolean confirme = AlertUtil.afficherConfirmation(
+                "Activer la 2FA obligatoire",
+                "Vous êtes sur le point de rendre la 2FA OBLIGATOIRE pour : "
+                        + username + "\n\n"
+                        + "⚠️ Cette opération est IRRÉVERSIBLE par vous.\n"
+                        + "L'utilisateur devra terminer la configuration du 2FA "
+                        + "à sa prochaine connexion.\n\n"
+                        + "Continuer ?",
+                getStage()
+        );
+
+        if (!confirme) {
+            // ✅ On bloque le listener pendant le reset
+            blocageListener2FA = true;
+            toggle2FA.setSelected(false);
+            blocageListener2FA = false;
             return;
         }
-
-        String id = utilisateurCourant.idUtilisateur();
-        String username = utilisateurCourant.username();
 
         utilisateurService.forcerActivation2FAAsync(
                 id,
                 () -> Platform.runLater(() -> {
-                    toggle2FA.setSelected(true);
-                    toggle2FA.setText(i18n().t("user_detail.2fa.required"));
-                    mettreAJourBadge2FA(true);
-
-                    ToastNotification.succes(getStage(), i18n().t("user_detail.2fa.forced"));
-
-                    auditService.tracerActionAsync(
-                            "SECURITE",
+                    ToastNotification.succes(getStage(),
+                            "2FA obligatoire activée pour " + username + ".");
+                    auditService.tracerActionAsync("SECURITE",
                             "ACTIVATION_OBLIGATOIRE_2FA",
-                            "Activation de l'obligation 2FA pour : " + username
-                    );
+                            "Activation obligatoire 2FA pour : " + username);
                     chargerHistorique();
                     notifierChangement();
                 }),
                 erreur -> Platform.runLater(() -> {
+                    // ✅ Blocage pendant le reset
+                    blocageListener2FA = true;
+                    toggle2FA.setSelected(false);
+                    blocageListener2FA = false;
+
                     ToastNotification.erreur(getStage(),
                             i18n().t("user_detail.2fa.error", erreur.getMessage()));
                 })
         );
+
+        return;
     }
+
+    /* ---------- CAS 2 : DÉSACTIVER (interdit) ---------- */
+    AlertUtil.afficherInformation(
+            "Désactivation impossible",
+            "Vous ne pouvez pas désactiver la 2FA d'un autre utilisateur.\n\n"
+                    + "Seul l'utilisateur concerné (« " + username
+                    + " ») peut désactiver sa propre 2FA depuis son profil personnel.",
+            getStage()
+    );
+
+    // ✅ Blocage pendant le reset
+    blocageListener2FA = true;
+    toggle2FA.setSelected(true);
+    blocageListener2FA = false;
+}
 
     private void chargerEntete() {
         String nom = utilisateurCourant.nom() != null ? utilisateurCourant.nom() : "";
@@ -445,25 +558,20 @@ public class UserDetailController implements Initializable {
     private void chargerSecurite() {
         boolean estActif = utilisateurCourant.statut() != null
                 && utilisateurCourant.statut().getLibelle().equalsIgnoreCase("Actif");
-        boolean est2FA = utilisateurCourant.deuxFacteursActif();
+//        boolean est2FA = utilisateurCourant.deuxFacteursActif();
+        boolean doitConfigurer2FA = utilisateurCourant.doitConfigurer2FA();
 
         toggleActif.setSelected(estActif);
-        toggleActif.setText(estActif ? i18n().t("status.active") : i18n().t("status.inactive"));
+//        toggleActif.setText(estActif ? i18n().t("status.active") : i18n().t("status.inactive"));
 
-        toggle2FA.setSelected(est2FA);
-        toggle2FA.setText(est2FA
-                ? i18n().t("user_detail.2fa.badge_enabled")
-                : i18n().t("user_detail.2fa.badge_disabled"));
+        toggle2FA.setSelected(doitConfigurer2FA);
 
         toggleActif.selectedProperty().addListener((obs, oldVal, isSelected) -> {
-            toggleActif.setText(isSelected ? i18n().t("status.active") : i18n().t("status.inactive"));
             mettreAJourBadgeStatut(isSelected);
         });
 
         toggle2FA.selectedProperty().addListener((obs, oldVal, isSelected) -> {
-            toggle2FA.setText(isSelected
-                    ? i18n().t("user_detail.2fa.badge_enabled")
-                    : i18n().t("user_detail.2fa.badge_disabled"));
+            if (blocageListener2FA) return;
             mettreAJourBadge2FA(isSelected);
         });
     }
@@ -566,7 +674,6 @@ public class UserDetailController implements Initializable {
         btnEnregistrerPermissions.setOnAction(e -> enregistrerPermissions());
         btnEnregistrerSecurite.setOnAction(e -> enregistrerSecurite());
         btnGenererTemp.setOnAction(e -> genererMotDePasseTemporaire());
-        btnEnvoyerLien.setOnAction(e -> envoyerLienReinitialisation());
     }
 
     private void enregistrerInformations() {
@@ -738,5 +845,20 @@ public class UserDetailController implements Initializable {
 
     private Stage getStage() {
         return (Stage) tabPane.getScene().getWindow();
+    }
+
+    private void configurerToggleSwitch(ToggleButton toggle) {
+        Circle cercle = new Circle(11);
+        cercle.getStyleClass().add("switch-bille");
+        toggle.setGraphic(cercle);
+        toggle.getStyleClass().add("switch-button");
+
+        // Animation
+        toggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            TranslateTransition tt = new TranslateTransition(Duration.millis(200), cercle);
+            tt.setToX(newVal ? 1 : 0);
+            tt.setInterpolator(Interpolator.SPLINE(0.33, 0, 0.1, 1));
+            tt.play();
+        });
     }
 }

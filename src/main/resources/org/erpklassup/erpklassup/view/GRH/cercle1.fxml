@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+    Écran "Personnel & Dossiers" — module GRH, Cercle 1.
+    Maître-détail : liste à gauche (ListView), détail à onglets à droite.
+    Styles 100 % puisés dans style.css (aucune classe inventée).
+-->
+
+<StackPane fx:id="rootStack" styleClass="content-area" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.moduleGrH.PersonnelController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <!-- ============================================================ -->
+        <!-- EN-TÊTE CONTEXTUEL                                            -->
+        <!-- ============================================================ -->
+        <VBox prefHeight="37.0" prefWidth="1006.0" spacing="2">
+            <Label fx:id="lblContextePersonnel" styleClass="page-subtitle" text="Gestion du personnel — 0 employé actif" />
+            <VBox.margin>
+                <Insets bottom="-15.0" />
+            </VBox.margin>
+        </VBox>
+
+        <!-- ============================================================ -->
+        <!-- BARRE D'OUTILS                                                -->
+        <!-- ============================================================ -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher un employé (nom, matricule, email)..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <ComboBox fx:id="filtreDepartement" promptText="Département" styleClass="special-combo" />
+            <ComboBox fx:id="filtrePoste" promptText="Poste" styleClass="special-combo" />
+            <ComboBox fx:id="filtreType" promptText="Type" styleClass="special-combo" />
+            <ComboBox fx:id="filtreStatut" promptText="Statut" styleClass="special-combo" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnExporter" styleClass="btn-icon-light">
+                <graphic>
+                    <HBox alignment="CENTER" spacing="6">
+                        <children>
+                            <FontIcon iconLiteral="fth-download" iconSize="12" styleClass="icon-orange" />
+                            <Label text="Exporter" />
+                        </children>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnNouvelEmploye" onAction="#onNouvelEmploye" styleClass="button-primary" text="Nouvel employé">
+                <graphic>
+                    <FontIcon iconLiteral="fth-user-plus" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- ============================================================ -->
+        <!-- ZONE MAÎTRE-DÉTAIL                                            -->
+        <!-- ============================================================ -->
+        <HBox spacing="16" VBox.vgrow="ALWAYS">
+
+            <!-- ======================================================= -->
+            <!-- ZONE 1 — LISTE DES EMPLOYÉS (gauche)                     -->
+            <!-- ======================================================= -->
+            <VBox maxWidth="340.0" minWidth="260.0" prefWidth="300.0" spacing="10" styleClass="roles-list-panel">
+
+                <ListView fx:id="listePersonnel" styleClass="roles-list" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <VBox alignment="CENTER" spacing="10">
+                            <FontIcon iconLiteral="fth-users" iconSize="32" styleClass="icon-grayClair" />
+                            <Label styleClass="table-placeholder" text="Aucun employé trouvé" wrapText="true" />
+                        </VBox>
+                    </placeholder>
+                </ListView>
+
+                <Separator />
+
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label fx:id="lblFooterListe" styleClass="footer-info" text="0 employé" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Pagination fx:id="paginationPersonnel" maxPageIndicatorCount="3" styleClass="custom-pagination" />
+                </HBox>
+            </VBox>
+
+            <!-- ======================================================= -->
+            <!-- ZONE 2 — DÉTAIL (droite) : TabPane à 4 onglets           -->
+            <!-- ======================================================= -->
+            <VBox spacing="0" styleClass="permissions-panel" HBox.hgrow="ALWAYS">
+
+                <!-- Bandeau d'identité du sélectionné (toujours visible) -->
+                <HBox alignment="CENTER_LEFT" spacing="16" styleClass="user-detail-header">
+                    <padding>
+                        <Insets bottom="14" left="22" right="22" top="14" />
+                    </padding>
+
+                    <!-- Avatar initiales (composé depuis .avatar-badge) -->
+                    <StackPane styleClass="avatar-badge avatar-badge-grand">
+                        <Label fx:id="lblAvatarInitiales" text="—" />
+                    </StackPane>
+
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblNomComplet" styleClass="user-detail-title" text="Aucun employé sélectionné" />
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label fx:id="lblMatricule" styleClass="page-subtitle-light" text="" />
+                            <Label styleClass="page-subtitle-light" text="•" />
+                            <Label fx:id="lblPosteActuel" styleClass="page-subtitle-light" text="" />
+                            <Label styleClass="page-subtitle-light" text="•" />
+                            <Label fx:id="lblDepartementActuel" styleClass="page-subtitle-light" text="" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Pastille de statut (vert = actif) -->
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Region fx:id="dotStatut" styleClass="row-status-dot row-status-actif" />
+                        <Label fx:id="lblStatutBadge" styleClass="online-label" text="Actif" />
+                    </HBox>
+
+                    <Button fx:id="btnEditerSelection" onAction="#onEditerSelection" prefHeight="23.0" prefWidth="30.0" styleClass="btn-icon-light">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-edit-2" />
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <!-- Onglets (réutilise .rbac-tabs de style.css) -->
+                <TabPane fx:id="tabDetail" styleClass="rbac-tabs" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+                    <!-- ================================================ -->
+                    <!-- ONGLET 1 — IDENTITÉ                              -->
+                    <!-- ================================================ -->
+                    <Tab text="Identité">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-user" iconSize="14" />
+                        </graphic>
+                        <content>
+                            <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                                <VBox spacing="20">
+                                    <padding>
+                                        <Insets bottom="24" left="8" right="8" top="12" />
+                                    </padding>
+
+                                    <!-- Bloc photo + identité de base -->
+                                    <HBox alignment="TOP_LEFT" spacing="20">
+
+                                        <!-- Colonne photo -->
+                                        <VBox alignment="CENTER" spacing="10">
+                                            <StackPane styleClass="avatar-photo-clip photo-profil-cadre">
+                                                <ImageView fx:id="imgPhoto" fitHeight="120" fitWidth="100" preserveRatio="true" />
+                                                <Label fx:id="lblPhotoPlaceholder" styleClass="table-placeholder" text="Photo" />
+                                            </StackPane>
+                                            <Button fx:id="btnChangerPhoto" styleClass="btn-kebab-light" text="Changer">
+                                                <graphic>
+                                                    <FontIcon iconLiteral="fth-camera" iconSize="12" styleClass="icon-orange" />
+                                                </graphic>
+                                            </Button>
+                                        </VBox>
+
+                                        <GridPane hgap="16" vgap="12" HBox.hgrow="ALWAYS">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Nom *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldNom" promptText="Nom de famille" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Prénom" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldPrenom" promptText="Prénom(s)" styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Matricule *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldMatricule" promptText="Ex : PER-2024-001" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="Type *" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                            <ComboBox fx:id="comboTypePersonnel" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="Poste / Fonction *" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                            <ComboBox fx:id="comboPoste" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                            <Label styleClass="field-label" text="Qualification" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                            <TextField fx:id="fieldQualification" promptText="Ex : Master, Bac+3..." styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </HBox>
+
+                                    <Separator />
+
+                                    <!-- Bloc état civil -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="État civil" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Sexe" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <HBox alignment="CENTER_LEFT" spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                <ToggleButton fx:id="toggleSexeM" styleClass="type-toggle" text="Masculin" />
+                                                <ToggleButton fx:id="toggleSexeF" styleClass="type-toggle" text="Féminin" />
+                                            </HBox>
+
+                                            <Label styleClass="field-label" text="Date de naissance" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <DatePicker fx:id="pickerDateNaissance" maxWidth="Infinity" styleClass="date-picker-custom" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Lieu de naissance" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldLieuNaissance" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="Nationalité" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldNationalite" styleClass="input" text="Camerounaise" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="CNI / NIU" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                            <TextField fx:id="fieldCniNiu" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <!-- Bloc coordonnées -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="Coordonnées" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Téléphone" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldTelephone" promptText="+237 6XX XXX XXX" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Email" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldEmail" promptText="nom@exemple.cm" styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Contact urgence" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldContactUrgence" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="Adresse" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                            <TextArea fx:id="areaAdresse" prefRowCount="2" styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <!-- Bloc emploi -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="Emploi" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="120" prefWidth="140" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Statut contractuel" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <ComboBox fx:id="comboStatutContractuel" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Date d'embauche" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <DatePicker fx:id="pickerDateEmbauche" maxWidth="Infinity" styleClass="date-picker-custom" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Quota heures / semaine" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldQuotaHeures" promptText="Ex : 20.00" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                            <Label styleClass="field-label" text="Décharge heures" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                            <TextField fx:id="fieldDechargeHeures" styleClass="input" text="0.00" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <!-- Actions onglet Identité -->
+                                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                                        <padding>
+                                            <Insets top="10" />
+                                        </padding>
+                                        <Button fx:id="btnAnnulerIdentite" styleClass="btn-icon-light" text="Annuler" />
+                                        <Button fx:id="btnEnregistrerIdentite" onAction="#onEnregistrerIdentite" styleClass="button-primary" text="Enregistrer">
+                                            <graphic>
+                                                <FontIcon iconLiteral="fth-save" />
+                                            </graphic>
+                                        </Button>
+                                    </HBox>
+                                </VBox>
+                            </ScrollPane>
+                        </content>
+                    </Tab>
+
+                    <!-- ================================================ -->
+                    <!-- ONGLET 2 — DOSSIER RH                             -->
+                    <!-- ================================================ -->
+                    <Tab text="Dossier RH">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-briefcase" iconSize="14" />
+                        </graphic>
+                        <content>
+                            <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                                <VBox spacing="20">
+                                    <padding>
+                                        <Insets bottom="24" left="8" right="8" top="12" />
+                                    </padding>
+
+                                    <!-- Bloc rattachement -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="Rattachement hiérarchique" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Département" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <ComboBox fx:id="comboDepartement" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Responsable" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <ComboBox fx:id="comboResponsable" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Grade salarial" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                            <ComboBox fx:id="comboGrade" maxWidth="Infinity" styleClass="special-combo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <!-- Bloc protection sociale -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="Protection sociale" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Numéro CNPS" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldNumeroCNPS" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                            <Label styleClass="field-label" text="Enfants à charge" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                            <TextField fx:id="fieldEnfantsCharge" styleClass="input" text="0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <!-- Bloc mode de paiement -->
+                                    <VBox spacing="12" styleClass="special-container">
+                                        <Label styleClass="card-title" text="Mode de paiement" />
+
+                                        <GridPane hgap="16" vgap="12">
+                                            <columnConstraints>
+                                                <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+
+                                            <Label styleClass="field-label" text="Mode préféré" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                            <ComboBox fx:id="comboModePaiement" maxWidth="280" styleClass="special-combo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                        </GridPane>
+
+                                        <!-- Section conditionnelle : virement -->
+                                        <VBox fx:id="sectionVirement" spacing="12">
+                                            <Separator />
+                                            <GridPane hgap="16" vgap="12">
+                                                <columnConstraints>
+                                                    <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                    <ColumnConstraints hgrow="ALWAYS" />
+                                                    <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                    <ColumnConstraints hgrow="ALWAYS" />
+                                                </columnConstraints>
+
+                                                <Label styleClass="field-label" text="Banque" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                <TextField fx:id="fieldBanque" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                                <Label styleClass="field-label" text="Numéro de compte" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                                <TextField fx:id="fieldNumeroCompte" styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                                    <rowConstraints>
+                                       <RowConstraints />
+                                    </rowConstraints>
+                                            </GridPane>
+                                        </VBox>
+
+                                        <!-- Section conditionnelle : mobile money -->
+                                        <VBox fx:id="sectionMobileMoney" spacing="12">
+                                            <Separator />
+                                            <GridPane hgap="16" vgap="12">
+                                                <columnConstraints>
+                                                    <ColumnConstraints minWidth="140" prefWidth="160" />
+                                                    <ColumnConstraints hgrow="ALWAYS" />
+                                                </columnConstraints>
+
+                                                <Label styleClass="field-label" text="Numéro Mobile Money" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                <TextField fx:id="fieldNumeroMobileMoney" promptText="+237 6XX XXX XXX" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <rowConstraints>
+                                       <RowConstraints />
+                                    </rowConstraints>
+                                            </GridPane>
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- Actions onglet Dossier RH -->
+                                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                                        <padding>
+                                            <Insets top="10" />
+                                        </padding>
+                                        <Button fx:id="btnAnnulerDossier" styleClass="btn-icon-light" text="Annuler" />
+                                        <Button fx:id="btnEnregistrerDossier" onAction="#onEnregistrerDossier" styleClass="button-primary" text="Enregistrer le dossier">
+                                            <graphic>
+                                                <FontIcon iconLiteral="fth-save" />
+                                            </graphic>
+                                        </Button>
+                                    </HBox>
+                                </VBox>
+                            </ScrollPane>
+                        </content>
+                    </Tab>
+
+                    <!-- ================================================ -->
+                    <!-- ONGLET 3 — CONTRATS (placeholder Phase 2)         -->
+                    <!-- ================================================ -->
+                    <Tab text="Contrats">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-file-text" iconSize="14" />
+                        </graphic>
+                        <content>
+                            <VBox alignment="CENTER" spacing="16" styleClass="special-container">
+                                <padding>
+                                    <Insets bottom="80" left="40" right="40" top="80" />
+                                </padding>
+
+                                <StackPane styleClass="stat-icon icon-orange">
+                                    <FontIcon iconLiteral="fth-file-text" iconSize="22" />
+                                </StackPane>
+
+                                <Label styleClass="card-title" text="Gestion des contrats" />
+                                <Label styleClass="page-subtitle" text="Ce module sera disponible à la Phase 2. Vous pourrez y gérer les CDI, CDD, vacations et avenants." textAlignment="CENTER" wrapText="true" />
+
+                                <Label styleClass="event-tag tag-orange" text="Phase 2 — À venir" />
+                            </VBox>
+                        </content>
+                    </Tab>
+
+                    <!-- ================================================ -->
+                    <!-- ONGLET 4 — DOCUMENTS (placeholder Phase 2)        -->
+                    <!-- ================================================ -->
+                    <Tab text="Documents">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-folder" iconSize="14" />
+                        </graphic>
+                        <content>
+                            <VBox alignment="CENTER" spacing="16" styleClass="special-container">
+                                <padding>
+                                    <Insets bottom="80" left="40" right="40" top="80" />
+                                </padding>
+
+                                <StackPane styleClass="stat-icon icon-blue">
+                                    <FontIcon iconLiteral="fth-folder" iconSize="22" />
+                                </StackPane>
+
+                                <Label styleClass="card-title" text="Documents du personnel" />
+                                <Label styleClass="page-subtitle" text="Ce module sera disponible à la Phase 2. Vous pourrez y stocker CNI, diplômes, certificats et contrats signés." textAlignment="CENTER" wrapText="true" />
+
+                                <Label styleClass="event-tag tag-blue" text="Phase 2 — À venir" />
+                            </VBox>
+                        </content>
+                    </Tab>
+                </TabPane>
+            </VBox>
+        </HBox>
+
+        <!-- ============================================================ -->
+        <!-- PIED — RÉSUMÉ DU SÉLECTIONNÉ                                  -->
+        <!-- ============================================================ -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label fx:id="lblFooterSelection" styleClass="footer-info" text="Sélectionnez un employé pour voir son dossier" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblFooterContrat" styleClass="footer-info" text="" />
+            <padding>
+                <Insets bottom="-10.0" top="-10.0" />
+            </padding>
+            <VBox.margin>
+                <Insets bottom="-15.0" top="-15.0" />
+            </VBox.margin>
+        </HBox>
+    </VBox>
+
+</StackPane>

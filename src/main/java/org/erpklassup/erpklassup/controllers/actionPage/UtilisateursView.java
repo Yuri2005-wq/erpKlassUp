@@ -1,6 +1,5 @@
 package org.erpklassup.erpklassup.controllers.actionPage;
 
-import eu.hansolo.tilesfx.Command;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,12 +37,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class UtilisateursView implements Initializable, VueDisposable {
 
+    /* ============================================================
+       CHAMPS FXML
+       ============================================================ */
     @FXML private TextField searchField;
     @FXML private ComboBox<RoleOption> filterRole;
     @FXML private ComboBox<StatutCompte> filterStatut;
     @FXML private Button btnActionsGroupees;
     @FXML private Button btnAjouterUtilisateur;
-    private final AuditService auditService = new AuditService();
 
     @FXML private TableView<UtilisateurLigne> tableUtilisateurs;
     @FXML private TableColumn<UtilisateurLigne, Boolean> colSelect;
@@ -63,30 +64,47 @@ public class UtilisateursView implements Initializable, VueDisposable {
     @FXML private Label statSuspendusLabel;
     @FXML private Pagination paginationAudit;
 
-    private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    /* ============================================================
+       CONSTANTES
+       ============================================================ */
+    private static final DateTimeFormatter FORMAT_DATE =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final int TAILLE_PAGE = FiltreUtilisateur.TAILLE_PAGE_DEFAUT;
+    private static final Duration PERIODE_REFRESH = Duration.seconds(5);
 
+    /* ============================================================
+       SERVICES & ÉTAT
+       ============================================================ */
     private final UtilisateurService service = new UtilisateurService();
+    private final AuditService auditService = new AuditService();
+
     private final Set<String> selectionnes = new HashSet<>();
     private final PauseTransition debounceRecherche = new PauseTransition(Duration.millis(350));
     private final Runnable ecouteurPermissions = this::appliquerControlesAcces;
-
-    // ✅ ÉCOUTEUR i18n
     private final Runnable ecouteurI18n = this::rafraichirTextes;
 
     private String idEcoleCourante;
     private GestionnairePagination<UtilisateurLigne> gestionnairePagination;
+    private AutoRefreshService<List<UtilisateurLigne>> autoRefresh;
 
-    // ✅ Raccourci i18n
+    /* ============================================================
+       RACCOURCI i18n
+       ============================================================ */
     private I18nManager i18n() {
         return I18nManager.getInstance();
     }
 
+    /* ============================================================
+       INITIALISATION
+       ============================================================ */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         idEcoleCourante = SessionManager.getInstance().getIdEcoleCourante();
 
-        gestionnairePagination = new GestionnairePagination<>(tableUtilisateurs, paginationAudit, TAILLE_PAGE);
+        gestionnairePagination = new GestionnairePagination<>(
+                tableUtilisateurs, paginationAudit, TAILLE_PAGE,
+                UtilisateurLigne::idUtilisateur
+        );
 
         configurerTable();
         configurerFiltres();
@@ -96,7 +114,6 @@ public class UtilisateursView implements Initializable, VueDisposable {
         SessionManager.getInstance().ecouterChangementsPermissions(ecouteurPermissions);
         appliquerControlesAcces();
 
-        // ✅ S'abonner aux changements de langue
         i18n().ecouterChangement(ecouteurI18n);
 
         if (idEcoleCourante == null) {
@@ -106,38 +123,121 @@ public class UtilisateursView implements Initializable, VueDisposable {
 
         chargerRoles();
         lancerRecherche();
+        demarrerRafraichissementAuto();
     }
 
+    /* ============================================================
+       DISPOSE
+       ============================================================ */
     @Override
     public void disposer() {
+        if (autoRefresh != null) {
+            autoRefresh.dispose();
+            autoRefresh = null;
+        }
         SessionManager.getInstance().arreterEcoute(ecouteurPermissions);
-        i18n().arreterEcoute(ecouteurI18n);   // ✅
+        i18n().arreterEcoute(ecouteurI18n);
     }
 
-    /** ✅ Rafraîchit les textes dynamiques après changement de langue. */
+    /* ============================================================
+       AUTO-REFRESH
+       ============================================================ */
+    private void demarrerRafraichissementAuto() {
+        autoRefresh = new AutoRefreshService<List<UtilisateurLigne>>(PERIODE_REFRESH)
+                .loader(this::chargerUtilisateursPourRefresh)
+                .onBeforeLoad(() -> {
+                    if (tableUtilisateurs.getItems().isEmpty()) {
+                        tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.loading")));
+                    }
+                })
+                .onSuccess(this::appliquerResultatRefresh)
+                .onFailure(err -> {
+                    System.err.println("❌ Auto-refresh utilisateurs : " + err.getMessage());
+                    if (tableUtilisateurs.getItems().isEmpty()) {
+                        tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.error_loading")));
+                    }
+                })
+                .start();
+    }
+
+    private List<UtilisateurLigne> chargerUtilisateursPourRefresh() {
+        if (idEcoleCourante == null) return List.of();
+
+        RoleOption role = filterRole.getSelectionModel().getSelectedItem();
+        StatutCompte statut = filterStatut.getSelectionModel().getSelectedItem();
+
+        FiltreUtilisateur filtre = new FiltreUtilisateur(
+                idEcoleCourante,
+                (role != null) ? role.idRole() : null,
+                statut,
+                searchField.getText(),
+                1,
+                Integer.MAX_VALUE
+        );
+
+        ResultatPagine<UtilisateurLigne> resultat = service.rechercher(filtre);
+        return resultat != null ? resultat.elements() : List.of();
+    }
+
+    /* ============================================================
+       APPLIQUER LE RÉSULTAT (pattern FusionListeUtil)
+       ============================================================ */
+    private void appliquerResultatRefresh(List<UtilisateurLigne> resultat) {
+        if (resultat == null) return;
+
+        // ✅ Récupère la liste courante de la table pour la fusionner
+        ObservableList<UtilisateurLigne> listeCourante = tableUtilisateurs.getItems();
+
+        // ✅ Fusion en place : préserve sélection, ordre visuel, scroll
+        FusionListeUtil.fusionner(listeCourante, resultat, UtilisateurLigne::idUtilisateur);
+
+        // Le gestionnaire de pagination continue de fonctionner sur la liste mise à jour
+        gestionnairePagination.mettreAJourDonnees(listeCourante);
+
+        tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.no_user")));
+
+        // ✅ Restaure la sélection
+        selectionnes.removeIf(id -> resultat.stream()
+                .noneMatch(r -> r.idUtilisateur().equals(id)));
+        tableUtilisateurs.refresh();
+
+        mettreAJourStatistiques(resultat, resultat.size());
+        checkAllUsers.setSelected(false);
+    }
+
+    /* ============================================================
+       i18n
+       ============================================================ */
     private void rafraichirTextes() {
         if (tableUtilisateurs != null) {
             tableUtilisateurs.refresh();
         }
 
-        // Si la table est vide → mettre à jour le placeholder
         if (tableUtilisateurs != null && tableUtilisateurs.getItems().isEmpty()) {
             tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.no_user")));
         }
     }
 
+    /* ============================================================
+       CONTRÔLES D'ACCÈS
+       ============================================================ */
     private void appliquerControlesAcces() {
         ControleAcces.appliquerAction(btnAjouterUtilisateur, "user.creer");
         ControleAcces.appliquerAction(btnActionsGroupees, "user.activer");
         tableUtilisateurs.refresh();
     }
 
+    /* ============================================================
+       CONFIGURATION DE LA TABLE
+       ============================================================ */
     private void configurerTable() {
         tableUtilisateurs.setEditable(true);
 
+        // ---------- Colonne SELECT ----------
         colSelect.setCellValueFactory(data -> {
             UtilisateurLigne ligne = data.getValue();
-            SimpleBooleanProperty prop = new SimpleBooleanProperty(selectionnes.contains(ligne.idUtilisateur()));
+            SimpleBooleanProperty prop = new SimpleBooleanProperty(
+                    selectionnes.contains(ligne.idUtilisateur()));
             prop.addListener((obs, ancien, nouveau) -> {
                 if (Boolean.TRUE.equals(nouveau)) {
                     selectionnes.add(ligne.idUtilisateur());
@@ -162,22 +262,29 @@ public class UtilisateursView implements Initializable, VueDisposable {
             tableUtilisateurs.refresh();
         });
 
+        // ---------- Colonne UTILISATEUR ----------
         colUtilisateur.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
         colUtilisateur.setCellFactory(col -> new TableCell<>() {
             private final Label nomLabel = new Label();
             private final Label emailLabel = new Label();
             private final VBox texte = new VBox(2, nomLabel, emailLabel);
             private final HBox conteneur = new HBox(10);
+
             {
                 nomLabel.getStyleClass().add("cell-title");
                 emailLabel.getStyleClass().add("cell-subtitle");
             }
 
-            @Override protected void updateItem(UtilisateurLigne ligne, boolean vide) {
+            @Override
+            protected void updateItem(UtilisateurLigne ligne, boolean vide) {
                 super.updateItem(ligne, vide);
-                if (vide || ligne == null) { setGraphic(null); return; }
+                if (vide || ligne == null) {
+                    setGraphic(null);
+                    return;
+                }
                 conteneur.getChildren().setAll(
-                        AvatarUtil.creer(ligne.photoPath(), ligne.nom(), ligne.prenom(), ligne.idUtilisateur()),
+                        AvatarUtil.creer(ligne.photoPath(), ligne.nom(), ligne.prenom(),
+                                ligne.idUtilisateur()),
                         texte
                 );
                 conteneur.setAlignment(Pos.CENTER_LEFT);
@@ -187,7 +294,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
             }
         });
 
-        // ✅ Rôle — avec i18n pour "Aucun rôle"
+        // ---------- Colonne RÔLE ----------
         colRole.setCellValueFactory(data -> {
             String roles = data.getValue().roles();
             return new SimpleStringProperty(
@@ -196,14 +303,17 @@ public class UtilisateursView implements Initializable, VueDisposable {
                             : roles);
         });
 
-        // ✅ Statut — avec i18n pour les libellés
+        // ---------- Colonne STATUT ----------
         colStatut.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
         colStatut.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(UtilisateurLigne ligne, boolean vide) {
+            @Override
+            protected void updateItem(UtilisateurLigne ligne, boolean vide) {
                 super.updateItem(ligne, vide);
-                if (vide || ligne == null) { setGraphic(null); return; }
+                if (vide || ligne == null) {
+                    setGraphic(null);
+                    return;
+                }
 
-                // ✅ Libellé traduit selon l'énum
                 String libelle = switch (ligne.statut()) {
                     case ACTIF -> i18n().t("status.active");
                     case VERROUILLE -> i18n().t("status.locked");
@@ -211,31 +321,40 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 };
 
                 Label badge = new Label(libelle);
-                badge.getStyleClass().addAll("badge-statut", switch (ligne.statut()) {
-                    case ACTIF -> "badge-succes";
-                    case VERROUILLE -> "badge-danger";
-                    case INACTIF -> "badge-neutre";
+                badge.getStyleClass().addAll("event-tag", switch (ligne.statut()) {
+                    case ACTIF -> "tag-green";
+                    case VERROUILLE -> "tag-orange";
+                    case INACTIF -> "tag-red";
                 });
                 setGraphic(badge);
             }
         });
 
+        // ---------- Colonne SÉCURITÉ ----------
         colSecurite.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
         colSecurite.setCellFactory(col -> new TableCell<>() {
             private final FontIcon icone = new FontIcon();
-            @Override protected void updateItem(UtilisateurLigne ligne, boolean vide) {
+
+            @Override
+            protected void updateItem(UtilisateurLigne ligne, boolean vide) {
                 super.updateItem(ligne, vide);
-                if (vide || ligne == null) { setGraphic(null); return; }
+                if (vide || ligne == null) {
+                    setGraphic(null);
+                    return;
+                }
                 icone.setIconLiteral(ligne.deuxFacteursActif() ? "fth-shield" : "fth-shield-off");
-                icone.getStyleClass().setAll(ligne.deuxFacteursActif() ? "icone-actif" : "icone-inactif");
+                icone.getStyleClass().setAll(
+                        ligne.deuxFacteursActif() ? "icone-actif" : "icone-inactif");
                 setGraphic(icone);
             }
         });
 
-        // ✅ Dernière connexion — avec i18n pour "Jamais connecté"
-        colDerniereConnexion.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
+        // ---------- Colonne DERNIÈRE CONNEXION ----------
+        colDerniereConnexion.setCellValueFactory(data ->
+                new SimpleObjectProperty<>(data.getValue()));
         colDerniereConnexion.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(UtilisateurLigne ligne, boolean vide) {
+            @Override
+            protected void updateItem(UtilisateurLigne ligne, boolean vide) {
                 super.updateItem(ligne, vide);
                 setText(vide || ligne == null ? null
                         : ligne.derniereConnexion() != null
@@ -244,6 +363,7 @@ public class UtilisateursView implements Initializable, VueDisposable {
             }
         });
 
+        // ---------- Colonne ACTIONS ----------
         colActions.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button btnVoir = new Button();
@@ -276,7 +396,8 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 });
             }
 
-            @Override protected void updateItem(UtilisateurLigne ligne, boolean vide) {
+            @Override
+            protected void updateItem(UtilisateurLigne ligne, boolean vide) {
                 super.updateItem(ligne, vide);
                 if (vide || ligne == null) {
                     setGraphic(null);
@@ -293,6 +414,9 @@ public class UtilisateursView implements Initializable, VueDisposable {
         });
     }
 
+    /* ============================================================
+       CONFIGURATION DES FILTRES
+       ============================================================ */
     private void configurerFiltres() {
         ObservableList<StatutCompte> statuts = FXCollections.observableArrayList();
         statuts.add(null);
@@ -307,7 +431,6 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 if (empty || item == null) {
                     setText(i18n().t("users.filter.all_status"));
                 } else {
-                    // ✅ Libellé traduit
                     setText(switch (item) {
                         case ACTIF -> i18n().t("status.active");
                         case VERROUILLE -> i18n().t("status.locked");
@@ -319,10 +442,15 @@ public class UtilisateursView implements Initializable, VueDisposable {
         filterStatut.setButtonCell(filterStatut.getCellFactory().call(null));
         filterStatut.getSelectionModel().selectFirst();
 
-        filterStatut.getSelectionModel().selectedItemProperty().addListener((o, a, n) -> lancerRecherche());
-        filterRole.getSelectionModel().selectedItemProperty().addListener((o, a, n) -> lancerRecherche());
+        filterStatut.getSelectionModel().selectedItemProperty()
+                .addListener((o, a, n) -> lancerRecherche());
+        filterRole.getSelectionModel().selectedItemProperty()
+                .addListener((o, a, n) -> lancerRecherche());
     }
 
+    /* ============================================================
+       RECHERCHE
+       ============================================================ */
     private void configurerRecherche() {
         debounceRecherche.setOnFinished(e -> lancerRecherche());
 
@@ -344,11 +472,17 @@ public class UtilisateursView implements Initializable, VueDisposable {
         }
     }
 
+    /* ============================================================
+       BOUTONS HAUT NIVEAU
+       ============================================================ */
     private void configurerBoutonsHautNiveau() {
         btnAjouterUtilisateur.setOnAction(e -> ouvrirModalCreationUtilisateur());
         btnActionsGroupees.setOnAction(this::ouvrirActionsGroupees);
     }
 
+    /* ============================================================
+       CHARGEMENT DES RÔLES
+       ============================================================ */
     private void chargerRoles() {
         service.chargerRolesAsync(idEcoleCourante,
                 roles -> Platform.runLater(() -> {
@@ -373,6 +507,9 @@ public class UtilisateursView implements Initializable, VueDisposable {
                 erreur -> Platform.runLater(() -> afficherErreurDialogue(erreur)));
     }
 
+    /* ============================================================
+       RECHERCHE PRINCIPALE
+       ============================================================ */
     private void lancerRecherche() {
         if (idEcoleCourante == null) return;
 
@@ -391,13 +528,24 @@ public class UtilisateursView implements Initializable, VueDisposable {
         tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.loading")));
 
         service.rechercherAsync(filtre,
-                resultat -> Platform.runLater(() -> afficherResultat(resultat)),
+                resultat -> Platform.runLater(() -> {
+                    afficherResultat(resultat);
+                    if (autoRefresh != null && autoRefresh.isRunning()) {
+                        autoRefresh.restartNow();
+                    }
+                }),
                 erreur -> Platform.runLater(() -> {
-                    tableUtilisateurs.setPlaceholder(new Label(i18n().t("users.value.error_loading")));
+                    tableUtilisateurs.setPlaceholder(
+                            new Label(i18n().t("users.value.error_loading")));
                     afficherErreurDialogue(erreur);
                 }));
     }
 
+    /**
+     * Affiche le résultat d'une recherche EXPLICITE (changement de filtre,
+     * recherche manuelle). Dans ce cas on remplace la liste, car l'utilisateur
+     * a explicitement demandé un nouveau jeu de résultats.
+     */
     private void afficherResultat(ResultatPagine<UtilisateurLigne> resultat) {
         List<UtilisateurLigne> liste = resultat.elements();
 
@@ -410,6 +558,9 @@ public class UtilisateursView implements Initializable, VueDisposable {
         selectionnes.clear();
     }
 
+    /* ============================================================
+       MODALES
+       ============================================================ */
     private void ouvrirModalCreationUtilisateur() {
         String fxmlPath = "/org/erpklassup/erpklassup/view/create-user-view.fxml";
 
@@ -429,22 +580,25 @@ public class UtilisateursView implements Initializable, VueDisposable {
 
     private void ouvrirModalEditionUtilisateur(UtilisateurLigne ligne) {
         if (ligne == null) return;
-
         String fxmlPath = "/org/erpklassup/erpklassup/view/user-detail-admin-page.fxml";
 
         UserDetailController ctrl = ModalUtil.ouvrirModal(
                 getClass(),
                 fxmlPath,
-                i18n().t("users.modal.edit.title"),
+                i18n().t("users.modal.update.title"),
                 tableUtilisateurs.getScene().getWindow(),
-                806,
-                668
+                695,
+                680
         );
+
         if (ctrl != null) {
             ctrl.initData(this.idEcoleCourante, ligne, this::lancerRecherche);
         }
     }
 
+    /* ============================================================
+       SUPPRESSION
+       ============================================================ */
     private void supprimerUtilisateur(UtilisateurLigne ligne) {
         Boolean confirmation = AlertUtil.afficherConfirmation(
                 i18n().t("users.confirm.delete.title"),
@@ -453,17 +607,18 @@ public class UtilisateursView implements Initializable, VueDisposable {
         );
 
         if (confirmation) {
-            Command lancerRecherche = this::lancerRecherche;
             service.supprimerAsync(ligne.idUtilisateur(),
                     () -> Platform.runLater(() -> {
                         auditService.tracerActionAsync("HABILITATIONS", "SUPPRESSION_UTILISATEUR",
                                 "Utilisateur Supprimé : " + ligne.nomComplet());
-                        ToastNotification.succes((Stage) tableUtilisateurs.getScene().getWindow(),
+                        ToastNotification.succes(
+                                (Stage) tableUtilisateurs.getScene().getWindow(),
                                 i18n().t("users.toast.deleted", ligne.nomComplet()));
                         lancerRecherche();
                     }),
                     erreur -> Platform.runLater(() -> {
-                        ToastNotification.erreur((Stage) tableUtilisateurs.getScene().getWindow(),
+                        ToastNotification.erreur(
+                                (Stage) tableUtilisateurs.getScene().getWindow(),
                                 i18n().t("users.toast.error_delete", erreur.getMessage()));
                         System.err.println(erreur);
                     })
@@ -471,6 +626,9 @@ public class UtilisateursView implements Initializable, VueDisposable {
         }
     }
 
+    /* ============================================================
+       ACTIONS GROUPÉES
+       ============================================================ */
     private void ouvrirActionsGroupees(ActionEvent event) {
         if (selectionnes.isEmpty()) {
             AlertUtil.afficherInformation(
@@ -495,17 +653,19 @@ public class UtilisateursView implements Initializable, VueDisposable {
                     tableUtilisateurs.getScene().getWindow()
             );
             if (confirmation) {
-                Command lancerRecherche = this::lancerRecherche;
                 service.supprimerEnMasseAsync(new HashSet<>(selectionnes),
                         () -> Platform.runLater(() -> {
-                            auditService.tracerActionAsync("HABILITATIONS", "SUPPRESSION_UTILISATEUR",
+                            auditService.tracerActionAsync("HABILITATIONS",
+                                    "SUPPRESSION_UTILISATEUR",
                                     "Utilisateur(s) " + selectionnes + " supprimé(s)");
-                            ToastNotification.succes((Stage) tableUtilisateurs.getScene().getWindow(),
+                            ToastNotification.succes(
+                                    (Stage) tableUtilisateurs.getScene().getWindow(),
                                     i18n().t("users.toast.deleted_bulk"));
                             lancerRecherche();
                         }),
                         erreur -> Platform.runLater(() ->
-                                ToastNotification.erreur((Stage) tableUtilisateurs.getScene().getWindow(),
+                                ToastNotification.erreur(
+                                        (Stage) tableUtilisateurs.getScene().getWindow(),
                                         i18n().t("users.toast.error_delete", erreur.getMessage())))
                 );
             }
@@ -528,6 +688,9 @@ public class UtilisateursView implements Initializable, VueDisposable {
         }
     }
 
+    /* ============================================================
+       ERREURS
+       ============================================================ */
     private void afficherErreurDialogue(Throwable erreur) {
         new Alert(Alert.AlertType.ERROR,
                 erreur != null && erreur.getMessage() != null
@@ -535,7 +698,11 @@ public class UtilisateursView implements Initializable, VueDisposable {
                         : i18n().t("common.error")).showAndWait();
     }
 
-    private void mettreAJourStatistiques(List<UtilisateurLigne> listeUtilisateurs, long totalElements) {
+    /* ============================================================
+       STATISTIQUES
+       ============================================================ */
+    private void mettreAJourStatistiques(List<UtilisateurLigne> listeUtilisateurs,
+                                         long totalElements) {
         if (listeUtilisateurs == null) {
             mettreAJourEtAnimer(statTotalLabel, "0");
             mettreAJourEtAnimer(statConnectesLabel, "0");
@@ -595,7 +762,8 @@ public class UtilisateursView implements Initializable, VueDisposable {
         final Node conteneurCarte = carte;
         String styleOrigine = conteneurCarte.getStyle();
 
-        conteneurCarte.setStyle(styleOrigine + "; -fx-background-color: rgba(255, 165, 0, 0.30); -fx-background-radius: 6px;");
+        conteneurCarte.setStyle(styleOrigine
+                + "; -fx-background-color: rgba(255, 165, 0, 0.30); -fx-background-radius: 6px;");
 
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(e -> conteneurCarte.setStyle(styleOrigine));

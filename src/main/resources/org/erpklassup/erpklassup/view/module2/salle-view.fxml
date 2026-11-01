@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.SalleController">
+
+    <VBox spacing="16" VBox.vgrow="ALWAYS">
+        <padding><Insets bottom="20" left="24" right="24" top="20" /></padding>
+
+        <!-- ==================== TOOLBAR ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <!-- Recherche -->
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
+                <TextField fx:id="searchSalleField" promptText="Rechercher une salle..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                <Button fx:id="clearSearchSalle" styleClass="btn-clear-search">
+                    <graphic><FontIcon iconLiteral="fth-x" iconSize="10" /></graphic>
+                </Button>
+            </HBox>
+
+            <!-- Filtres -->
+            <ComboBox fx:id="filtreTypeCombo" prefWidth="180" promptText="Tous les types" styleClass="combo-box" />
+            <ComboBox fx:id="filtreBatimentCombo" prefWidth="160" promptText="Tous les bâtiments" styleClass="special-combo" />
+            <ComboBox fx:id="filtreOccupationCombo" prefWidth="150" promptText="Toutes" styleClass="special-combo" />
+
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox spacing="0" styleClass="lang-selector">
+                <ToggleButton fx:id="btnVueCartes" prefHeight="32" selected="true" styleClass="lang-btn, lang-btn-left" text="Cartes">
+                    <graphic><FontIcon iconLiteral="fth-grid" iconSize="12" /></graphic>
+               <toggleGroup>
+                  <ToggleGroup fx:id="groupVue" />
+               </toggleGroup>
+                </ToggleButton>
+                <ToggleButton fx:id="btnVueTable" prefHeight="32" styleClass="lang-btn, lang-btn-right" text="Tableau" toggleGroup="$groupVue">
+                    <graphic><FontIcon iconLiteral="fth-list" iconSize="12" /></graphic>
+                </ToggleButton>
+            </HBox>
+
+            <!-- Bouton Nouvelle salle -->
+            <Button fx:id="btnNouvelleSalle" styleClass="button-primary" text="Nouvelle salle">
+                <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" /></graphic>
+            </Button>
+
+            <!-- Toggle vue Cartes / Tableau -->
+            <fx:define>
+                <ToggleGroup fx:id="groupVue" />
+            </fx:define>
+        </HBox>
+
+        <!-- ==================== BANDEAU STATISTIQUES ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <!-- Total -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32;                                   -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-blue">
+                    <FontIcon iconLiteral="fth-home" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Total" />
+                    <Label fx:id="statTotalSalles" styleClass="stat-number" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- Libres -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32;                                   -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-green">
+                    <FontIcon iconLiteral="fth-check-circle" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Libres" />
+                    <Label fx:id="statSallesLibres" styleClass="stat-number stat-success" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- Occupées -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32;                                   -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-red">
+                    <FontIcon iconLiteral="fth-x-circle" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Occupées" />
+                    <Label fx:id="statSallesOccupees" styleClass="stat-number stat-danger" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- Capacité totale -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32;                                   -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-orange">
+                    <FontIcon iconLiteral="fth-users" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Capacité" />
+                    <Label fx:id="statCapaciteTotale" styleClass="stat-number" text="0" />
+                </VBox>
+            </HBox>
+        </HBox>
+
+        <!-- ==================== VUE CARTES ==================== -->
+        <ScrollPane fx:id="scrollCartes" fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
+            <FlowPane fx:id="cartesPane" alignment="TOP_LEFT" hgap="20" prefWrapLength="2000.0" styleClass="salles-flow-pane" vgap="20">
+                <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
+            </FlowPane>
+        </ScrollPane>
+
+        <!-- ==================== VUE TABLEAU (cachée) ==================== -->
+        <VBox fx:id="containerTable" managed="false" spacing="8" visible="false" VBox.vgrow="ALWAYS">
+
+            <TableView fx:id="tableSalles" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colSalleCode" prefWidth="120" text="Code" />
+                    <TableColumn fx:id="colSalleNom" prefWidth="180" text="Nom" />
+                    <TableColumn fx:id="colSalleBatiment" prefWidth="140" text="Bâtiment" />
+                    <TableColumn fx:id="colSalleType" prefWidth="180" text="Type" />
+                    <TableColumn fx:id="colSalleCapacite" prefWidth="100" text="Capacité" />
+                    <TableColumn fx:id="colSalleStatut" prefWidth="140" text="Statut" />
+                    <TableColumn fx:id="colSalleActions" prefWidth="140" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                </columns>
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="8">
+                        <FontIcon iconLiteral="fth-home" iconSize="32" style="-fx-icon-color: #CBD5E1;" />
+                        <Label styleClass="table-placeholder" text="Aucune salle enregistrée" />
+                    </VBox>
+                </placeholder>
+            </TableView>
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="table-footer">
+                <Label fx:id="footerInfoSalle" styleClass="footer-info" text="0 salle" />
+                <Region HBox.hgrow="ALWAYS" />
+            </HBox>
+        </VBox>
+    </VBox>
+
+</StackPane>

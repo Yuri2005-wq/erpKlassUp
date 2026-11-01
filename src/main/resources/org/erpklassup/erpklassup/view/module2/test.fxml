@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.DatePicker?>
+<StackPane fx:id="rootStack" prefHeight="700.0" prefWidth="1000.0"
+           stylesheets="@../../style.css"
+           xmlns="http://javafx.com/javafx/26"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.PeriodeEvaluationController">
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- COUCHE 1 : Vue principale (timeline)            -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <AnchorPane fx:id="mainLayer">
+
+        <VBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+              AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+              spacing="0">
+
+            <!-- ─── HEADER ─── -->
+            <VBox spacing="0" style="-fx-background-color: white; -fx-border-color: transparent transparent #E4E4E7 transparent; -fx-border-width: 0 0 1 0;">
+                <padding><Insets top="20" right="28" bottom="18" left="28" /></padding>
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox spacing="4">
+                        <Label text="Périodes d'évaluation"
+                               style="-fx-font-size: 22px; -fx-font-weight: 700; -fx-text-fill: #18181B;" />
+                        <Label fx:id="lblResume"
+                               text="Chargement…"
+                               style="-fx-font-size: 12px; -fx-text-fill: #71717A;" />
+                    </VBox>
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Button fx:id="btnGenererStructure"
+                            onAction="#onGenererStructureStandard"
+                            styleClass="button-secondary"
+                            text="Structure standard">
+                        <graphic><FontIcon iconLiteral="fth-zap" /></graphic>
+                    </Button>
+
+                    <Button fx:id="btnNouvellePeriode"
+                            onAction="#onNouvellePeriodeRacine"
+                            styleClass="button-primary"
+                            text="Nouvelle période">
+                        <graphic><FontIcon iconLiteral="fth-plus-circle" /></graphic>
+                    </Button>
+                </HBox>
+
+                <!-- Barre de contexte année + mode -->
+                <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+                    <Label fx:id="lblAnneeContexte"
+                           text="Année : —"
+                           style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #3F3F46;" />
+                    <Label text="•" style="-fx-text-fill: #D4D4D8;" />
+                    <Label fx:id="lblModeConsultation"
+                           text=""
+                           style="-fx-font-size: 11px;" />
+                </HBox>
+            </VBox>
+
+            <!-- ─── TIMELINE (scroll) ─── -->
+            <ScrollPane fx:id="scrollTimeline"
+                        fitToWidth="true"
+                        VBox.vgrow="ALWAYS"
+                        style="-fx-background: #FAFAFA; -fx-background-color: #FAFAFA;">
+
+                <VBox fx:id="timelineContainer"
+                      spacing="16"
+                      style="-fx-padding: 24 28 24 28;">
+
+                    <!-- Les TrimestreCard sont injectés ici par le controller -->
+
+                    <!-- État vide -->
+                    <VBox fx:id="emptyStateBox"
+                          alignment="CENTER"
+                          spacing="18"
+                          visible="false"
+                          managed="false"
+                          style="-fx-padding: 80 20;">
+                        <FontIcon iconLiteral="fth-calendar"
+                                  style="-fx-icon-size: 56px; -fx-icon-color: #D4D4D8;" />
+                        <Label text="Aucune période pour cette année"
+                               style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #3F3F46;" />
+                        <Label text="Commence par générer la structure standard (3 trimestres + 9 séquences) ou crée une période manuellement."
+                               wrapText="true"
+                               textAlignment="CENTER"
+                               maxWidth="420"
+                               style="-fx-font-size: 12px; -fx-text-fill: #71717A;" />
+                        <HBox spacing="10">
+                            <Button onAction="#onGenererStructureStandard"
+                                    styleClass="button-primary"
+                                    text="Générer la structure">
+                                <graphic><FontIcon iconLiteral="fth-zap" /></graphic>
+                            </Button>
+                            <Button onAction="#onNouvellePeriodeRacine"
+                                    styleClass="button-secondary"
+                                    text="Créer manuellement">
+                                <graphic><FontIcon iconLiteral="fth-plus" /></graphic>
+                            </Button>
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+
+        </VBox>
+    </AnchorPane>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- COUCHE 2 : Drawer d'édition (overlay)          -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <AnchorPane fx:id="drawerLayer"
+                visible="false"
+                managed="false"
+                AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- Scrim : clic pour fermer -->
+        <AnchorPane fx:id="drawerScrim"
+                    onMouseClicked="#onFermerDrawer"
+                    AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                    AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                    style="-fx-background-color: rgba(24,24,27,0.35);" />
+
+        <!-- Panneau drawer (ancré à droite) -->
+        <VBox fx:id="drawerPanel"
+              prefWidth="440"
+              maxWidth="440"
+              AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+              AnchorPane.rightAnchor="0"
+              style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 24, 0, -6, 0);">
+
+            <!-- Header drawer -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-padding: 20 24 16 24; -fx-border-color: transparent transparent #F4F4F5 transparent; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblDrawerTitre"
+                           text="Nouvelle période"
+                           style="-fx-font-size: 16px; -fx-font-weight: 700;" />
+                    <Label fx:id="lblDrawerSousTitre"
+                           text=""
+                           style="-fx-font-size: 11px; -fx-text-fill: #71717A;" />
+                </VBox>
+                <Button onAction="#onFermerDrawer"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;">
+                    <graphic><FontIcon iconLiteral="fth-x" style="-fx-icon-color: #71717A;" /></graphic>
+                </Button>
+            </HBox>
+
+            <!-- Corps scrollable -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        style="-fx-background: white; -fx-background-color: white;">
+                <VBox spacing="22" style="-fx-padding: 24;">
+
+                    <!-- SECTION : Type -->
+                    <VBox spacing="8">
+                        <Label text="TYPE DE PÉRIODE"
+                               style="-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #A1A1AA;" />
+                        <HBox spacing="8">
+                            <Button fx:id="btnTypeTrimestre"
+                                    onAction="#onTypeTrimestre"
+                                    maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                    styleClass="type-chip"
+                                    text="Trimestre">
+                                <graphic><FontIcon iconLiteral="fth-layers" /></graphic>
+                            </Button>
+                            <Button fx:id="btnTypeSequence"
+                                    onAction="#onTypeSequence"
+                                    maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                    styleClass="type-chip"
+                                    text="Séquence">
+                                <graphic><FontIcon iconLiteral="fth-file-text" /></graphic>
+                            </Button>
+                        </HBox>
+                    </VBox>
+
+                    <!-- SECTION : Identité -->
+                    <VBox spacing="10">
+                        <Label text="IDENTITÉ"
+                               style="-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #A1A1AA;" />
+                        <VBox spacing="6">
+                            <Label text="Libellé" styleClass="field-label" />
+                            <TextField fx:id="champLibelle"
+                                       promptText="Ex : Trimestre 1"
+                                       styleClass="input" />
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Code" styleClass="field-label" />
+                            <TextField fx:id="champCode"
+                                       promptText="Ex : T1, SEQ1"
+                                       styleClass="input" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- SECTION : Planification -->
+                    <VBox spacing="10">
+                        <Label text="PLANIFICATION"
+                               style="-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #A1A1AA;" />
+                        <HBox spacing="12">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Début" styleClass="field-label" />
+                                <DatePicker fx:id="champDateDebut"
+                                            maxWidth="Infinity"
+                                            styleClass="date-picker-custom" />
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Fin" styleClass="field-label" />
+                                <DatePicker fx:id="champDateFin"
+                                            maxWidth="Infinity"
+                                            styleClass="date-picker-custom" />
+                            </VBox>
+                        </HBox>
+                        <VBox fx:id="boxPoids" spacing="6" visible="false" managed="false">
+                            <Label text="Poids d'agrégation" styleClass="field-label" />
+                            <TextField fx:id="champPoids"
+                                       promptText="1.00"
+                                       styleClass="input" />
+                        </VBox>
+                    </VBox>
+
+                    <!-- SECTION : Statut (uniquement en édition) -->
+                    <VBox fx:id="boxStatutEdit" spacing="10" visible="false" managed="false">
+                        <Label text="STATUT"
+                               style="-fx-font-size: 10px; -fx-font-weight: 700; -fx-text-fill: #A1A1AA;" />
+                        <HBox alignment="CENTER_LEFT" spacing="12"
+                              style="-fx-background-color: #FAFAFA; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #E4E4E7; -fx-border-radius: 8;">
+                            <FontIcon fx:id="icoStatut"
+                                      iconLiteral="fth-unlock"
+                                      style="-fx-icon-color: #71717A; -fx-icon-size: 20px;" />
+                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                <Label fx:id="lblStatutTitre"
+                                       text="Période ouverte"
+                                       style="-fx-font-size: 13px; -fx-font-weight: 600;" />
+                                <Label fx:id="lblStatutDesc"
+                                       text="La saisie des notes est autorisée."
+                                       style="-fx-font-size: 11px; -fx-text-fill: #71717A;"
+                                       wrapText="true" />
+                            </VBox>
+                            <Button fx:id="btnBasculerStatut"
+                                    onAction="#onBasculerStatut"
+                                    styleClass="button-secondary"
+                                    text="Clôturer" />
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+
+            <!-- Footer drawer : actions -->
+            <HBox alignment="CENTER_RIGHT" spacing="10"
+                  style="-fx-padding: 16 24; -fx-border-color: #F4F4F5 transparent transparent transparent; -fx-border-width: 1 0 0 0; -fx-background-color: #FAFAFA;">
+                <Button fx:id="btnSupprimerDrawer"
+                        onAction="#onSupprimer"
+                        visible="false" managed="false"
+                        styleClass="button-danger-outline"
+                        text="Supprimer">
+                    <graphic><FontIcon iconLiteral="fth-trash-2" /></graphic>
+                </Button>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#onFermerDrawer"
+                        styleClass="button-secondary"
+                        text="Annuler" />
+                <Button fx:id="btnEnregistrerDrawer"
+                        onAction="#onEnregistrer"
+                        styleClass="button-primary"
+                        text="Enregistrer">
+                    <graphic><FontIcon iconLiteral="fth-check" /></graphic>
+                </Button>
+            </HBox>
+
+        </VBox>
+    </AnchorPane>
+
+</StackPane>

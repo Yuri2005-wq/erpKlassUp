@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefHeight="720.0" prefWidth="920.0" spacing="0" styleClass="content-area" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.PersonnelFormController">
+
+    <!-- ==================== BANDEAU D'EN-TÊTE STYLE ODOO ==================== -->
+    <VBox prefHeight="116.0" prefWidth="920.0" spacing="16" style="-fx-background-color: #16213A; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;">
+        <padding>
+            <Insets bottom="16" left="24" right="24" top="20" />
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <!-- Emplacement Photo de Profil -->
+            <StackPane style="-fx-min-width: 64; -fx-min-height: 64; -fx-max-width: 64; -fx-max-height: 64; -fx-background-color: #F1F5F9; -fx-background-radius: 12; -fx-border-color: #CBD5E1; -fx-border-radius: 12; -fx-cursor: hand;" styleClass="avatar-photo-clip">
+                <VBox alignment="CENTER" prefHeight="95.0" prefWidth="85.0" spacing="2">
+                    <FontIcon iconLiteral="fth-camera" iconSize="20" styleClass="icon-gray" />
+                    <Label style="-fx-font-size: 9px; -fx-text-fill: #64748B; -fx-font-weight: bold;" text="PHOTO" />
+                </VBox>
+            </StackPane>
+
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;" text="Nouveau Membre du Personnel" />
+                    <Label fx:id="lblMatriculePreview" styleClass="tag-neutral" text="Matricule : AUTO-GEN" />
+                </HBox>
+                <Label styleClass="page-subtitle" text="Saisie de la fiche employé et configuration de l'accès applicatif" />
+            </VBox>
+
+            <!-- Status Quick Badges Odoo Style -->
+            <VBox alignment="TOP_RIGHT" spacing="6">
+                <HBox alignment="CENTER_RIGHT" spacing="6">
+                    <Label styleClass="stat-label" text="Statut Emploi :" />
+                    <ComboBox fx:id="comboStatutEmploi" prefWidth="130" styleClass="combo-box" />
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- ==================== FORMULAIRE PAR ONGLETS (STYLE ERP) ==================== -->
+    <TabPane styleClass="top-tab-pane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+
+            <!-- 👤 ONGLET 1 : IDENTITÉ & CIVILITÉ -->
+            <Tab text="Identité &amp; Civilité">
+                <graphic><FontIcon iconLiteral="fth-user" iconSize="14" styleClass="tab-icon" /></graphic>
+                <content>
+                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                        <VBox spacing="20">
+                            <padding>
+                                <Insets bottom="20" left="24" right="24" top="20" />
+                            </padding>
+
+                            <!-- Carte : Identité Légale -->
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fth-user-check" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="État Civil &amp; Identité Légale" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <!-- Nom -->
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Nom de famille *" />
+                                        <TextField fx:id="txtNom" promptText="ex: KAMGA" styleClass="input" />
+                                        <Label fx:id="errNom" managed="false" styleClass="field-error" visible="false" />
+                                    </VBox>
+
+                                    <!-- Prénom -->
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Prénom(s)" />
+                                        <TextField fx:id="txtPrenom" promptText="ex: Alain Thierry" styleClass="input" />
+                                    </VBox>
+
+                                    <!-- Sexe -->
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Sexe *" />
+                                        <ComboBox fx:id="comboSexe" maxWidth="Infinity" promptText="Sélectionner le sexe" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <!-- Situation Matrimoniale -->
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Situation Matrimoniale" />
+                                        <ComboBox fx:id="comboSituationMatrimoniale" maxWidth="Infinity" promptText="Sélectionner..." styleClass="combo-box" />
+                                    </VBox>
+
+                                    <!-- Date de Naissance -->
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Date de Naissance" />
+                                        <DatePicker fx:id="dpDateNaissance" maxWidth="Infinity" styleClass="date-picker-custom" />
+                                    </VBox>
+
+                                    <!-- Lieu de Naissance -->
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Lieu de Naissance" />
+                                        <TextField fx:id="txtLieuNaissance" promptText="ex: Yaoundé" styleClass="input" />
+                                    </VBox>
+
+                                    <!-- Nationalité -->
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Nationalité" />
+                                        <TextField fx:id="txtNationalite" styleClass="input" text="Camerounaise" />
+                                    </VBox>
+
+                                    <!-- Nombre d'enfants -->
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Nombre d'enfants à charge" />
+                                        <TextField fx:id="txtNombreEnfants" promptText="0" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+
+                            <!-- Carte : Coordonnées & Contacts -->
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fth-phone-call" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="Coordonnées &amp; Urgence" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Téléphone principal" />
+                                        <TextField fx:id="txtTelephone" promptText="ex: 699000000" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Adresse e-mail" />
+                                        <TextField fx:id="txtEmail" promptText="ex: employe@ecole.cm" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Ville de résidence" />
+                                        <TextField fx:id="txtVille" promptText="ex: Douala" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Adresse / Quartier" />
+                                        <TextField fx:id="txtAdresse" promptText="ex: Bastos, Rue 1.040" styleClass="input" />
+                                    </VBox>
+
+                                    <!-- Contacts Urgence -->
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Nom de la personne à contacter en cas d'urgence" />
+                                        <TextField fx:id="txtContactUrgenceNom" promptText="ex: M. KAMGA Pierre" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Téléphone d'urgence" />
+                                        <TextField fx:id="txtContactUrgence" promptText="ex: 677000000" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </content>
+            </Tab>
+
+            <!-- 💼 ONGLET 2 : POSTE & CONTRAT -->
+            <Tab text="Poste &amp; Structure">
+                <graphic><FontIcon iconLiteral="fas-user-tie" iconSize="14" styleClass="tab-icon" /></graphic>
+                <content>
+                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                        <VBox spacing="20">
+                            <padding>
+                                <Insets bottom="20" left="24" right="24" top="20" />
+                            </padding>
+
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fas-sitemap" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="Affectation Organisationnelle" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Type de Personnel *" />
+                                        <ComboBox fx:id="comboTypePersonnel" maxWidth="Infinity" promptText="Sélectionner..." styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Département *" />
+                                        <ComboBox fx:id="comboDepartement" maxWidth="Infinity" promptText="Sélectionner le département" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Poste rattaché" />
+                                        <ComboBox fx:id="comboPoste" maxWidth="Infinity" promptText="Sélectionner le poste" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Poste ou Fonction (Intitulé libre) *" />
+                                        <TextField fx:id="txtPosteOuFonction" promptText="ex: Enseignant d'Anglais" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Responsable hiérarchique" />
+                                        <ComboBox fx:id="comboResponsable" maxWidth="Infinity" promptText="Sélectionner le N+1" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Qualification / Diplôme principal" />
+                                        <TextField fx:id="txtQualification" promptText="ex: Master en Sciences de l'Éducation" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fth-file-text" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="Contrat &amp; Volume Horaire" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Statut Contractuel" />
+                                        <ComboBox fx:id="comboStatutContractuel" maxWidth="Infinity" promptText="Sélectionner le type de contrat" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Matricule Fonction Publique (si détaché)" />
+                                        <TextField fx:id="txtMatriculeFonctionPublique" promptText="ex: 789456-X" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Date d'embauche" />
+                                        <DatePicker fx:id="dpDateEmbauche" maxWidth="Infinity" styleClass="date-picker-custom" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Quota d'heures hebdo." />
+                                        <TextField fx:id="txtQuotaHeuresHebdo" promptText="ex: 40.0" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </content>
+            </Tab>
+
+            <!-- 💳 ONGLET 3 : PAIE & ADMINISTRATIF -->
+            <Tab text="Paie &amp; Administratif">
+                <graphic><FontIcon iconLiteral="fth-credit-card" iconSize="14" styleClass="tab-icon" /></graphic>
+                <content>
+                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                        <VBox spacing="20">
+                            <padding>
+                                <Insets bottom="20" left="24" right="24" top="20" />
+                            </padding>
+
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fth-dollar-sign" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="Modalités de Règlement" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Mode de Paiement" />
+                                        <ComboBox fx:id="comboModePaiement" maxWidth="Infinity" styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Nom de la Banque" />
+                                        <TextField fx:id="txtNomBanque" promptText="ex: BICEC, Afriland, UBA..." styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="IBAN ou RIB" />
+                                        <TextField fx:id="txtIbanOuRib" promptText="ex: CM21 1000 5000 0000 0000 00" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Numéro Mobile Money / Orange Money" />
+                                        <TextField fx:id="txtNumeroMobileMoney" promptText="ex: 650000000" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+
+                            <VBox spacing="14" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <StackPane styleClass="card-title-icon"><FontIcon iconLiteral="fth-shield" iconSize="16" /></StackPane>
+                                    <Label styleClass="card-title" text="Identifiants Fiscaux &amp; Sociaux" />
+                                </HBox>
+
+                                <GridPane hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="N° de CNI / Passeport" />
+                                        <TextField fx:id="txtNumeroCni" promptText="ex: 102345678" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="NIU (Numéro Identifiant Unique)" />
+                                        <TextField fx:id="txtNiu" promptText="ex: M0123456789A" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="N° CNPS" />
+                                        <TextField fx:id="txtNumCnps" promptText="ex: 350-0100000-00" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </content>
+            </Tab>
+
+            <!-- 🔐 ONGLET 4 : COMPTE UTILISATEUR (ACCÈS SYSTÈME) -->
+            <Tab text="Compte Utilisateur">
+                <graphic><FontIcon iconLiteral="fth-lock" iconSize="14" styleClass="tab-icon" /></graphic>
+                <content>
+                    <ScrollPane fitToWidth="true" styleClass="page-scroll">
+                        <VBox spacing="20">
+                            <padding>
+                                <Insets bottom="20" left="24" right="24" top="20" />
+                            </padding>
+
+                            <VBox spacing="16" styleClass="special-container">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <CheckBox fx:id="chkCreerCompteUser" styleClass="remember-checkbox" />
+                                    <VBox spacing="2">
+                                        <Label styleClass="card-title" text="Créer un compte d'accès ERPKlassUp pour ce membre du personnel" />
+                                        <Label styleClass="page-subtitle" text="Permet à l'employé de se connecter à la plateforme selon le rôle attribué." />
+                                    </VBox>
+                                </HBox>
+
+                                <Separator />
+
+                                <GridPane fx:id="gridCompteUser" hgap="16" vgap="12">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                    </columnConstraints>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Nom d'utilisateur (Login) *" />
+                                        <TextField fx:id="txtUsername" promptText="ex: akamga" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Rôle d'accès *" />
+                                        <ComboBox fx:id="comboRole" maxWidth="Infinity" promptText="Sélectionner le rôle..." styleClass="combo-box" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Mot de passe *" />
+                                        <PasswordField fx:id="txtPassword" promptText="••••••••" styleClass="input" />
+                                    </VBox>
+
+                                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Confirmer le mot de passe *" />
+                                        <PasswordField fx:id="txtPasswordConfirm" promptText="••••••••" styleClass="input" />
+                                    </VBox>
+                                    <rowConstraints><RowConstraints /><RowConstraints /></rowConstraints>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </content>
+            </Tab>
+
+        </tabs>
+    </TabPane>
+
+    <!-- Erreur globale -->
+    <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true">
+        <VBox.margin>
+            <Insets left="24" right="24" top="8" />
+        </VBox.margin>
+    </Label>
+
+    <!-- ==================== BAS DE PAGE : ACTIONS ==================== -->
+    <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-background-color: #FFFFFF; -fx-border-color: #E2E8F0; -fx-border-width: 1 0 0 0;">
+        <padding>
+            <Insets bottom="16" left="24" right="24" top="16" />
+        </padding>
+        <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler" />
+        <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer le personnel">
+            <graphic><FontIcon iconLiteral="fth-save" iconSize="16" /></graphic>
+        </Button>
+    </HBox>
+
+</VBox>

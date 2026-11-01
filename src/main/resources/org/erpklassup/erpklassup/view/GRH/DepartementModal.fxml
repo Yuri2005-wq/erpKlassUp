@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="560.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.DepartementModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== En-tête ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon fx:id="iconModal" iconLiteral="fas-sitemap" iconSize="36" styleClass="icon-orange" />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label fx:id="lblTitreModal" text="Nouveau département" textFill="#1E293B">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSousTitreModal" text="Renseignez les informations de la structure organisationnelle" textFill="#64748B">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+            <VBox.margin>
+                <Insets bottom="-15.0" top="-15.0" />
+            </VBox.margin>
+        </HBox>
+
+        <Separator />
+
+        <!-- ===== Formulaire ===== -->
+        <VBox spacing="14.0">
+            <children>
+
+                <!-- Code + Libellé -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox prefWidth="160.0" spacing="6.0">
+                            <children>
+                                <Label text="Code *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtCode" promptText="ex: DEP-MATH" styleClass="input" />
+                                <Label fx:id="errCode" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Nom du département *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtLibelle" promptText="ex: Mathématiques &amp; Informatique" styleClass="input" />
+                                <Label fx:id="errLibelle" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Type + Sous-système (Bilinguisme) -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Type de département *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboType" maxWidth="Infinity" styleClass="combo-box" />
+                                <Label fx:id="errType" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Sous-système *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboSousSysteme" maxWidth="Infinity" styleClass="combo-box" />
+                                <Label fx:id="errSousSysteme" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Département Parent (Hiérarchie) + Code MINESEC/MINESUP -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Rattaché à (Département parent)" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboDepartementParent" maxWidth="Infinity" promptText="Aucun (Département racine)" styleClass="combo-box" />
+                            </children>
+                        </VBox>
+                        <VBox prefWidth="180.0" spacing="6.0">
+                            <children>
+                                <Label text="Code MINESEC / Homologation" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtCodeMineduc" promptText="ex: CE-MAT-01" styleClass="input" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Responsables (Titulaire & Adjoint) -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Chef de département (Responsable)" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboResponsable" maxWidth="Infinity" promptText="Sélectionner un employé" styleClass="combo-box" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Responsable adjoint" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboResponsableAdjoint" maxWidth="Infinity" promptText="Sélectionner un adjoint" styleClass="combo-box" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Budget + Effectif Max + Statut -->
+                <HBox spacing="12.0">
+                    <children>
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Budget annuel (FCFA)" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtBudgetAnnuel" promptText="ex: 2500000" styleClass="input" />
+                                <Label fx:id="errBudget" managed="false" styleClass="field-error" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox prefWidth="120.0" spacing="6.0">
+                            <children>
+                                <Label text="Effectif max" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtEffectifMax" promptText="ex: 15" styleClass="input" />
+                            </children>
+                        </VBox>
+                        <VBox prefWidth="150.0" spacing="6.0">
+                            <children>
+                                <Label text="Statut *" textFill="#334155">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboStatut" maxWidth="Infinity" styleClass="combo-box" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Option Conseil d'Enseignement (Spécificité Cameroun) -->
+                <CheckBox fx:id="chkConseilEnseignement" styleClass="remember-checkbox" text="Activer comme Conseil d'Enseignement (CE Pédagogique MINESEC)" textFill="#334155">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </CheckBox>
+
+                <!-- Description / Remarques -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Description / Remarques" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextArea fx:id="txtDescription" prefRowCount="2" promptText="Missions principales ou périmètre d'intervention..." styleClass="input" wrapText="true" />
+                    </children>
+                </VBox>
+
+                <!-- Message d'erreur global -->
+                <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+            </children>
+        </VBox>
+
+        <!-- ===== Actions ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                    <graphic>
+                        <FontIcon iconLiteral="fth-save" iconSize="12" styleClass="icon-orange" />
+                    </graphic>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--<?import com.erpklassup.grh.fiche.ChampLecture?>-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import org.erpklassup.erpklassup.util.grh.ChampLecture?>
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.FichePersonnelController"
+            styleClass="fiche-scroll" fitToWidth="true" hbarPolicy="NEVER">
+    <content>
+        <VBox spacing="14">
+            <padding>
+                <Insets bottom="14"/>
+            </padding>
+
+            <VBox styleClass="fiche-card" spacing="14">
+                <Label text="État civil" styleClass="carte-titre"/>
+                <GridPane hgap="24" vgap="16">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <ChampLecture fx:id="nom" libelle="Nom" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="prenom" libelle="Prénom" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="sexe" libelle="Sexe" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="dateNaissance" libelle="Date de naissance" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <ChampLecture fx:id="lieuNaissance" libelle="Lieu de naissance" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <ChampLecture fx:id="nationalite" libelle="Nationalité" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <ChampLecture fx:id="situationFamiliale" libelle="Situation familiale" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                </GridPane>
+            </VBox>
+
+            <VBox styleClass="fiche-card" spacing="14">
+                <Label text="Coordonnées" styleClass="carte-titre"/>
+                <GridPane hgap="24" vgap="16">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <ChampLecture fx:id="telephone" libelle="Téléphone" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="email" libelle="E-mail" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="ville" libelle="Ville" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="adresse" libelle="Adresse" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
+                </GridPane>
+            </VBox>
+
+            <VBox styleClass="fiche-card" spacing="14">
+                <Label text="Contact d'urgence" styleClass="carte-titre"/>
+                <GridPane hgap="24" vgap="16">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <ChampLecture fx:id="urgenceNom" libelle="Nom complet" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="urgenceTelephone" libelle="Téléphone" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                </GridPane>
+            </VBox>
+
+            <VBox styleClass="fiche-card" spacing="14">
+                <Label text="Identifiants administratifs" styleClass="carte-titre"/>
+                <GridPane hgap="24" vgap="16">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                        <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                    </columnConstraints>
+                    <ChampLecture fx:id="numeroCni" libelle="N° de CNI" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="numeroCnps" libelle="N° CNPS" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <ChampLecture fx:id="niu" libelle="NIU (contribuable)" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                </GridPane>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

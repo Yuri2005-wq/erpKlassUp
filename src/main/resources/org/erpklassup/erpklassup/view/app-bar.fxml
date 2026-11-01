@@ -19,9 +19,38 @@
 
     <children>
 
+        <!-- ===== FIL D'ARIANE ===== -->
+        <Region maxWidth="280.0" prefWidth="280.0" HBox.hgrow="ALWAYS" />
+        <HBox alignment="CENTER_LEFT" spacing="6.0" styleClass="breadcrumb-box">
+
+            <Label fx:id="breadcrumbParent"
+                   styleClass="breadcrumb-parent"
+                   text=""
+                   visible="false" managed="false"/>
+
+            <Label fx:id="breadcrumbSeparator1"
+                   styleClass="breadcrumb-separator"
+                   text="›"
+                   visible="false" managed="false"/>
+
+            <Label fx:id="breadcrumbSection"
+                   styleClass="breadcrumb-section"
+                   text=""/>
+
+            <Label fx:id="breadcrumbSeparator2"
+                   styleClass="breadcrumb-separator"
+                   text="›"
+                   visible="false" managed="false"/>
+
+            <Label fx:id="breadcrumbSousSection"
+                   styleClass="breadcrumb-sub"
+                   text=""
+                   visible="false" managed="false"/>
+        </HBox>
+
         <Region HBox.hgrow="ALWAYS" />
 
-        <!-- ===== ZONE DESINFORMATIONS DU SYSTÈME ET PROFIL ===== -->
+        <!-- ===== ZONE D'INFORMATIONS DU SYSTÈME ET PROFIL ===== -->
         <HBox alignment="CENTER" spacing="16.0">
             <children>
 
@@ -33,7 +62,6 @@
                     </children>
                 </HBox>
 
-                <!-- Séparateur visuel léger -->
                 <Region styleClass="bar-divider" />
 
                 <!-- 2. Date du Jour -->
@@ -44,10 +72,23 @@
                     </children>
                 </HBox>
 
-                <!-- Séparateur visuel léger -->
                 <Region styleClass="bar-divider" />
 
-                <!-- 3. Commutateur de Langue (FR / EN) -->
+                <!-- 3. ✅ NOUVEAU — Badge Année Active -->
+                <HBox fx:id="anneeActiveBadge" alignment="CENTER" spacing="6.0"
+                      styleClass="info-badge, annee-active-badge"
+                      onMouseClicked="#handleChangerAnnee">
+                    <children>
+                        <Circle fx:id="anneeActiveDot" radius="4.0"
+                                styleClass="annee-active-dot" />
+                        <Label fx:id="lblAnneeActive" styleClass="annee-active-text"
+                               text="—" />
+                    </children>
+                </HBox>
+
+                <Region styleClass="bar-divider" />
+
+                <!-- 4. Commutateur de Langue (FR / EN) -->
                 <HBox alignment="CENTER" styleClass="lang-selector">
                     <children>
                         <ToggleButton fx:id="btnLangFr" selected="true" styleClass="lang-btn, lang-btn-left" text="FR">
@@ -59,10 +100,9 @@
                     </children>
                 </HBox>
 
-                <!-- Séparateur visuel léger -->
                 <Region styleClass="bar-divider" />
 
-                <!-- 4. Bloc Profil Utilisateur Connecté -->
+                <!-- 5. Bloc Profil Utilisateur Connecté -->
                 <HBox fx:id="userProfilBox" alignment="CENTER_LEFT" onMouseClicked="#handleOuvrirProfil" prefHeight="50.0" prefWidth="173.0" spacing="10" style="-fx-padding: 6 12; -fx-background-radius: 8; -fx-cursor: hand;">
 
                     <StackPane style="-fx-min-width: 36; -fx-min-height: 36;                       -fx-max-width: 36; -fx-max-height: 36;                       -fx-background-color: #F5A524;                       -fx-background-radius: 50%;">

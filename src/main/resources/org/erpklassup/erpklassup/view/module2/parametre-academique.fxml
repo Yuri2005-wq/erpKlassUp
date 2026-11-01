@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+    Écran générique de paramétrage — "famille 1"
+    Regroupe les tables de référence simples : Niveau, Filiere, GroupeMatiere.
+    Salle n'apparaît pas ici, elle a déjà sa propre vue en cartes (salle-card).
+
+    Un seul tiroir latéral partagé entre les 3 onglets : le controller affiche/masque
+    blocChampsNiveau selon l'onglet actif et adapte les libellés/placeholders.
+-->
+
+<StackPane fx:id="rootStack" prefHeight="716.0" prefWidth="899.0" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.AcademiqueController">
+
+    <!-- ============ CONTENU PRINCIPAL ============ -->
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="10.0" left="24.0" right="24.0" top="10.0" />
+        </padding>
+
+        <!-- En-tête de page -->
+        <VBox spacing="2">
+            <Label styleClass="page-subtitle" text="Niveaux, filières et groupes de matières de l'établissement" />
+        </VBox>
+
+        <!-- Barre d'outils -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNouveau" styleClass="button-primary" text="Nouveau">
+                <graphic>
+                    <FontIcon iconLiteral="fth-plus-circle" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Onglets Niveaux / Filières / Groupes de matières -->
+        <TabPane fx:id="tabsStructure" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+            <Tab text="Niveaux">
+                <VBox spacing="10">
+                    <TableView fx:id="tableNiveaux" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucun niveau enregistré" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colNiveauNom" prefWidth="220" text="Niveau" />
+                            <TableColumn fx:id="colNiveauSysteme" prefWidth="130" text="Système" />
+                            <TableColumn fx:id="colNiveauCycle" prefWidth="150" text="Cycle" />
+                            <TableColumn fx:id="colNiveauOrdre" prefWidth="121.5999755859375" text="Ordre" />
+                            <TableColumn fx:id="colNiveauActions" prefWidth="224.0" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="lblFooterNiveaux" prefHeight="19.0" prefWidth="83.0" styleClass="footer-info" text="0 niveau" />
+                        <Region maxHeight="56.0" HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationNiveaux" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                  <padding>
+                     <Insets bottom="-10.0" top="-10.0" />
+                  </padding>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <Tab text="Filières">
+                <VBox spacing="10">
+                    <TableView fx:id="tableFilieres" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucune filière enregistrée" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colFiliereCode" prefWidth="122.4000244140625" text="Code" />
+                            <TableColumn fx:id="colFiliereNom" prefWidth="466.3999328613281" text="Filière" />
+                            <TableColumn fx:id="colFiliereActions" prefWidth="255.20001220703125" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="lblFooterFilieres" styleClass="footer-info" text="0 filière" />
+                        <Region prefHeight="21.0" prefWidth="573.0" HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationFilieres" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                  <padding>
+                     <Insets bottom="-10.0" top="-15.0" />
+                  </padding>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <Tab text="Groupes de matières">
+                <VBox spacing="10">
+                    <TableView fx:id="tableGroupes" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucun groupe de matières enregistré" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colGroupeCode" prefWidth="100" text="Code" />
+                            <TableColumn fx:id="colGroupeNom" prefWidth="260" text="Groupe" />
+                            <TableColumn fx:id="colGroupeOrdre" prefWidth="189.59994506835938" text="Ordre" />
+                            <TableColumn fx:id="colGroupeActions" prefWidth="295.20001220703125" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="lblFooterGroupes" styleClass="footer-info" text="0 groupe" />
+                        <Region prefHeight="48.0" prefWidth="631.0" HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationGroupes" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                  <padding>
+                     <Insets bottom="-10.0" top="-15.0" />
+                  </padding>
+                    </HBox>
+                </VBox>
+            </Tab>
+         <styleClass>
+            <String fx:value="top-tab-pane" />
+            <String fx:value="tabs-arrondis-structure" />
+         </styleClass>
+
+        </TabPane>
+    </VBox>
+
+    <!-- ============ VOILE DE FOND DU TIROIR ============ -->
+    <Region fx:id="drawerScrim" managed="false" styleClass="drawer-scrim" visible="false" />
+
+    <!-- ============ TIROIR CRÉATION / ÉDITION (partagé entre les 3 onglets) ============ -->
+    <HBox fx:id="drawerWrapper" alignment="CENTER_RIGHT" managed="false" pickOnBounds="false" visible="false">
+        <VBox fx:id="drawerPanel" maxWidth="380" prefWidth="380" spacing="18" styleClass="special-container">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="20" />
+            </padding>
+
+            <!-- En-tête du tiroir -->
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="drawerTitre" styleClass="card-title" text="Nouveau niveau" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button styleClass="btn-icon-light">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-x" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <Separator />
+
+            <!-- Champs communs à Niveau / Filiere / GroupeMatiere -->
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Code" />
+                <TextField fx:id="champCode" promptText="Ex : C, A4, TI..." styleClass="input" />
+            </VBox>
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Libellé" />
+                <TextField fx:id="champLibelle" promptText="Ex : Terminale, Sciences Mathématiques..." styleClass="input" />
+            </VBox>
+
+            <!-- Bloc spécifique à l'onglet Niveaux — masqué (visible/managed=false) sur Filières et Groupes -->
+            <VBox fx:id="blocChampsNiveau" spacing="14">
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Système" />
+                    <ComboBox fx:id="comboSysteme" maxWidth="Infinity" styleClass="special-combo" />
+                </VBox>
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Cycle" />
+                    <ComboBox fx:id="comboCycle" maxWidth="Infinity" styleClass="special-combo" />
+                </VBox>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Ordre d'affichage" />
+                <TextField fx:id="champOrdre" promptText="0" styleClass="input" />
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label styleClass="field-label" text="Actif" />
+                <Region HBox.hgrow="ALWAYS" />
+                <ToggleButton fx:id="toggleActif" selected="true" styleClass="toggle-switch" text="Actif" />
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <!-- Pied du tiroir -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button styleClass="btn-icon-light" text="Annuler" />
+                <Button fx:id="btnEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-check" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+        </VBox>
+    </HBox>
+
+</StackPane>

@@ -55,7 +55,7 @@
                                     <!-- ===== 1. PILOTAGE ===== -->
                                     <Label styleClass="nav-section-label" text="%sidebar.pilotage" />
 
-                                    <Button fx:id="btnDashboard" onAction="#handleDashboardHome" prefWidth="Infinity" styleClass="nav-item, active" text="%sidebar.dashboard">
+                                    <Button fx:id="btnDashboard" onAction="#handleDashboardHome" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.dashboard">
                                         <graphic><FontIcon iconLiteral="fth-grid" iconSize="16" /></graphic>
                                     </Button>
 
@@ -205,9 +205,27 @@
                                     <!-- ===== 7. SYSTÈME ===== -->
                                     <Label styleClass="nav-section-label" text="%sidebar.systeme" />
 
-                                    <Button fx:id="btnSettings" onAction="#handleSettings" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.settings">
-                                        <graphic><FontIcon iconLiteral="fth-settings" iconSize="16" /></graphic>
-                                    </Button>
+
+                                    <VBox spacing="1.0">
+                                        <Button fx:id="btnSettings" onAction="#toggleSousMenu" prefWidth="Infinity" styleClass="nav-item" >
+                                            <graphic>
+                                                <HBox alignment="CENTER_LEFT" spacing="12.0" HBox.hgrow="ALWAYS">
+                                                    <FontIcon iconLiteral="fth-settings" iconSize="16" />
+                                                    <Label text="%sidebar.settings" HBox.hgrow="ALWAYS" style="-fx-text-fill: inherit;" />
+                                                    <FontIcon fx:id="chevronSettings" iconLiteral="fth-chevron-down" iconSize="12" />
+                                                </HBox>
+                                            </graphic>
+                                        </Button>
+                                        <VBox fx:id="sousMenuSettings" spacing="1.0" managed="false" visible="false" styleClass="sous-menu">
+                                            <Button onAction="#handleSettings" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Configuration Pédagogique">
+                                                <graphic><FontIcon iconLiteral="fth-layers" iconSize="14" /></graphic>
+                                            </Button>
+
+                                            <Button onAction="#handleEcole" prefWidth="Infinity" styleClass="nav-item, sous-item" text="Configuration infos Ecole">
+                                                <graphic><FontIcon iconLiteral="fas-school" iconSize="14" /></graphic>
+                                            </Button>
+                                        </VBox>
+                                    </VBox>
 
                                     <Button fx:id="btnUtilisateurs" onAction="#handleUtilisateurs" prefWidth="Infinity" styleClass="nav-item" text="%sidebar.users">
                                         <graphic><FontIcon iconLiteral="fth-shield" iconSize="16" /></graphic>

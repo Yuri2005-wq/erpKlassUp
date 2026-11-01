@@ -11,6 +11,9 @@ import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerCasseTitre;
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerMajuscules;
+
 public class RoleModalController {
 
     @FXML private Label lblTitreModal;
@@ -20,6 +23,10 @@ public class RoleModalController {
     @FXML private CheckBox chkIsActive;
     @FXML private Button btnAnnuler;
     @FXML private Button btnEnregistrer;
+
+    RolesPermissionsTabController controller = new RolesPermissionsTabController();
+    Button btn = controller.getBtnNouveauRole();
+
 
     private final RoleService roleService = new RoleService();
     private final AuditService auditService = new AuditService();
@@ -46,6 +53,8 @@ public class RoleModalController {
         if (lblSousTitreModal != null) lblSousTitreModal.setText(i18n().t("role.modal.create.subtitle"));
         if (btnEnregistrer != null) btnEnregistrer.setText(i18n().t("role.modal.create.button"));
         if (chkIsActive != null) chkIsActive.setSelected(true);
+
+        forcerMajuscules(txtNomRole);
     }
 
     /**
@@ -68,6 +77,8 @@ public class RoleModalController {
         if (btnEnregistrer != null) {
             btnEnregistrer.setText(i18n().t("common.save"));
         }
+
+        forcerMajuscules(txtNomRole);
     }
 
     @FXML
@@ -147,4 +158,5 @@ public class RoleModalController {
         Stage stage = (Stage) btnEnregistrer.getScene().getWindow();
         stage.close();
     }
+
 }

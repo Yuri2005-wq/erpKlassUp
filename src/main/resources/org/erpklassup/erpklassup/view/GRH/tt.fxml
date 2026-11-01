@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane styleClass="fiche-page" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.AppBarController">
+
+    <VBox spacing="14">
+        <padding>
+            <Insets bottom="14" left="18" right="18" top="14" />
+        </padding>
+
+        <!-- Barre d'actions -->
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Button  styleClass="btn-ghost" text="Retour à la liste">
+                <graphic><FontIcon iconLiteral="fth-arrow-left" /></graphic>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button  styleClass="btn-secondaire" text="Imprimer la fiche">
+                <graphic><FontIcon iconLiteral="fth-printer" /></graphic>
+            </Button>
+            <Button  styleClass="btn-primaire" text="Modifier">
+                <graphic><FontIcon iconLiteral="fth-edit-2" /></graphic>
+            </Button>
+        </HBox>
+
+        <!-- Bandeau d'erreur de chargement -->
+        <HBox fx:id="bandeauErreur" alignment="CENTER_LEFT" managed="false" spacing="10" styleClass="bandeau-erreur" visible="false">
+            <FontIcon iconLiteral="fth-alert-circle" />
+            <Label fx:id="lblErreur" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS" />
+            <Button  styleClass="btn-secondaire" text="Réessayer" />
+        </HBox>
+
+        <!-- En-tête de la fiche -->
+        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="fiche-card">
+            <StackPane styleClass="fiche-avatar">
+                <Label fx:id="lblInitiales" styleClass="fiche-avatar-texte" />
+            </StackPane>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblNomComplet" styleClass="fiche-nom" />
+                <Label fx:id="lblMeta" styleClass="fiche-meta" />
+                <HBox spacing="6">
+                    <Label fx:id="badgeStatut" />
+                    <Label fx:id="badgeContrat" />
+                </HBox>
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox minWidth="110" spacing="3" styleClass="metrique">
+                <Label styleClass="metrique-libelle" text="Ancienneté" />
+                <Label fx:id="lblAnciennete" styleClass="metrique-valeur" />
+            </VBox>
+            <Separator orientation="VERTICAL" />
+            <VBox minWidth="110" spacing="3" styleClass="metrique">
+                <Label styleClass="metrique-libelle" text="Solde de congés" />
+                <Label fx:id="lblSoldeConges" styleClass="metrique-valeur" />
+            </VBox>
+        </HBox>
+
+        <!-- Onglets -->
+        <TabPane fx:id="onglets" styleClass="fiche-tabs" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <Tab text="Identité">
+                <graphic><FontIcon iconLiteral="fth-user" /></graphic>
+                <content>
+                    <fx:include fx:id="ficheIdentite" source="fiche-employe-identite.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Contrat">
+                <graphic><FontIcon iconLiteral="fth-briefcase" /></graphic>
+                <content>
+                    <fx:include fx:id="ficheContrat" source="fiche-employe-contrat.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Congés">
+                <graphic><FontIcon iconLiteral="fth-calendar" /></graphic>
+                <content>
+                    <fx:include fx:id="ficheConges" source="fiche-employe-conges.fxml" />
+                </content>
+            </Tab>
+            <Tab fx:id="ongletPaie" text="Paie">
+                <graphic><FontIcon iconLiteral="fth-file-text" /></graphic>
+                <content>
+                    <fx:include fx:id="fichePaie" source="fiche-employe-paie.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Documents">
+                <graphic><FontIcon iconLiteral="fth-folder" /></graphic>
+                <content>
+                    <fx:include fx:id="ficheDocuments" source="fiche-employe-documents.fxml" />
+                </content>
+            </Tab>
+        </TabPane>
+    </VBox>
+
+    <!-- Voile de chargement -->
+    <StackPane fx:id="voile" styleClass="voile" visible="false">
+        <ProgressIndicator maxHeight="44" maxWidth="44" />
+    </StackPane>
+</StackPane>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.PersonnelController">
+
+    <VBox spacing="16" VBox.vgrow="ALWAYS">
+        <padding><Insets bottom="20" left="24" right="24" top="20" /></padding>
+
+        <!-- ==================== TOOLBAR ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <!-- Recherche -->
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
+                <TextField fx:id="searchPersonnelField" promptText="Rechercher un employé (nom, matricule, poste)..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                <Button fx:id="clearSearchPersonnel" styleClass="btn-clear-search">
+                    <graphic><FontIcon iconLiteral="fth-x" iconSize="10" /></graphic>
+                </Button>
+            </HBox>
+
+            <!-- Filtres Odoo RH -->
+            <ComboBox fx:id="filtreDepartementCombo" prefWidth="180" promptText="Tous les départements" styleClass="combo-box" />
+            <ComboBox fx:id="filtreStatutCombo" prefWidth="150" promptText="Tous les statuts" styleClass="special-combo" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Commutateur de Vue (Cartes Kanban / Tableau) -->
+            <HBox spacing="0" styleClass="lang-selector">
+                <ToggleButton fx:id="btnVueCartes" prefHeight="32" selected="true" styleClass="lang-btn, lang-btn-left" text="Kanban">
+                    <graphic><FontIcon iconLiteral="fth-grid" iconSize="12" /></graphic>
+                    <toggleGroup>
+                        <ToggleGroup fx:id="groupVue" />
+                    </toggleGroup>
+                </ToggleButton>
+                <ToggleButton fx:id="btnVueTable" prefHeight="32" styleClass="lang-btn, lang-btn-right" text="Liste" toggleGroup="$groupVue">
+                    <graphic><FontIcon iconLiteral="fth-list" iconSize="12" /></graphic>
+                </ToggleButton>
+            </HBox>
+
+            <!-- Action Création -->
+            <Button fx:id="btnNouveauPersonnel" styleClass="button-primary" text="Créer un employé">
+                <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="14" /></graphic>
+            </Button>
+        </HBox>
+
+        <!-- ==================== BANDEAU STATISTIQUES ODOO ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <!-- Total Employés -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32; -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-blue">
+                    <FontIcon iconLiteral="fth-users" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Effectif total" />
+                    <Label fx:id="statTotalPersonnel" styleClass="stat-number" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- En poste (Actifs) -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32; -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-green">
+                    <FontIcon iconLiteral="fth-check-circle" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="En poste" />
+                    <Label fx:id="statActifs" styleClass="stat-number stat-success" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- En congé / Absents -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32; -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-orange">
+                    <FontIcon iconLiteral="fth-clock" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="En congé" />
+                    <Label fx:id="statEnConge" styleClass="stat-number" text="0" />
+                </VBox>
+            </HBox>
+
+            <!-- Départ / Inactifs -->
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10" styleClass="stat-card-compact" HBox.hgrow="ALWAYS">
+                <StackPane style="-fx-min-width:32; -fx-min-height:32; -fx-max-width:32; -fx-max-height:32;" styleClass="stat-icon icon-sm icon-red">
+                    <FontIcon iconLiteral="fth-user-x" iconSize="14" />
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="stat-card-label" text="Inactifs" />
+                    <Label fx:id="statInactifs" styleClass="stat-number stat-danger" text="0" />
+                </VBox>
+            </HBox>
+        </HBox>
+
+        <!-- ==================== VUE CARTES KANBAN (STYLE ODOO RH) ==================== -->
+        <ScrollPane fx:id="scrollCartes" fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
+            <FlowPane fx:id="cartesPane" alignment="TOP_LEFT" hgap="20" prefWrapLength="2000.0" styleClass="salles-flow-pane" vgap="20">
+                <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
+            </FlowPane>
+        </ScrollPane>
+
+        <!-- ==================== VUE TABLEAU ==================== -->
+        <VBox fx:id="containerTable" managed="false" spacing="8" visible="false" VBox.vgrow="ALWAYS">
+
+            <TableView fx:id="tablePersonnel" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colEmploye" prefWidth="240" text="Employé" />
+                    <TableColumn fx:id="colMatricule" prefWidth="120" text="Matricule" />
+                    <TableColumn fx:id="colPoste" prefWidth="180" text="Poste / Fonction" />
+                    <TableColumn fx:id="colDepartement" prefWidth="160" text="Département" />
+                    <TableColumn fx:id="colContact" prefWidth="180" text="Contact" />
+                    <TableColumn fx:id="colStatut" prefWidth="110" text="Statut" />
+                    <TableColumn fx:id="colActions" prefWidth="100" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                </columns>
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="8">
+                        <FontIcon iconLiteral="fth-users" iconSize="32" style="-fx-icon-color: #CBD5E1;" />
+                        <Label styleClass="table-placeholder" text="Aucun employé trouvé" />
+                    </VBox>
+                </placeholder>
+            </TableView>
+
+            <!-- Pied de page -->
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="table-footer">
+                <Label fx:id="footerInfoPersonnel" styleClass="footer-info" text="0 employé" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Pagination fx:id="pagination" maxPageIndicatorCount="5" pageCount="1" styleClass="custom-pagination" />
+            </HBox>
+        </VBox>
+    </VBox>
+
+</StackPane>

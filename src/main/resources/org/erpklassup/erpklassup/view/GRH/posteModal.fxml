@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="560.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.PosteModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== En-tête ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon fx:id="iconModal" iconLiteral="fth-briefcase" iconSize="36" styleClass="icon-orange" />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label fx:id="lblTitreModal" text="Nouveau poste" textFill="#1E293B">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSousTitreModal" text="Renseignez les informations du poste professionnel" textFill="#64748B">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Separator />
+
+        <!-- ===== Formulaire ===== -->
+        <VBox spacing="16.0">
+            <children>
+
+                <!-- Intitulé du poste -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Intitulé du poste *" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtIntitule" promptText="ex: Professeur de Mathématiques" styleClass="input" />
+                        <Label fx:id="errIntitule" managed="false" styleClass="field-error" visible="false" />
+                    </children>
+                </VBox>
+
+                <!-- Département de rattachement -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Département de rattachement" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="comboDepartement" maxWidth="Infinity" promptText="Sélectionner un département..." styleClass="combo-box" />
+                        <Label fx:id="errDepartement" managed="false" styleClass="field-error" visible="false" />
+                    </children>
+                </VBox>
+
+                <!-- Catégorie -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Catégorie" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="comboCategorie" maxWidth="Infinity" promptText="Sélectionner une catégorie..." styleClass="combo-box" />
+                    </children>
+                </VBox>
+
+                <!-- Description -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Description / Missions" textFill="#334155">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtDescription" prefHeight="15.0" prefWidth="504.0" promptText="Résumé des missions et responsabilités..." styleClass="input" />
+                    </children>
+                </VBox>
+
+                <!-- Case : Actif -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-padding: 12;">
+                    <children>
+                        <FontIcon iconLiteral="fth-check-circle" iconSize="16" styleClass="icon-orange" />
+                        <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Poste actif" textFill="#16213A">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Rendre ce poste disponible pour les affectations" textFill="#64748B">
+                                    <font>
+                                        <Font size="11.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <CheckBox fx:id="chkEstActif" styleClass="remember-checkbox" />
+                    </children>
+                </HBox>
+
+                <!-- Erreur globale -->
+                <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+            </children>
+        </VBox>
+
+        <!-- ===== Actions ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

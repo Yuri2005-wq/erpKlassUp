@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+    Écran "Années scolaires".
+    Le bandeau du haut affiche le cycle de vie (PREPARATION -> EN_COURS -> CLOTUREE -> ARCHIVEE)
+    de l'année courante via le composant stepper déjà utilisé dans la modale de création de compte
+    (step-circle / step-num / step-label / step-connector). Le controller bascule les styleClass
+    ".active" / ".completed" sur les cercles et connecteurs selon le statut réel.
+-->
+
+<StackPane fx:id="rootStack" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.controller.academique.AnneeScolaireController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <VBox spacing="2" styleClass="page-header">
+            <Label styleClass="page-title" text="Années scolaires" />
+            <Label styleClass="page-subtitle" text="Cycle de vie des années scolaires de l'établissement" />
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher une année..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNouvelleAnnee" onAction="#onNouvelleAnnee" styleClass="button-primary" text="Nouvelle année">
+                <graphic>
+                    <FontIcon iconLiteral="fth-plus" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Bandeau "Année en cours" avec stepper de statut -->
+        <VBox spacing="18" styleClass="card">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <HBox alignment="CENTER" styleClass="stat-icon, icon-orange">
+                    <FontIcon iconLiteral="fth-calendar" styleClass="card-title-icon" />
+                </HBox>
+                <VBox spacing="1">
+                    <Label fx:id="lblAnneeCouranteLibelle" styleClass="card-title" text="Aucune année active" />
+                    <Label fx:id="lblAnneeCourantePeriode" styleClass="page-subtitle" text="—" />
+                </VBox>
+            </HBox>
+
+            <HBox fx:id="stepperStatut" alignment="CENTER" spacing="0">
+                <VBox alignment="CENTER" spacing="8">
+                    <StackPane>
+                        <Circle fx:id="circlePreparation" radius="16" styleClass="step-circle" />
+                        <Label fx:id="numPreparation" styleClass="step-num" text="1" />
+                    </StackPane>
+                    <Label fx:id="labelPreparation" styleClass="step-label" text="Préparation" />
+                </VBox>
+                <Region fx:id="connecteur1" prefHeight="0.0" prefWidth="161.0" styleClass="step-connector" HBox.hgrow="ALWAYS" />
+                <VBox alignment="CENTER" spacing="8">
+                    <StackPane>
+                        <Circle fx:id="circleEnCours" radius="16" styleClass="step-circle" />
+                        <Label fx:id="numEnCours" styleClass="step-num" text="2" />
+                    </StackPane>
+                    <Label fx:id="labelEnCours" styleClass="step-label" text="En cours" />
+                </VBox>
+                <Region fx:id="connecteur2" prefHeight="2" prefWidth="60" styleClass="step-connector" HBox.hgrow="ALWAYS" />
+                <VBox alignment="CENTER" spacing="8">
+                    <StackPane>
+                        <Circle fx:id="circleCloturee" radius="16" styleClass="step-circle" />
+                        <Label fx:id="numCloturee" styleClass="step-num" text="3" />
+                    </StackPane>
+                    <Label fx:id="labelCloturee" styleClass="step-label" text="Clôturée" />
+                </VBox>
+                <Region fx:id="connecteur3" prefHeight="2" prefWidth="60" styleClass="step-connector" HBox.hgrow="ALWAYS" />
+                <VBox alignment="CENTER" spacing="8">
+                    <StackPane>
+                        <Circle fx:id="circleArchivee" radius="16" styleClass="step-circle" />
+                        <Label fx:id="numArchivee" styleClass="step-num" text="4" />
+                    </StackPane>
+                    <Label fx:id="labelArchivee" styleClass="step-label" text="Archivée" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- Liste de toutes les années -->
+        <TableView fx:id="tableAnnees" styleClass="custom-table" VBox.vgrow="ALWAYS">
+            <placeholder>
+                <Label styleClass="table-placeholder" text="Aucune année scolaire enregistrée" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colAnneeLibelle" prefWidth="140" text="Libellé" />
+                <TableColumn fx:id="colAnneeDebut" prefWidth="110" text="Début" />
+                <TableColumn fx:id="colAnneeFin" prefWidth="110" text="Fin" />
+                <TableColumn fx:id="colAnneeStatut" prefWidth="130" text="Statut" />
+                <TableColumn fx:id="colAnneeCourante" prefWidth="100" text="Courante" />
+                <TableColumn fx:id="colAnneeActions" prefWidth="110" text="Actions" />
+            </columns>
+        </TableView>
+        <HBox alignment="CENTER_LEFT" styleClass="table-footer">
+            <Label fx:id="lblFooterAnnees" styleClass="footer-info" text="0 année" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="paginationAnnees" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+        </HBox>
+    </VBox>
+
+    <!-- ============ VOILE + TIROIR ============ -->
+    <Region fx:id="drawerScrim" managed="false" onMouseClicked="#onFermerTiroir" styleClass="drawer-scrim" visible="false" />
+
+    <HBox fx:id="drawerWrapper" alignment="CENTER_RIGHT" managed="false" pickOnBounds="false" visible="false">
+        <VBox fx:id="drawerPanel" maxWidth="380" prefWidth="380" spacing="18" styleClass="special-container">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="20" />
+            </padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="drawerTitre" styleClass="card-title" text="Nouvelle année scolaire" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#onFermerTiroir" styleClass="btn-icon-light">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-x" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <Separator />
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Libellé" />
+                <TextField fx:id="champLibelle" promptText="Ex : 2026-2027" styleClass="input" />
+            </VBox>
+
+            <HBox spacing="14">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Date de début" />
+                    <DatePicker fx:id="champDateDebut" maxWidth="Infinity" styleClass="date-picker-custom" />
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label styleClass="field-label" text="Date de fin" />
+                    <DatePicker fx:id="champDateFin" maxWidth="Infinity" styleClass="date-picker-custom" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Statut" />
+                <ComboBox fx:id="comboStatut" maxWidth="Infinity" styleClass="special-combo" />
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label styleClass="field-label" text="Définir comme année courante" />
+                <Region HBox.hgrow="ALWAYS" />
+                <ToggleButton fx:id="toggleCourante" styleClass="toggle-switch" text="Courante" />
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#onFermerTiroir" styleClass="btn-icon-light" text="Annuler" />
+                <Button fx:id="btnEnregistrer" onAction="#onEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-check" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+        </VBox>
+    </HBox>
+
+</StackPane>

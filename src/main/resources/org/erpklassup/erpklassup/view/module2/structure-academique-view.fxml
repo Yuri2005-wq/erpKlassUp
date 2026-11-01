@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.renduView.module2.StructureAcademiqueController">
+
+    <VBox fx:id="mainContainer" spacing="0">
+
+        <!-- ==================== HEADER ==================== -->
+        <VBox spacing="4" styleClass="page-header">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <FontIcon fx:id="iconTitle" iconLiteral="fth-layers" iconSize="26" styleClass="page-header-icon" />
+                <VBox>
+                    <Label fx:id="lblPageCourante" styleClass="page-title" text="Structure Académique" />
+                    <Label styleClass="page-subtitle" text="Gérez les années, niveaux, filières, salles et classes" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- ==================== NAVIGATION ONGLETS ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="top-bar">
+            <padding><Insets bottom="0" left="24" right="24" top="0" /></padding>
+
+            <Button fx:id="btnTabParametrage" onAction="#switchTab" styleClass="top-tab-btn" text="Paramétrage">
+                <graphic>
+                    <FontIcon iconLiteral="fth-settings" iconSize="14" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnTabClasses" onAction="#switchTab" styleClass="top-tab-btn" text="Classes">
+                <graphic>
+                    <FontIcon iconLiteral="fth-users" iconSize="14" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnTabCalendrier" onAction="#switchTab" styleClass="top-tab-btn" text="Calendrier">
+                <graphic>
+                    <FontIcon iconLiteral="fth-calendar" iconSize="14" />
+                </graphic>
+            </Button>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnAssistant" styleClass="button-primary" text="Assistant de configuration">
+                <graphic>
+                    <FontIcon iconLiteral="fth-zap" iconSize="12" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- ==================== CONTENU ==================== -->
+        <StackPane fx:id="tabContentContainer" styleClass="content-area" VBox.vgrow="ALWAYS" />
+
+    </VBox>
+</StackPane>

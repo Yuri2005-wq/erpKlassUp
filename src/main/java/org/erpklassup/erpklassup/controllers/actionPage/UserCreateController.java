@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
+import net.bytebuddy.asm.MemberSubstitution;
 import org.erpklassup.erpklassup.dto.PersonneDTO;
 import org.erpklassup.erpklassup.dto.RoleOption;
 import org.erpklassup.erpklassup.service.AuditService;
@@ -23,6 +24,8 @@ import org.erpklassup.erpklassup.util.ToastNotification;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static org.erpklassup.erpklassup.util.ValidationUtil.*;
 
 public class UserCreateController implements Initializable {
 
@@ -93,6 +96,9 @@ public class UserCreateController implements Initializable {
         configurerMotDePasse();
         configurerChampsDirects();
         mettreAJourAffichageEtape();
+
+        forcerCasseTitre(prenomDirectField);
+        forcerMajuscules(nomDirectField);
     }
 
     public void initData(String idEcoleCourante, ObservableList<RoleOption> items, Runnable onSuccess) {
@@ -466,12 +472,12 @@ public class UserCreateController implements Initializable {
                 email,
                 typeCompteSelectionne,
                 () -> Platform.runLater(() -> {
-                    auditService.tracerActionAsync("HABILITATIONS", "CREATION_UTILISATEUR",
-                            "Compte créé pour : " + username + " (" + typeCompteSelectionne + ")");
-                    ToastNotification.succes(getStage(), i18n().t("user_create.success"));
-                    if (callbackSuccess != null) callbackSuccess.run();
-                    fermerFenetre();
-                }),
+                        auditService.tracerActionAsync("HABILITATIONS", "CREATION_UTILISATEUR",
+                                "Compte créé pour : " + username + " (" + typeCompteSelectionne + ")");
+                        ToastNotification.succes(getStage(), i18n().t("user_create.success"));
+                        if (callbackSuccess != null) callbackSuccess.run();
+                        fermerFenetre();
+                    }),
                 erreur -> Platform.runLater(() -> {
                     btnCreer.setDisable(false);
                     ToastNotification.erreur(getStage(),

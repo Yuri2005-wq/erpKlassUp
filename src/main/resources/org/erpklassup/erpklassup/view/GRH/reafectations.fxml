@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="720.0" spacing="18.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.ReaffectationResponsablesModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== EN-TÊTE ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon iconLiteral="fth-users" iconSize="36" styleClass="icon-orange" />
+                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Réaffectation et  Supervision des Responsables" textFill="#1E293B">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+                        <Label text="Modifiez les chefs de département ou réaffectez les responsabilités en un clic." textFill="#64748B">
+                            <font>
+                                <Font size="12.5" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Separator />
+
+        <!-- ===== SECTION 1 : TRANSFERT RAPIDE / REMPLACEMENT EN MASSE ===== -->
+        <VBox spacing="10.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 10; -fx-padding: 14; -fx-border-color: #E2E8F0; -fx-border-radius: 10;">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <children>
+                        <FontIcon iconLiteral="fth-repeat" iconSize="16" styleClass="icon-orange" />
+                        <Label text="Transfert rapide de responsabilités (Départ / Changement de poste)" textFill="#0F172A">
+                            <font>
+                                <Font name="System Bold" size="12.5" />
+                            </font>
+                        </Label>
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <!-- Ancien Responsable -->
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Ancien responsable *" textFill="#475569">
+                                    <font>
+                                        <Font name="System Bold" size="11.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboAncienResponsable" maxWidth="Infinity" promptText="Sélectionner l'employé sortant..." styleClass="combo-box" />
+                            </children>
+                        </VBox>
+
+                        <FontIcon iconLiteral="fth-arrow-right" iconSize="18" styleClass="icon-gray">
+                            <HBox.margin>
+                                <Insets top="16.0" />
+                            </HBox.margin>
+                        </FontIcon>
+
+                        <!-- Nouveau Responsable -->
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Nouveau responsable *" textFill="#475569">
+                                    <font>
+                                        <Font name="System Bold" size="11.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="comboNouveauResponsable" maxWidth="Infinity" promptText="Sélectionner le remplaçant..." styleClass="combo-box" />
+                            </children>
+                        </VBox>
+
+                        <!-- Bouton Appliquer Transfert -->
+                        <Button fx:id="btnTransfererTout" maxWidth="107.0" onAction="#handleTransfererTout" prefHeight="35.0" prefWidth="107.0" styleClass="button-primary" text="Appliquer">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets top="18.0" />
+                            </HBox.margin>
+                            <graphic>
+                                <FontIcon iconLiteral="fth-check-circle" iconSize="14" />
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <!-- ===== BARRE DE RECHERCHE & FILTRE TABLEAU ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <children>
+                <TextField fx:id="fieldFiltreDept" promptText="Rechercher une structure ou un responsable..." styleClass="input" HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnRetirerSelection" onAction="#handleRetirerSelection" styleClass="btn-icon-light" text="Retirer le chef (Sélection)">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                    <graphic>
+                        <FontIcon iconLiteral="fth-user-x" iconSize="14" styleClass="icon-red" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Laisse le champ responsable 'Non assigné' pour les départements cochés" />
+                    </tooltip>
+                </Button>
+            </children>
+        </HBox>
+
+        <!-- ===== SECTION 2 : TABLEAU DE SUPERVISION DES DÉPARTEMENTS ===== -->
+        <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+            <children>
+                <TableView fx:id="tableResponsables" prefHeight="260.0" styleClass="custom-table">
+                    <columns>
+                        <!-- Structure / Département -->
+                        <TableColumn fx:id="colDeptLibelle" prefWidth="220.0" text="Département" />
+
+                        <!-- Responsable Actuel -->
+                        <TableColumn fx:id="colDeptResponsableActuel" prefWidth="210.0" text="Responsable actuel" />
+
+                        <!-- Modifier le responsable en 1 clic -->
+                        <TableColumn fx:id="colChangerResponsable" prefWidth="210.0" text="Nouveau responsable (1 clic)" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
+
+        <!-- Message d'erreur ou d'avertissement -->
+        <Label fx:id="lblMessage" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+        <!-- ===== ACTIONS (PIED DE PAGE) ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Label fx:id="lblNbModifs" text="0 modification(s) en attente" textFill="#64748B">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnFermer" onAction="#handleFermer" styleClass="btn-icon-light" text="Fermer">
+                    <font>
+                        <Font name="System Bold" size="12.5" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrerModifs" defaultButton="true" onAction="#handleEnregistrerModifs" styleClass="button-primary" text="Enregistrer les modifications">
+                    <font>
+                        <Font name="System Bold" size="12.5" />
+                    </font>
+                    <graphic>
+                        <FontIcon iconLiteral="fth-save" iconSize="14" />
+                    </graphic>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="4.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

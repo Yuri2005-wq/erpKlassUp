@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="480.0" spacing="18.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.GroupeFormController">
+
+    <padding><Insets bottom="24.0" left="28.0" right="28.0" top="24.0" /></padding>
+
+    <children>
+
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <FontIcon fx:id="iconModal" iconLiteral="fth-layers" iconSize="22" styleClass="icon-orange" />
+            <VBox spacing="4.0">
+                <Label fx:id="lblTitreModal" text="Nouveau groupe de matières" textFill="#1E293B">
+                    <font><Font name="System Bold" size="18.0" /></font>
+                </Label>
+                <Label text="Renseignez les informations du groupe" textFill="#64748B">
+                    <font><Font size="12.0" /></font>
+                </Label>
+            </VBox>
+        </HBox>
+
+        <Separator />
+
+        <VBox spacing="14.0">
+
+            <VBox spacing="6.0">
+                <Label text="Code *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="txtCode" promptText="ex: G1, G2, LITT" styleClass="input" />
+                <Label fx:id="errCode" managed="false" styleClass="field-error" visible="false" />
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Nom du groupe *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="txtNom" promptText="ex: Langues vivantes" styleClass="input" />
+                <Label fx:id="errNom" managed="false" styleClass="field-error" visible="false" />
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Ordre d'affichage" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <TextField fx:id="txtOrdre" promptText="1" styleClass="input" />
+            </VBox>
+
+            <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+        </VBox>
+
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+            <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+        </HBox>
+
+    </children>
+</VBox>

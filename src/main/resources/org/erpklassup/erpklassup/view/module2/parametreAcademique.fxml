@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="settingsRoot" prefHeight="700.0" prefWidth="1000.0" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.renduView.module2.StructureAcademiqueController">
+
+    <VBox style="-fx-background-color: #111a2e;">
+        <children>
+
+            <!-- ===== BARRE D'ONGLETS ===== -->
+            <HBox alignment="CENTER_LEFT" prefHeight="36.0" prefWidth="1000.0" spacing="5.0" style="-fx-background-color: #16213A; -fx-padding: 0; -fx-border-color: #2A3B61; -fx-border-width: 0 0 1 0;">
+                <children>
+                    <Button fx:id="btnTabNiveaux" onAction="#switchTab" styleClass="top-tab-btn" text="Structure Académique">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-settings" iconSize="16" />
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnTabClasses" onAction="#switchTab" styleClass="top-tab-btn" text="Année scolaire">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-calendar" iconSize="16" />
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnTabSalles" onAction="#switchTab" styleClass="top-tab-btn" text="Salles">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-home" iconSize="16" />
+                        </graphic>
+                    </Button>
+               <Button fx:id="btnTabMatieres" layoutX="492.0" layoutY="10.0" onAction="#switchTab" styleClass="top-tab-btn" text="Matières">
+                  <graphic>
+                     <FontIcon iconLiteral="fth-book" iconSize="16" />
+                  </graphic>
+               </Button>
+                    <Button fx:id="btnTabPeriode" onAction="#switchTab" styleClass="top-tab-btn" text="Periode Evalution">
+                        <graphic>
+                            <FontIcon iconLiteral="fth-calendar" iconSize="16" />
+                        </graphic>
+                    </Button>
+
+                    <Button fx:id="btnClasses" onAction="#switchTab" styleClass="top-tab-btn" text="Classes">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-chalkboard" iconSize="14" />
+                        </graphic>
+                    </Button>
+                </children>
+            </HBox>
+
+            <StackPane fx:id="tabContentContainer" style="-fx-padding: 5;" styleClass="content-area" VBox.vgrow="ALWAYS" />
+
+        </children>
+    </VBox>
+</StackPane>

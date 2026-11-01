@@ -197,11 +197,11 @@
                                     <HBox alignment="CENTER_LEFT" spacing="20">
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="%user_detail.security.account_active" />
-                                            <ToggleButton fx:id="toggleActif" styleClass="toggle-switch" text="%status.active" />
+                                            <ToggleButton fx:id="toggleActif" styleClass="switch-button" />
                                         </VBox>
                                         <VBox spacing="5">
                                             <Label styleClass="field-label" text="%user_detail.security.2fa" />
-                                            <ToggleButton fx:id="toggle2FA" onAction="#handleActiver2FA" styleClass="toggle-switch" text="%user_detail.2fa.badge_disabled" />
+                                            <ToggleButton fx:id="toggle2FA" onAction="#handleActiver2FA" styleClass="switch-button" />
                                         </VBox>
                                     </HBox>
                                     <Separator />
@@ -212,9 +212,6 @@
                                     </HBox>
 
                                     <HBox spacing="10">
-                                        <Button fx:id="btnEnvoyerLien" styleClass="btn-icon-light" text="%user_detail.security.send_link">
-                                            <graphic><FontIcon iconLiteral="fth-mail" iconSize="14" /></graphic>
-                                        </Button>
                                         <Button fx:id="btnGenererTemp" styleClass="btn-icon-light" text="%user_detail.security.gen_temp">
                                             <graphic><FontIcon iconLiteral="fth-file-text" iconSize="14" /></graphic>
                                         </Button>

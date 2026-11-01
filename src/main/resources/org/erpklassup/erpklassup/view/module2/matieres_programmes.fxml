@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.MatiereProgrammeController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <VBox spacing="2">
+            <Label styleClass="page-subtitle" text="Matières de l'établissement et leur affectation par niveau" />
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher une matière..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <Region prefHeight="38.0" prefWidth="456.0" HBox.hgrow="ALWAYS" />
+         <Button fx:id="btnRenommerMatiere" styleClass="btn-icon-light">
+            <graphic>
+               <FontIcon iconLiteral="fth-edit-2" iconSize="14" styleClass="btn-icon" />
+            </graphic>
+         </Button>
+         <Button fx:id="btnSupprimerMatiere" styleClass="btn-icon-light, btn-danger-icon">
+            <graphic>
+               <FontIcon iconLiteral="fth-trash-2" iconSize="14" styleClass="btn-icon" />
+            </graphic>
+         </Button>
+        </HBox>
+
+        <SplitPane fx:id="rolesSplitPane" dividerPositions="0.28" styleClass="rbac-split-pane" VBox.vgrow="ALWAYS">
+
+            <items>
+
+                <!-- Panneau gauche : liste des matières -->
+                <VBox alignment="CENTER" spacing="10.0" styleClass="roles-list-panel">
+                    <padding>
+                        <Insets bottom="4.0" left="4.0" right="10.0" top="4.0" />
+                    </padding>
+                    <children>
+                        <Label styleClass="panel-title" text="Matières" />
+                        <ListView fx:id="listMatieres" styleClass="special-container" VBox.vgrow="ALWAYS" />
+                        <Button fx:id="btnNouvelleMatiere" styleClass="button-primary" text="Nouvelle matière">
+                            <graphic>
+                                <FontIcon iconLiteral="fth-plus-circle" iconSize="14" styleClass="btn-icon" />
+                            </graphic>
+                        </Button>
+                    </children>
+                </VBox>
+
+                <!-- Panneau droit : accordéon construit dynamiquement -->
+                <VBox spacing="12.0" styleClass="permissions-panel">
+                    <padding>
+                        <Insets bottom="4.0" left="14.0" right="4.0" top="4.0" />
+                    </padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                <Label fx:id="lblMatiereSelectionnee" styleClass="panel-title" text="Sélectionnez une matière" />
+                                <Label styleClass="muted-text" text="Cochez les niveaux où cette matière est enseignée" />
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <CheckBox fx:id="chkAppliquerTous" styleClass="check-select-all" text="Appliquer à tous les niveaux" />
+                        </HBox>
+
+                        <!-- Accordéon VIDE : rempli dynamiquement par le controller -->
+                        <ScrollPane fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
+                            <content>
+                                <Accordion fx:id="accordionNiveaux" styleClass="permissions-accordion" />
+                            </content>
+                        </ScrollPane>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0" styleClass="permissions-save-bar">
+                            <Button fx:id="btnEnregistrerAffectations" styleClass="button-primary" text="Enregistrer">
+                                <graphic>
+                                    <FontIcon iconLiteral="fth-save" iconSize="14" styleClass="btn-icon" />
+                                </graphic>
+                            </Button>
+                        </HBox>
+
+                    </children>
+                </VBox>
+
+            </items>
+        </SplitPane>
+    </VBox>
+
+</StackPane>

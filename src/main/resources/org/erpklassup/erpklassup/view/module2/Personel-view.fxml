@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" styleClass="content-area" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.rh.PersonnelController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <!-- ============ TITRE + CONTEXTE ============ -->
+        <VBox prefHeight="37.0" prefWidth="1006.0" spacing="2">
+            <Label fx:id="lblAnneeContexte" styleClass="page-subtitle" text="Année scolaire courante : —" />
+        </VBox>
+
+        <!-- ============ TOOLBAR ============ -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <!-- Recherche -->
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher un employé (nom, matricule, poste)..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <!-- Filtres -->
+            <ComboBox fx:id="filtreCategorie" promptText="Catégorie" styleClass="combo-box" />
+            <ComboBox fx:id="filtreStatut" promptText="Statut" styleClass="combo-box" />
+            <ComboBox fx:id="filtrePoste" promptText="Poste" styleClass="combo-box" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Actions groupées (futur) -->
+            <Button fx:id="btnActionsGroupees" styleClass="btn-icon-light">
+                <graphic>
+                    <FontIcon iconLiteral="fth-more-horizontal" iconSize="16" />
+                </graphic>
+                <tooltip>
+                    <javafx.scene.control.Tooltip text="Actions groupées" />
+                </tooltip>
+            </Button>
+
+            <!-- Nouvel employé -->
+            <Button fx:id="btnNouvelEmploye" onAction="#onNouvelEmploye" styleClass="button-primary" text="Nouvel employé">
+                <graphic>
+                    <FontIcon iconLiteral="fth-user-plus" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- ============ TABLEAU ============ -->
+        <TableView fx:id="tablePersonnel" prefHeight="402.0" prefWidth="1006.0" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+            <placeholder>
+                <Label styleClass="table-placeholder" text="Aucun employé enregistré" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colMatricule" prefWidth="110.0" text="Matricule" />
+                <TableColumn fx:id="colEmploye" prefWidth="177.60000610351562" text="Employé" />
+                <TableColumn fx:id="colPoste" prefWidth="174.39996337890625" text="Poste" />
+                <TableColumn fx:id="colCategorie" prefWidth="129.60003662109375" text="Catégorie" />
+                <TableColumn fx:id="colTelephone" prefWidth="152.0" text="Téléphone" />
+                <TableColumn fx:id="colStatut" minWidth="0.0" prefWidth="100.0" text="Statut" />
+                <TableColumn fx:id="colActions" prefWidth="217.5999755859375" text="Actions" />
+            </columns>
+        </TableView>
+
+        <!-- ============ FOOTER ============ -->
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="lblFooterPersonnel" styleClass="footer-info" text="0 employé" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="paginationPersonnel" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+            <padding>
+                <Insets bottom="-10.0" top="-10.0" />
+            </padding>
+         <VBox.margin>
+            <Insets bottom="-10.0" top="-10.0" />
+         </VBox.margin>
+        </HBox>
+
+    </VBox>
+
+</StackPane>

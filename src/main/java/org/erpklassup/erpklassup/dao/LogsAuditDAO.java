@@ -13,14 +13,81 @@ public class LogsAuditDAO {
 
     private static final int LIMITE_RESULTATS = 1000;
 
+//    public List<AuditLigne> rechercher(FiltreAudit filtre) {
+//        StringBuilder sql = new StringBuilder("""
+//                SELECT idLogAudit, dateAction, nomAuteur, categorieAction, action, details, adresseIp, appareil
+//                FROM LogsAudit
+//                WHERE idEcole = ?
+//                """);
+//        List<Object> parametres = new ArrayList<>();
+//        parametres.add(filtre.idEcole());
+//
+//        if (filtre.terme() != null && !filtre.terme().isBlank()) {
+//            sql.append(" AND (nomAuteur LIKE ? OR action LIKE ? OR details LIKE ?) ");
+//            String motif = "%" + filtre.terme().trim() + "%";
+//            parametres.add(motif);
+//            parametres.add(motif);
+//            parametres.add(motif);
+//        }
+//        if (filtre.dateDebut() != null) {
+//            sql.append(" AND dateAction >= ? ");
+//            parametres.add(Timestamp.valueOf(filtre.dateDebut().atStartOfDay()));
+//        }
+//        if (filtre.dateFin() != null) {
+//            sql.append(" AND dateAction < ? ");
+//            parametres.add(Timestamp.valueOf(filtre.dateFin().plusDays(1).atStartOfDay()));
+//        }
+//        if (filtre.categorie() != null && !filtre.categorie().isBlank()) {
+//            sql.append(" AND categorieAction = ? ");
+//            parametres.add(filtre.categorie());
+//        }
+//
+//        sql.append(" ORDER BY dateAction DESC LIMIT ").append(LIMITE_RESULTATS);
+//
+//        List<AuditLigne> lignes = new ArrayList<>();
+//        try (Connection conn = Database.getConnexion();
+//             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+//
+//            int index = 1;
+//            for (Object param : parametres) {
+//                stmt.setObject(index++, param);
+//            }
+//
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                while (rs.next()) {
+//                    lignes.add(new AuditLigne(
+//                            rs.getString("idLogAudit"),
+//                            rs.getTimestamp("dateAction").toLocalDateTime(),
+//                            rs.getString("nomAuteur"),
+//                            rs.getString("categorieAction"),
+//                            rs.getString("action"),
+//                            rs.getString("details"),
+//                            rs.getString("adresseIp"),
+//                            rs.getString("appareil")
+//                    ));
+//                }
+//            }
+//        } catch (SQLException e) {
+//            System.err.println("Erreur rechercher (LogsAudit) : " + e.getMessage());
+//        }
+//        return lignes;
+//    }
+
+
     public List<AuditLigne> rechercher(FiltreAudit filtre) {
         StringBuilder sql = new StringBuilder("""
-                SELECT idLogAudit, dateAction, nomAuteur, categorieAction, action, details, adresseIp, appareil
-                FROM LogsAudit
-                WHERE idEcole = ?
-                """);
+            SELECT idLogAudit, dateAction, nomAuteur, categorieAction, action, details, adresseIp, appareil
+            FROM LogsAudit
+            WHERE idEcole = ?
+            """);
         List<Object> parametres = new ArrayList<>();
         parametres.add(filtre.idEcole());
+
+        // ✅ NOUVEAU : filtrer par auteur (les actions FAITES PAR cet utilisateur)
+        if (filtre.idUtilisateurAuteur() != null && !filtre.idUtilisateurAuteur().isBlank()) {
+            sql.append(" AND idUtilisateur = ? ");
+            parametres.add(filtre.idUtilisateurAuteur());
+        }
 
         if (filtre.terme() != null && !filtre.terme().isBlank()) {
             sql.append(" AND (nomAuteur LIKE ? OR action LIKE ? OR details LIKE ?) ");
@@ -72,6 +139,8 @@ public class LogsAuditDAO {
         }
         return lignes;
     }
+
+
 
     public List<String> listerCategoriesDistinctes(String idEcole) {
         String sql = "SELECT DISTINCT categorieAction FROM LogsAudit WHERE idEcole = ? ORDER BY categorieAction";

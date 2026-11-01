@@ -17,8 +17,10 @@ public record UtilisateurLigne(
         boolean actif,
         boolean verrouille,
         boolean deuxFacteursActif,
-        LocalDateTime derniereConnexion
-) {
+        LocalDateTime derniereConnexion,
+        boolean doitConfigurer2FA
+
+        ) {
     public StatutCompte statut() {
         if (verrouille) return StatutCompte.VERROUILLE;
         if (!actif) return StatutCompte.INACTIF;

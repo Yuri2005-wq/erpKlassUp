@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+    Ecran "Classes" - liste + filtres + pagination.
+    La creation et l'edition passent par les modales ClasseModal.fxml
+    et GenereClasses.fxml (voir ClasseController).
+-->
+
+<StackPane fx:id="rootStack" styleClass="content-area" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.ClasseController">
+
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <VBox prefHeight="37.0" prefWidth="1006.0" spacing="2">
+            <Label fx:id="lblAnneeContexte" styleClass="page-subtitle" text="Année scolaire courante : —" />
+         <VBox.margin>
+            <Insets bottom="-15.0" />
+         </VBox.margin>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher une classe..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <ComboBox fx:id="filtreAnnee" promptText="Année scolaire" styleClass="combo-box" />
+            <ComboBox fx:id="filtreNiveau" promptText="Niveau" styleClass="combo-box" />
+            <ComboBox fx:id="filtreFiliere" promptText="Filière" styleClass="combo-box" />
+            <ComboBox fx:id="filtreVacation" promptText="Vacation" styleClass="combo-box" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnCreationMultiple" styleClass="btn-icon-light">
+                <graphic>
+                    <HBox alignment="CENTER" spacing="6">
+                        <children>
+                            <FontIcon iconLiteral="fth-zap" iconSize="12" styleClass="icon-orange" />
+                            <Label text="Générer" />
+                        </children>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnNouvelleClasse" onAction="#onNouvelleClasse" styleClass="button-primary" text="Nouvelle classe">
+                <graphic>
+                    <FontIcon iconLiteral="fth-plus-circle" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <TableView fx:id="tableClasses" prefHeight="402.0" prefWidth="1006.0" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
+            <placeholder>
+                <Label styleClass="table-placeholder" text="Aucune classe enregistrée pour cette année" />
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colClasseNom" prefWidth="140.0" text="Nom" />
+                <TableColumn fx:id="colClasseNiveau" prefWidth="120.0" text="Niveau" />
+                <TableColumn fx:id="colClasseFiliere" prefWidth="110.0" text="Filière" />
+                <TableColumn fx:id="colClasseVacation" prefWidth="120.0" text="Vacation" />
+                <TableColumn fx:id="colClasseSalle" prefWidth="122.4" text="Salle" />
+                <TableColumn fx:id="colClasseTitulaire" prefWidth="149.6" text="Titulaire" />
+                <TableColumn fx:id="colClasseEffectif" prefWidth="111.2" text="Effectif" />
+                <TableColumn fx:id="colClasseActions" prefWidth="160.0" text="Actions" />
+            </columns>
+        </TableView>
+
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="lblFooterClasses" styleClass="footer-info" text="0 classe" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="paginationClasses" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+            <padding>
+                <Insets bottom="-10.0" top="-10.0" />
+            </padding>
+         <VBox.margin>
+            <Insets bottom="-15.0" top="-15.0" />
+         </VBox.margin>
+        </HBox>
+    </VBox>
+
+</StackPane>

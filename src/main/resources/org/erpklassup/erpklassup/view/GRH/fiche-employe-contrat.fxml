@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import org.erpklassup.erpklassup.util.grh.ChampLecture?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.FichePersonnelController" spacing="14">
+    <padding>
+        <Insets bottom="14"/>
+    </padding>
+
+    <VBox styleClass="fiche-card" spacing="14">
+        <Label text="Contrat en cours" styleClass="carte-titre"/>
+        <GridPane hgap="24" vgap="16">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+                <ColumnConstraints percentWidth="33.33" hgrow="SOMETIMES"/>
+            </columnConstraints>
+            <ChampLecture fx:id="typeContrat" libelle="Type de contrat" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ChampLecture fx:id="dateDebut" libelle="Date de début" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <ChampLecture fx:id="dateFin" libelle="Date de fin" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            <ChampLecture fx:id="poste" libelle="Poste" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ChampLecture fx:id="departement" libelle="Département" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <ChampLecture fx:id="salaireBase" libelle="Salaire de base" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+        </GridPane>
+    </VBox>
+
+    <VBox styleClass="fiche-card, carte-table" VBox.vgrow="ALWAYS">
+        <HBox styleClass="carte-entete">
+            <Label text="Historique des contrats et avenants" styleClass="carte-titre"/>
+        </HBox>
+        <TableView fx:id="tableContrats" styleClass="fiche-table" fixedCellSize="42" VBox.vgrow="ALWAYS">
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+            <placeholder>
+                <Label text="Aucun contrat enregistré"/>
+            </placeholder>
+            <columns>
+                <TableColumn fx:id="colType" text="Type" prefWidth="100" sortable="false"/>
+                <TableColumn fx:id="colDebut" text="Début" prefWidth="120" sortable="false"/>
+                <TableColumn fx:id="colFin" text="Fin" prefWidth="140" sortable="false"/>
+                <TableColumn fx:id="colSalaire" text="Salaire de base" prefWidth="150" sortable="false"
+                             style="-fx-alignment: CENTER-RIGHT;"/>
+                <TableColumn fx:id="colStatut" text="Statut" prefWidth="110" sortable="false"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

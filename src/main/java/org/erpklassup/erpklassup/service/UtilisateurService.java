@@ -63,6 +63,10 @@ public class UtilisateurService extends ServiceAsyncBase {
     // ==========================================
     // RECHERCHE
     // ==========================================
+    public ResultatPagine<UtilisateurLigne> rechercher(FiltreUtilisateur filtre) {
+        return utilisateurDAO.rechercherPagine(filtre);
+    }
+
     public void rechercherAsync(FiltreUtilisateur filtre,
                                 Consumer<ResultatPagine<UtilisateurLigne>> onSucces,
                                 Consumer<Throwable> onErreur) {
@@ -92,10 +96,6 @@ public class UtilisateurService extends ServiceAsyncBase {
             u.setPasswordHash(PasswordService.hacher(motDePasse));
             if (!utilisateurDAO.create(u))
                 throw new IllegalStateException("Identifiant déjà utilisé ou création impossible.");
-            if (idRole != null) {
-                utilisateurRoleDAO.assignerRole(u.getIdUtilisateur(), idRole, idEcole);
-                rafraichisseur.rafraichirPourUtilisateur(u.getIdUtilisateur());
-            }
         }, onSucces, onErreur);
     }
 

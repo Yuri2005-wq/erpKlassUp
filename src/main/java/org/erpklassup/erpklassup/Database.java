@@ -7,11 +7,18 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 public class Database {
+
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
     private static final String HOST = "localhost";
     private static final String PORT = "3306";
     private static final String DB_NAME = "erpklassup";
@@ -19,13 +26,15 @@ public class Database {
     private static final String PASSWORD = "yuriDjaleu";
 
     private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
-            + "?useSSL=false&serverTimezone=Africa/Douala&allowMultiQueries=true";
-
-
-//   private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
-//            + "?useSSL=false&serverTimezone=UTC&allowMultiQueries=true";
+            + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Africa/Douala&allowMultiQueries=true";
 
     private static final HikariDataSource dataSource;
+
+    // ==========================================
+    // VARIABLES DE SESSION POUR LES TRIGGERS
+    // ==========================================
+    private static String clientIdCache;
+    private static final String SYSTEM_USER_ID = "SYSTEM";
 
     static {
         HikariConfig config = new HikariConfig();
@@ -34,15 +43,13 @@ public class Database {
         config.setPassword(PASSWORD);
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        // Dimensionnement raisonnable pour une appli desktop mono-poste ou petit réseau local.
-        // Pas besoin de plus pour une école primaire avec 2-3 postes de saisie simultanés.
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
-        config.setConnectionTimeout(10_000); // 10s avant d'abandonner si le pool est saturé
-        config.setIdleTimeout(300_000);      // 5 min avant de fermer une connexion inactive
-        config.setMaxLifetime(1_800_000);    // 30 min avant recyclage forcé (évite les timeouts MySQL silencieux)
+        config.setConnectionTimeout(10_000);
+        config.setIdleTimeout(300_000);
+        config.setMaxLifetime(1_800_000);
 
-        // Optimisations MySQL recommandées par HikariCP lui-même
+        // Optimisations MySQL recommandées
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -51,29 +58,150 @@ public class Database {
         dataSource = new HikariDataSource(config);
     }
 
+    // ==========================================
+    // OBTENTION DE CONNEXION
+    // ==========================================
+
     /**
-     * Retourne une connexion depuis le pool — quasi instantané, contrairement
-     * à DriverManager.getConnection() qui rouvrait une connexion TCP à chaque appel.
-     * IMPORTANT : cette connexion doit TOUJOURS être fermée (try-with-resources) —
-     * "fermer" ici ne fait que la rendre au pool, elle n'est pas réellement détruite.
+     * Retourne une connexion depuis le pool ET initialise automatiquement
+     * les variables de session utilisées par les triggers MySQL :
+     *   - @klassup_client_id : identifiant de la machine courante
+     *   - @klassup_user_id   : identifiant de l'utilisateur connecté
+     *
+     * ⚠️ Ces variables sont OBLIGATOIRES pour que les triggers SyncLog
+     *     puissent enregistrer correctement l'origine des modifications.
+     *
+     * La connexion DOIT toujours être fermée (try-with-resources) —
+     * "fermer" ici ne fait que la rendre au pool.
      */
     public static Connection getConnexion() throws SQLException {
-        return dataSource.getConnection();
+        Connection conn = dataSource.getConnection();
+
+        try {
+            initialiserVariablesSession(conn);
+        } catch (SQLException e) {
+            // En cas d'échec, on rend la connexion au pool et on propage l'erreur
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+            }
+            throw new SQLException(
+                    "Impossible d'initialiser les variables de session MySQL : "
+                            + e.getMessage(), e);
+        }
+
+        return conn;
     }
+
+    private static void initialiserVariablesSession(Connection conn) throws SQLException {
+        String clientId = getClientId();
+        String userId = getUserId();
+
+        // @klassup_sync_in_progress remis à 0 défensivement à CHAQUE emprunt
+        // de connexion — même si SyncOrchestrator.setSyncGuard(cx, false)
+        // dans son `finally` est censé déjà l'avoir fait. Cette double
+        // sécurité protège contre le cas où le JVM crashe / est tué en plein
+        // cycle de pull avant que le `finally` ait pu s'exécuter : sans ce
+        // reset ici, la connexion reviendrait au pool avec le garde bloqué
+        // à 1, et les écritures locales de tout autre thread cesseraient
+        // silencieusement d'être mises en file dans SyncFile.
+        String sql = "SET @klassup_client_id = ?, @klassup_user_id = ?, "
+                + "@klassup_sync_in_progress = 0";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, clientId);
+            stmt.setString(2, userId);
+            stmt.execute();
+        }
+    }
+
+
+    /**
+     * Récupère l'identifiant unique du client (machine).
+     * Stocké dans les préférences Java pour persister entre redémarrages.
+     */
+    public static synchronized String getClientId() {
+        if (clientIdCache != null) {
+            return clientIdCache;
+        }
+
+        // 1. Priorité : propriété système (définie par HelloApplication au démarrage)
+        String clientId = System.getProperty("klassup.clientId");
+
+        if (clientId == null || clientId.isBlank()) {
+            // 2. Fallback : préférences Java
+            Preferences prefs = Preferences.userNodeForPackage(Database.class);
+            clientId = prefs.get("klassup.clientId", null);
+
+            if (clientId == null || clientId.isBlank()) {
+                // 3. Génère un nouveau clientId
+                clientId = "CLI-" + UUID.randomUUID().toString().substring(0, 8);
+                prefs.put("klassup.clientId", clientId);
+                System.out.println("🆔 Nouveau clientId généré : " + clientId);
+            }
+
+            System.setProperty("klassup.clientId", clientId);
+        }
+
+        clientIdCache = clientId;
+        return clientId;
+    }
+
+    /**
+     * Récupère l'identifiant de l'utilisateur connecté.
+     * Retourne "SYSTEM" si aucun utilisateur n'est connecté (ex: démarrage).
+     */
+    private static String getUserId() {
+        try {
+            var session = org.erpklassup.erpklassup.service.SessionManager.getInstance();
+            if (session.getUtilisateurCourant() != null
+                    && session.getUtilisateurCourant().getIdUtilisateur() != null) {
+                return session.getUtilisateurCourant().getIdUtilisateur();
+            }
+        } catch (Exception ignored) {
+            // SessionManager pas encore initialisé (ex: au démarrage)
+        }
+        return SYSTEM_USER_ID;
+    }
+
+    // ==========================================
+    // FERMETURE
+    // ==========================================
 
     /** À appeler une seule fois à la fermeture propre de l'application. */
     public static void fermerPool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
+            System.out.println("🔒 Pool de connexions fermé");
         }
     }
 
+    // ==========================================
+    // INITIALISATION SCHEMA
+    // ==========================================
+
+    /**
+     * Initialise la base de données :
+     *   1. Charge et exécute le fichier DB.sql (tables + triggers + procédures)
+     *   2. Idempotent : peut être appelé plusieurs fois sans erreur
+     */
     public static void initializeDatabase() {
-        try (Connection conn = getConnexion(); Statement stmt = conn.createStatement()) {
-            InputStream is = Database.class.getResourceAsStream("DB.sql");
+        executerScriptSql("DB.sql");
+        System.out.println("✅ Base de données initialisée (Tables, Triggers et Procédures)");
+    }
+
+    /**
+     * Exécute un script SQL depuis les ressources.
+     * Gère les blocs complexes (triggers, procédures) qui contiennent des `;` internes.
+     */
+    private static void executerScriptSql(String nomFichier) {
+        try (Connection conn = getConnexion();
+             Statement stmt = conn.createStatement()) {
+
+            InputStream is = Database.class.getResourceAsStream(nomFichier);
 
             if (is == null) {
-                System.err.println("Le fichier DB.sql est introuvable dans les ressources.");
+                System.err.println("❌ Fichier introuvable dans les ressources : " + nomFichier);
                 return;
             }
 
@@ -81,43 +209,54 @@ public class Database {
                     .lines()
                     .collect(Collectors.joining("\n"));
 
-            String[] commands = sqlScript.split(";(?=(?:[^`]*`[^`]*`)*[^`]*$)(?=(?:[^']*'[^']*')*[^']*$)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            // Découpage intelligent qui ignore les `;` dans les blocs complexes
+            String[] commands = sqlScript.split(
+                    ";(?=(?:[^`]*`[^`]*`)*[^`]*$)(?=(?:[^']*'[^']*')*[^']*$)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-            StringBuilder triggerBuffer = new StringBuilder();
-            boolean dansUnTrigger = false;
+            StringBuilder blocBuffer = new StringBuilder();
+            boolean dansUnBlocComplexe = false;
 
             for (String command : commands) {
                 String trimmedCommand = command.trim();
-                if (trimmedCommand.isEmpty()) continue;
 
-                if (trimmedCommand.toUpperCase().contains("CREATE TRIGGER")) {
-                    dansUnTrigger = true;
+                // Ignore les mots-clés DELIMITER (non supportés par JDBC)
+                if (trimmedCommand.isEmpty()
+                        || trimmedCommand.toUpperCase().startsWith("DELIMITER")) {
+                    continue;
                 }
 
-                if (dansUnTrigger) {
-                    triggerBuffer.append(trimmedCommand).append(";");
+                String upper = trimmedCommand.toUpperCase();
 
-                    if (trimmedCommand.toUpperCase().endsWith("END")) {
-                        String finalTrigger = triggerBuffer.toString().trim();
+                // Détection du début d'un TRIGGER ou d'une PROCEDURE
+                if (upper.contains("CREATE TRIGGER") || upper.contains("CREATE PROCEDURE")) {
+                    dansUnBlocComplexe = true;
+                }
 
-                        stmt.execute("DROP TRIGGER IF EXISTS before_insert_ecole_unique");
-                        stmt.execute(finalTrigger);
+                if (dansUnBlocComplexe) {
+                    blocBuffer.append(trimmedCommand).append(";");
 
-                        dansUnTrigger = false;
-                        triggerBuffer.setLength(0);
+                    // Le bloc se termine quand on rencontre 'END' en fin d'instruction
+                    if (upper.endsWith("END")) {
+                        String finalBlock = blocBuffer.toString().trim();
+
+                        // Nettoyage du délimiteur final en trop
+                        if (finalBlock.endsWith(";;")) {
+                            finalBlock = finalBlock.substring(0, finalBlock.length() - 1);
+                        }
+
+                        stmt.execute(finalBlock);
+
+                        dansUnBlocComplexe = false;
+                        blocBuffer.setLength(0);
                     }
                 } else {
                     stmt.execute(trimmedCommand);
                 }
             }
 
-            System.out.println("Base de données initialisée avec succès avec l'entité Ecole et son Trigger !");
-
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur d'initialisation MySQL : " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Erreur d'exécution du script " + nomFichier + " : " + e.getMessage(), e);
         }
     }
-
-
-    }
-
+}

@@ -1,253 +1,216 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.erpklassup.erpklassup.controller.UserFormController"
-      spacing="20"
-      styleClass="content-area"
-      prefWidth="650"
-      prefHeight="700">
+<!--
+    Écran générique de paramétrage — "famille 1"
+    Regroupe les tables de référence simples : Niveau, Filiere, GroupeMatiere.
+    Salle n'apparaît pas ici, elle a déjà sa propre vue en cartes (salle-card).
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+    Un seul tiroir latéral partagé entre les 3 onglets : le controller affiche/masque
+    blocChampsNiveau selon l'onglet actif et adapte les libellés/placeholders.
+-->
 
-    <!-- ===== EN-TÊTE ===== -->
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Button fx:id="btnRetour"
-                onAction="#handleRetour"
-                styleClass="btn-icon-light">
-            <graphic>
-                <FontIcon iconLiteral="fth-arrow-left" iconSize="16"/>
-            </graphic>
-            <tooltip><Tooltip text="Retour à la liste"/></tooltip>
-        </Button>
-        <VBox spacing="3">
-            <Label fx:id="titreLabel" text="Nouvel Utilisateur" styleClass="page-title"/>
-            <Label fx:id="sousTitreLabel" text="Créez un compte utilisateur avec ses rôles et permissions" styleClass="page-subtitle"/>
+<StackPane fx:id="rootStack" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.controller.academique.StructureAcademiqueController">
+
+    <!-- ============ CONTENU PRINCIPAL ============ -->
+    <VBox spacing="16" styleClass="content-area">
+        <padding>
+            <Insets bottom="20" left="24" right="24" top="20" />
+        </padding>
+
+        <!-- En-tête de page -->
+        <VBox spacing="2" styleClass="page-header">
+            <Label styleClass="page-title" text="Structure académique" />
+            <Label styleClass="page-subtitle" text="Niveaux, filières et groupes de matières de l'établissement" />
         </VBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="badgeEcoleLabel" text="" styleClass="event-tag, tag-blue"/>
+
+        <!-- Barre d'outils -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" styleClass="search-icon-light" />
+                <TextField fx:id="fieldRecherche" promptText="Rechercher..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <Button fx:id="btnFiltres" onAction="#onOuvrirFiltres" styleClass="btn-icon-light">
+                <graphic>
+                    <FontIcon iconLiteral="fth-filter" />
+                </graphic>
+            </Button>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNouveau" onAction="#onNouveau" styleClass="button-primary" text="Nouveau">
+                <graphic>
+                    <FontIcon iconLiteral="fth-plus-circle" />
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Onglets Niveaux / Filières / Groupes de matières -->
+        <TabPane fx:id="tabsStructure" styleClass="rbac-tabs" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+            <Tab text="Niveaux">
+                <graphic>
+                    <FontIcon iconLiteral="fth-layers" styleClass="tab-icon" />
+                </graphic>
+                <VBox spacing="10">
+                    <TableView fx:id="tableNiveaux" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucun niveau enregistré" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colNiveauNom" prefWidth="220" text="Niveau" />
+                            <TableColumn fx:id="colNiveauSysteme" prefWidth="130" text="Système" />
+                            <TableColumn fx:id="colNiveauCycle" prefWidth="150" text="Cycle" />
+                            <TableColumn fx:id="colNiveauOrdre" prefWidth="80" text="Ordre" />
+                            <TableColumn fx:id="colNiveauStatut" prefWidth="110" text="Statut" />
+                            <TableColumn fx:id="colNiveauActions" prefWidth="90" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" styleClass="table-footer">
+                        <Label fx:id="lblFooterNiveaux" styleClass="footer-info" text="0 niveau" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationNiveaux" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <Tab text="Filières">
+                <graphic>
+                    <FontIcon iconLiteral="fth-git-branch" styleClass="tab-icon" />
+                </graphic>
+                <VBox spacing="10">
+                    <TableView fx:id="tableFilieres" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucune filière enregistrée" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colFiliereCode" prefWidth="100" text="Code" />
+                            <TableColumn fx:id="colFiliereNom" prefWidth="260" text="Filière" />
+                            <TableColumn fx:id="colFiliereStatut" prefWidth="110" text="Statut" />
+                            <TableColumn fx:id="colFiliereActions" prefWidth="90" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" styleClass="table-footer">
+                        <Label fx:id="lblFooterFilieres" styleClass="footer-info" text="0 filière" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationFilieres" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <Tab text="Groupes de matières">
+                <graphic>
+                    <FontIcon iconLiteral="fth-folder" styleClass="tab-icon" />
+                </graphic>
+                <VBox spacing="10">
+                    <TableView fx:id="tableGroupes" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label styleClass="table-placeholder" text="Aucun groupe de matières enregistré" />
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colGroupeCode" prefWidth="100" text="Code" />
+                            <TableColumn fx:id="colGroupeNom" prefWidth="260" text="Groupe" />
+                            <TableColumn fx:id="colGroupeOrdre" prefWidth="80" text="Ordre" />
+                            <TableColumn fx:id="colGroupeStatut" prefWidth="148.79998779296875" text="Statut" />
+                            <TableColumn fx:id="colGroupeActions" prefWidth="190.39996337890625" text="Actions" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" styleClass="table-footer">
+                        <Label fx:id="lblFooterGroupes" styleClass="footer-info" text="0 groupe" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Pagination fx:id="paginationGroupes" maxPageIndicatorCount="5" styleClass="custom-pagination" />
+                    </HBox>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </VBox>
+
+    <!-- ============ VOILE DE FOND DU TIROIR ============ -->
+    <Region fx:id="drawerScrim" managed="false" onMouseClicked="#onFermerTiroir" styleClass="drawer-scrim" visible="false" />
+
+    <!-- ============ TIROIR CRÉATION / ÉDITION (partagé entre les 3 onglets) ============ -->
+    <HBox fx:id="drawerWrapper" alignment="CENTER_RIGHT" managed="false" pickOnBounds="false" visible="false">
+        <VBox fx:id="drawerPanel" maxWidth="380" prefWidth="380" spacing="18" styleClass="special-container">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="20" />
+            </padding>
+
+            <!-- En-tête du tiroir -->
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="drawerTitre" styleClass="card-title" text="Nouveau niveau" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#onFermerTiroir" styleClass="btn-icon-light">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-x" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <Separator />
+
+            <!-- Champs communs à Niveau / Filiere / GroupeMatiere -->
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Code" />
+                <TextField fx:id="champCode" promptText="Ex : C, A4, TI..." styleClass="input" />
+            </VBox>
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Libellé" />
+                <TextField fx:id="champLibelle" promptText="Ex : Terminale, Sciences Mathématiques..." styleClass="input" />
+            </VBox>
+
+            <!-- Bloc spécifique à l'onglet Niveaux — masqué (visible/managed=false) sur Filières et Groupes -->
+            <VBox fx:id="blocChampsNiveau" spacing="14">
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Système" />
+                    <ComboBox fx:id="comboSysteme" maxWidth="Infinity" styleClass="special-combo" />
+                </VBox>
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Cycle" />
+                    <ComboBox fx:id="comboCycle" maxWidth="Infinity" styleClass="special-combo" />
+                </VBox>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label styleClass="field-label" text="Ordre d'affichage" />
+                <TextField fx:id="champOrdre" promptText="0" styleClass="input" />
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label styleClass="field-label" text="Actif" />
+                <Region HBox.hgrow="ALWAYS" />
+                <ToggleButton fx:id="toggleActif" selected="true" styleClass="toggle-switch" text="Actif" />
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <!-- Pied du tiroir -->
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button onAction="#onFermerTiroir" styleClass="btn-icon-light" text="Annuler" />
+                <Button fx:id="btnEnregistrer" onAction="#onEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-check" />
+                    </graphic>
+                </Button>
+            </HBox>
+
+        </VBox>
     </HBox>
 
-    <!-- ===== FORMULAIRE ===== -->
-    <ScrollPane fitToWidth="true" styleClass="page-scroll" VBox.vgrow="ALWAYS">
-        <content>
-            <VBox spacing="20" maxWidth="700">
-
-                <!-- ===== SECTION 1 : INFORMATIONS DE BASE ===== -->
-                <VBox styleClass="card" spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fth-user" iconSize="18" styleClass="tile-icon"/>
-                        <Label text="Informations de base" styleClass="card-title"/>
-                    </HBox>
-
-                    <!-- Nom + Prénom -->
-                    <HBox spacing="15">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Nom *" styleClass="field-label"/>
-                            <TextField fx:id="nomField"
-                                       promptText="Ex: Kamdem"
-                                       styleClass="input"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Prénom" styleClass="field-label"/>
-                            <TextField fx:id="prenomField"
-                                       promptText="Ex: Marie"
-                                       styleClass="input"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Username + Email -->
-                    <HBox spacing="15">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Username *" styleClass="field-label"/>
-                            <TextField fx:id="usernameField"
-                                       promptText="Ex: mkamdem"
-                                       styleClass="input"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Email *" styleClass="field-label"/>
-                            <TextField fx:id="emailField"
-                                       promptText="Ex: marie.kamdem@ecole.com"
-                                       styleClass="input"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Téléphone + Type utilisateur -->
-                    <HBox spacing="15">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Téléphone" styleClass="field-label"/>
-                            <TextField fx:id="telephoneField"
-                                       promptText="Ex: 677123456"
-                                       styleClass="input"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Type d'utilisateur *" styleClass="field-label"/>
-                            <ComboBox fx:id="typeUserCombo"
-                                      promptText="Sélectionner un type"
-                                      maxWidth="Infinity"
-                                      styleClass="input"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- École -->
-                    <VBox spacing="6">
-                        <Label text="École *" styleClass="field-label"/>
-                        <ComboBox fx:id="ecoleCombo"
-                                  promptText="Sélectionner une école"
-                                  maxWidth="Infinity"
-                                  styleClass="input"/>
-                    </VBox>
-                </VBox>
-
-                <!-- ===== SECTION 2 : SÉCURITÉ ===== -->
-                <VBox styleClass="card" spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fth-lock" iconSize="18" styleClass="tile-icon"/>
-                        <Label text="Sécurité" styleClass="card-title"/>
-                    </HBox>
-
-                    <!-- Mot de passe -->
-                    <VBox spacing="6">
-                        <Label text="Mot de passe *" styleClass="field-label"/>
-                        <HBox styleClass="input-container" spacing="10" alignment="CENTER_LEFT">
-                            <FontIcon iconLiteral="fth-lock" iconSize="14" styleClass="input-icon"/>
-                            <PasswordField fx:id="passwordField"
-                                           promptText="Minimum 8 caractères"
-                                           HBox.hgrow="ALWAYS"
-                                           styleClass="login-input"/>
-                            <Button fx:id="togglePasswordBtn" styleClass="toggle-password-btn">
-                                <graphic>
-                                    <FontIcon iconLiteral="fth-eye" iconSize="14"/>
-                                </graphic>
-                            </Button>
-                        </HBox>
-
-                        <!-- Indicateur de force -->
-                        <HBox spacing="5" alignment="CENTER_LEFT">
-                            <Label text="Force :" styleClass="footer-info"/>
-                            <Label fx:id="forceMdpLabel" text="—" style="-fx-font-weight: bold;"/>
-                            <ProgressBar fx:id="forceMdpProgress" prefWidth="150" prefHeight="6"
-                                         styleClass="kpi-progress" visible="false"/>
-                        </HBox>
-                    </VBox>
-
-                    <!-- Confirmation -->
-                    <VBox spacing="6">
-                        <Label text="Confirmer le mot de passe *" styleClass="field-label"/>
-                        <HBox styleClass="input-container" spacing="10" alignment="CENTER_LEFT">
-                            <FontIcon iconLiteral="fth-lock" iconSize="14" styleClass="input-icon"/>
-                            <PasswordField fx:id="confirmPasswordField"
-                                           promptText="Retapez le mot de passe"
-                                           HBox.hgrow="ALWAYS"
-                                           styleClass="login-input"/>
-                        </HBox>
-                    </VBox>
-
-                    <!-- Options -->
-                    <CheckBox fx:id="changerMdpCheckBox"
-                              text="L'utilisateur doit changer son mot de passe à la première connexion"
-                              styleClass="remember-checkbox"/>
-
-                    <CheckBox fx:id="activer2FACheckBox"
-                              text="Activer la double authentification (2FA)"
-                              styleClass="remember-checkbox"/>
-                </VBox>
-
-                <!-- ===== SECTION 3 : RÔLES ===== -->
-                <VBox styleClass="card" spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fth-shield" iconSize="18" styleClass="tile-icon"/>
-                        <Label text="Rôles de l'utilisateur" styleClass="card-title"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="roleCountLabel" text="0 sélectionné(s)" styleClass="footer-info"/>
-                    </HBox>
-
-                    <Label text="Sélectionnez un ou plusieurs rôles :" styleClass="field-label"/>
-
-                    <!-- Recherche de rôle -->
-                    <HBox styleClass="search-box-light" spacing="8" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light"/>
-                        <TextField fx:id="searchRoleField"
-                                   promptText="Rechercher un rôle..."
-                                   HBox.hgrow="ALWAYS"
-                                   styleClass="search-field-inner"/>
-                    </HBox>
-
-                    <!-- Checkboxes de rôles -->
-                    <ScrollPane fitToWidth="true" prefHeight="150" styleClass="page-scroll">
-                        <content>
-                            <FlowPane fx:id="rolesFlowPane"
-                                      hgap="10"
-                                      vgap="10"
-                                      prefWrapLength="600"/>
-                        </content>
-                    </ScrollPane>
-
-                    <!-- Rôle principal -->
-                    <VBox spacing="6">
-                        <Label text="Rôle principal (pour l'affichage par défaut)" styleClass="field-label"/>
-                        <ComboBox fx:id="rolePrincipalCombo"
-                                  promptText="Sélectionner le rôle principal"
-                                  maxWidth="Infinity"
-                                  styleClass="input"/>
-                    </VBox>
-                </VBox>
-
-                <!-- ===== SECTION 4 : PERMISSIONS D'EXCEPTION ===== -->
-                <VBox styleClass="card" spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fth-key" iconSize="18" styleClass="tile-icon"/>
-                        <Label text="Permissions d'exception (optionnel)" styleClass="card-title"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="permCountLabel" text="0 sélectionnée(s)" styleClass="footer-info"/>
-                    </HBox>
-
-                    <Label text="Permissions supplémentaires au-delà des rôles :" styleClass="field-label" wrapText="true"/>
-
-                    <CheckBox fx:id="showExceptionsCheckBox"
-                              text="Afficher les permissions d'exception"
-                              styleClass="remember-checkbox"/>
-
-                    <VBox fx:id="permissionsContainer" spacing="5" visible="false" managed="false">
-                        <!-- Checkboxes de permissions dynamiques -->
-                    </VBox>
-                </VBox>
-
-                <!-- ===== MESSAGE D'ERREUR ===== -->
-                <Label fx:id="errorLabel"
-                       visible="false"
-                       managed="false"
-                       wrapText="true"
-                       styleClass="error-label"/>
-
-                <!-- ===== BOUTONS ===== -->
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Button fx:id="btnAnnuler"
-                            onAction="#handleAnnuler"
-                            text="Annuler"
-                            styleClass="btn-icon-light">
-                        <graphic>
-                            <FontIcon iconLiteral="fth-x" iconSize="14"/>
-                        </graphic>
-                    </Button>
-                    <Button fx:id="btnEnregistrer"
-                            onAction="#handleEnregistrer"
-                            text="Enregistrer l'utilisateur"
-                            defaultButton="true"
-                            styleClass="button-primary">
-                        <graphic>
-                            <FontIcon iconLiteral="fth-save" iconSize="16"/>
-                        </graphic>
-                    </Button>
-                </HBox>
-            </VBox>
-        </content>
-    </ScrollPane>
-</VBox>
+</StackPane>

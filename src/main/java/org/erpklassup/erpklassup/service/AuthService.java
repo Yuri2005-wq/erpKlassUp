@@ -3,6 +3,7 @@ package org.erpklassup.erpklassup.service;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.erpklassup.erpklassup.dao.*;
+import org.erpklassup.erpklassup.dao.module2.AnneeScolaireDAO;
 import org.erpklassup.erpklassup.models.TentativeConnexion;
 import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.util.I18nManager;
@@ -24,6 +25,7 @@ public class AuthService {
     private final ActionPermissionDAO actionPermissionDAO = new ActionPermissionDAO();
     private final SessionUtilisateurDAO sessionUtilisateurDAO = new SessionUtilisateurDAO();
     private final TentativeConnexionDAO tentativeConnexionDAO = new TentativeConnexionDAO();
+    private final AnneeScolaireDAO anneeScolaireDAO = new AnneeScolaireDAO();
     private final SessionManager sessionManager = SessionManager.getInstance();
 
     // ✅ Plus de "final" ni de "new" ici : instanciation paresseuse
@@ -314,6 +316,8 @@ public class AuthService {
         Set<String> permissionsEffectives =
                 permissionDAO.findPermissionsEffectivesPourUtilisateur(user.getIdUtilisateur());
 
+        revoquerSessionConcurrenteSiPresente(user);
+
         // Enregistrement de la session BDD
         String idSession = UUID.randomUUID().toString();
         String refreshTokenHash = UUID.randomUUID().toString();
@@ -334,6 +338,7 @@ public class AuthService {
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
         I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
+        chargerAnneeActive(idEcole);
 
 
         // ✅ Audit APRÈS demarrerSession (pour que la session soit active)
@@ -492,6 +497,9 @@ public class AuthService {
 
         Set<String> permissionsEffectives = permissionDAO.findPermissionsEffectivesPourUtilisateur(user.getIdUtilisateur());
 
+        revoquerSessionConcurrenteSiPresente(user);
+
+
         String idSession = UUID.randomUUID().toString();
         String refreshTokenHash = UUID.randomUUID().toString();
         String familleToken = UUID.randomUUID().toString();
@@ -510,10 +518,31 @@ public class AuthService {
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
         I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
+        chargerAnneeActive(idEcole);
 
 
         afficherToast(stage, () -> ToastNotification.succes(stage, "Bienvenue " + user.getPrenom() + " !"));
 
         return new ResultatConnexion(true, "Connexion réussie", user, permissionsEffectives);
+    }
+
+    private void chargerAnneeActive(String idEcole) {
+        anneeScolaireDAO.findCourante(idEcole).ifPresentOrElse(
+                sessionManager::setAnneeActive,
+                () -> System.err.println("⚠️ Aucune année scolaire courante pour l'école " + idEcole)
+        );
+    }
+
+    private void revoquerSessionConcurrenteSiPresente(Utilisateur user) {
+        try {
+            sessionUtilisateurDAO.trouverIdSessionActive(user.getIdUtilisateur()).ifPresent(idSessionExistante -> {
+                sessionUtilisateurDAO.revoquerSession(idSessionExistante, "NOUVELLE_CONNEXION_AUTRE_POSTE");
+                audit().tracerActionAsync("AUTHENTIFICATION", "SESSION_CONCURRENTE_REVOQUEE",
+                        "Session " + idSessionExistante + " révoquée suite à une nouvelle connexion pour "
+                                + user.getNomComplet());
+            });
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur lors de la révocation de session concurrente : " + e.getMessage());
+        }
     }
 }

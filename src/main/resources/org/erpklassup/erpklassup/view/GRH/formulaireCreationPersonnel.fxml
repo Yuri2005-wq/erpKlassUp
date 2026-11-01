@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="650.0" prefWidth="750.0"
+      style="-fx-background-color: #F8FAFC;"
+      stylesheets="@../../style.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.PersonnelFormController">
+
+    <!-- EN-TÊTE DE LA MODALE -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: white; -fx-padding: 16 24; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;">
+        <FontIcon iconLiteral="fth-user-plus" iconSize="24" iconColor="#2563EB"/>
+        <VBox>
+            <Label text="Gestion du Personnel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+            <Label text="Remplissez les informations de l'employé pour l'établissement" style="-fx-font-size: 12px; -fx-text-fill: #64748B;"/>
+        </VBox>
+    </HBox>
+
+    <!-- CONTENU PRINCIPAL PAR ONGLETS (TABPANE) -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-padding: 10;">
+
+        <!-- ONGLET 1 : ÉTAT CIVIL & IDENTITÉ -->
+        <Tab text="État Civil / Identité">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <VBox spacing="16.0" style="-fx-padding: 16; -fx-background-color: white; -fx-background-radius: 8;">
+
+                    <!-- Ligne Photo & Infos principales -->
+                    <HBox spacing="20.0" alignment="CENTER_LEFT">
+                        <StackPane fx:id="paneAvatarContainer" prefWidth="70" prefHeight="70" style="-fx-background-color: #E2E8F0; -fx-background-radius: 35;">
+                            <!-- Placeholder ou Avatar dynamique injecté par le contrôleur -->
+                            <FontIcon iconLiteral="fth-user" iconSize="30" iconColor="#64748B"/>
+                        </StackPane>
+                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                            <Label text="Photo de profil" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                            <Label text="La photo sera recadrée automatiquement via AvatarUtil" style="-fx-font-size: 11px; -fx-text-fill: #64748B;"/>
+                        </VBox>
+                    </HBox>
+
+                    <Separator/>
+
+                    <!-- Grille des champs d'état civil -->
+                    <GridPane hgap="16.0" vgap="12.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Matricule -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Matricule Interne *" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtMatricule" promptText="Ex: MAT-2026-001"/>
+                        </VBox>
+
+                        <!-- Sexe -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Sexe" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <ComboBox fx:id="comboSexe" maxWidth="Infinity" promptText="Sélectionner"/>
+                        </VBox>
+
+                        <!-- Nom -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Nom *" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtNom" promptText="Nom de famille"/>
+                        </VBox>
+
+                        <!-- Prénom -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Prénom" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtPrenom" promptText="Prénom(s)"/>
+                        </VBox>
+
+                        <!-- Date de naissance -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <Label text="Date de naissance" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <DatePicker fx:id="dateNaissance" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <!-- Lieu de naissance -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Label text="Lieu de naissance" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtLieuNaissance" promptText="Ville ou localité"/>
+                        </VBox>
+
+                        <!-- Nationalité -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                            <Label text="Nationalité" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtNationalite" text="Camerounaise"/>
+                        </VBox>
+
+                        <!-- Numéro CNI / NIU / CNPS -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <Label text="Numéro CNI" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtNumeroCni" promptText="Carte Nationale d'Identité"/>
+                        </VBox>
+                    </GridPane>
+
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+        <!-- ONGLET 2 : AFFECTATION & POSTE -->
+        <Tab text="Affectation / Poste">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <VBox spacing="16.0" style="-fx-padding: 16; -fx-background-color: white; -fx-background-radius: 8;">
+                    <GridPane hgap="16.0" vgap="12.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Département -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Département" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <ComboBox fx:id="comboDepartement" maxWidth="Infinity" promptText="Choisir un département"/>
+                        </VBox>
+
+                        <!-- Type de personnel -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Type de personnel *" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <ComboBox fx:id="comboTypePersonnel" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <!-- Poste ou Fonction -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Poste ou Fonction *" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtPoste" promptText="Ex: Professeur Principal, Économe..."/>
+                        </VBox>
+
+                        <!-- Statut contractuel -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Statut Contractuel" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <ComboBox fx:id="comboStatutContractuel" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <!-- Date d'embauche -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <Label text="Date d'embauche (Hired Date)" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <DatePicker fx:id="dateEmbauche" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <!-- Numéro CNPS -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Label text="Numéro CNPS" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtNumCnps" promptText="Immatriculation CNPS"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+        <!-- ONGLET 3 : CONTACTS & ADRESSE -->
+        <Tab text="Contacts / Adresse">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <VBox spacing="16.0" style="-fx-padding: 16; -fx-background-color: white; -fx-background-radius: 8;">
+                    <GridPane hgap="16.0" vgap="12.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Téléphone -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Téléphone" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtTelephone" promptText="+237 ..."/>
+                        </VBox>
+
+                        <!-- Email -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="E-mail professionnel" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtEmail" promptText="employe@ecole.cm"/>
+                        </VBox>
+
+                        <!-- Adresse -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Adresse physique" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtAdresse" promptText="Quartier, Rue..."/>
+                        </VBox>
+
+                        <!-- Ville -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Ville" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtVille" promptText="Ex: Douala, Yaoundé..."/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+        <!-- ONGLET 4 : PAIE & PAIEMENT -->
+        <Tab text="Paie / Paiement">
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <VBox spacing="16.0" style="-fx-padding: 16; -fx-background-color: white; -fx-background-radius: 8;">
+                    <GridPane hgap="16.0" vgap="12.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <!-- Mode de paiement -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Mode de paiement" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <ComboBox fx:id="comboModePaiement" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <!-- Nom de la banque -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Banque (si virement)" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtNomBanque" promptText="Nom de l'établissement bancaire"/>
+                        </VBox>
+
+                        <!-- IBAN / RIB -->
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="IBAN ou RIB" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtIban" promptText="Numéro de compte bancaire"/>
+                        </VBox>
+
+                        <!-- Numéro Mobile Money -->
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Numéro Mobile Money" style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                            <TextField fx:id="txtMobileMoney" promptText="+237 ..."/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+            </ScrollPane>
+        </Tab>
+
+    </TabPane>
+
+    <!-- BARRE DES BOUTONS D'ACTION (PIED DE PAGE) -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0" style="-fx-background-color: white; -fx-padding: 16 24; -fx-border-color: #E2E8F0; -fx-border-width: 1 0 0 0;">
+        <Button fx:id="btnAnnuler" text="Annuler" styleClass="btn-secondary" prefWidth="100.0"/>
+        <Button fx:id="btnEnregistrer" text="Enregistrer" styleClass="btn-primary" prefWidth="120.0"/>
+    </HBox>
+
+</VBox>

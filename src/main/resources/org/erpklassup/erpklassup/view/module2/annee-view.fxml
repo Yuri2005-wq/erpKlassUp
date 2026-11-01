@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="rootStack" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.AnneeController">
+
+    <VBox spacing="16" VBox.vgrow="ALWAYS">
+        <padding><Insets bottom="20" left="24" right="24" top="20" /></padding>
+
+        <!-- ==================== TOOLBAR ==================== -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-toolbar">
+
+            <!-- Recherche -->
+            <HBox alignment="CENTER_LEFT" styleClass="search-box-light">
+                <FontIcon iconLiteral="fth-search" iconSize="14" styleClass="search-icon-light" />
+                <TextField fx:id="searchAnneeField" promptText="Rechercher une année..." styleClass="search-field-inner" HBox.hgrow="ALWAYS" />
+                <Button fx:id="clearSearchAnnee" styleClass="btn-clear-search" visible="false">
+                    <graphic><FontIcon iconLiteral="fth-x" iconSize="10" /></graphic>
+                </Button>
+            </HBox>
+
+            <!-- Filtre par statut -->
+            <ComboBox fx:id="filterStatut" prefWidth="200" promptText="Tous les statuts" styleClass="special-combo" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnNouvelleAnnee" styleClass="button-primary" text="Nouvelle année">
+                <graphic><FontIcon iconLiteral="fth-plus-circle" iconSize="12" /></graphic>
+            </Button>
+        </HBox>
+
+        <!-- ==================== TABLE ==================== -->
+        <VBox spacing="8" styleClass="card" VBox.vgrow="ALWAYS">
+
+            <TableView fx:id="tableAnnees" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colAnneeLibelle" prefWidth="200" text="Libellé" />
+                    <TableColumn fx:id="colAnneeDebut" prefWidth="160" text="Date début" />
+                    <TableColumn fx:id="colAnneeFin" prefWidth="160" text="Date fin" />
+                    <TableColumn fx:id="colAnneeStatut" prefWidth="200" text="Statut" />
+                    <TableColumn fx:id="colAnneeActions" prefWidth="130" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                </columns>
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="8">
+                        <FontIcon iconLiteral="fth-calendar" iconSize="32" styleClass="icon-gray" />
+                        <Label styleClass="table-placeholder" text="Aucune année scolaire enregistrée" />
+                    </VBox>
+                </placeholder>
+            </TableView>
+
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="table-footer">
+                <Label fx:id="footerInfoAnnee" styleClass="footer-info" text="0 année" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox fx:id="paginationAnnee" spacing="4" />
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <!-- ==================== DRAWER ANNÉE ==================== -->
+    <StackPane fx:id="drawerOverlayAnnee" managed="false" visible="false">
+
+        <Region fx:id="scrimAnnee" styleClass="drawer-scrim" StackPane.alignment="CENTER" />
+
+        <VBox fx:id="drawerAnnee" maxHeight="640" maxWidth="480" spacing="16" styleClass="special-container" StackPane.alignment="CENTER_RIGHT">
+            <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <FontIcon fx:id="drawerAnneeIcon" iconLiteral="fth-calendar" iconSize="20" style="-fx-icon-color: #F5A524;" />
+                <VBox>
+                    <Label fx:id="drawerAnneeTitle" styleClass="card-title" text="Nouvelle année scolaire" />
+                    <Label fx:id="drawerAnneeSubtitle" styleClass="page-subtitle" text="Renseignez les informations de l'année" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnCloseAnnee" styleClass="btn-icon-light">
+                    <graphic><FontIcon iconLiteral="fth-x" iconSize="12" /></graphic>
+                </Button>
+            </HBox>
+
+            <Separator />
+
+            <VBox spacing="14" VBox.vgrow="ALWAYS">
+
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Libellé *" />
+                    <TextField fx:id="fieldAnneeLibelle" promptText="ex: 2025-2026" styleClass="input" />
+                    <Label fx:id="errAnneeLibelle" managed="false" styleClass="field-error" visible="false" />
+                </VBox>
+
+                <HBox spacing="12">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Date de début *" />
+                        <DatePicker fx:id="fieldAnneeDebut" maxWidth="Infinity" styleClass="date-picker-custom" />
+                        <Label fx:id="errAnneeDebut" managed="false" styleClass="field-error" visible="false" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Date de fin *" />
+                        <DatePicker fx:id="fieldAnneeFin" maxWidth="Infinity" styleClass="date-picker-custom" />
+                        <Label fx:id="errAnneeFin" managed="false" styleClass="field-error" visible="false" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6">
+                    <Label styleClass="field-label" text="Statut" />
+                    <ComboBox fx:id="fieldAnneeStatut" maxWidth="Infinity" styleClass="special-combo" />
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="special-container">
+                    <FontIcon iconLiteral="fth-star" iconSize="14" style="-fx-icon-color: #F5A524;" />
+                    <VBox>
+                        <Label styleClass="field-label" text="Année courante" />
+                        <Label styleClass="page-subtitle" text="Définir comme année active par défaut" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <ToggleButton fx:id="toggleAnneeCourante" styleClass="custom-toggle-button" />
+                </HBox>
+
+                <Label fx:id="errAnneeGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+            </VBox>
+
+            <Separator />
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button fx:id="btnCancelAnnee" style="-fx-padding: 8 20;" styleClass="btn-icon-light" text="Annuler" />
+                <Button fx:id="btnSaveAnnee" styleClass="button-primary" text="Enregistrer" />
+            </HBox>
+        </VBox>
+    </StackPane>
+
+    <!-- ==================== CONFIRMATION SUPPRESSION ==================== -->
+    <StackPane fx:id="confirmOverlay" managed="false" visible="false">
+        <Region styleClass="drawer-scrim" />
+        <VBox maxWidth="420" spacing="18" styleClass="special-container" StackPane.alignment="CENTER">
+            <padding><Insets bottom="24" left="24" right="24" top="24" /></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="14">
+                <StackPane style="-fx-min-width:44; -fx-min-height:44;                                   -fx-max-width:44; -fx-max-height:44;                                   -fx-background-radius:50%;" styleClass="icon-red">
+                    <FontIcon iconLiteral="fth-alert-triangle" iconSize="20" />
+                </StackPane>
+                <VBox>
+                    <Label fx:id="confirmTitle" styleClass="card-title" text="Confirmer la suppression" />
+                    <Label fx:id="confirmMessage" maxWidth="280" styleClass="page-subtitle" wrapText="true" />
+                </VBox>
+            </HBox>
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button fx:id="btnCancelDelete" style="-fx-padding: 8 18;" styleClass="btn-icon-light" text="Annuler" />
+                <Button fx:id="btnConfirmDelete" style="-fx-background-color: #E5484D;                                -fx-text-fill: white;                                -fx-font-weight: 700;                                -fx-background-radius: 8;                                -fx-padding: 8 18;                                -fx-cursor: hand;" text="Supprimer" />
+            </HBox>
+        </VBox>
+    </StackPane>
+
+    <!-- ==================== TOAST ==================== -->
+    <HBox fx:id="toastBox" alignment="CENTER_LEFT" managed="false" maxWidth="360" spacing="12" styleClass="card" visible="false" StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin><Insets bottom="24" right="24" /></StackPane.margin>
+        <FontIcon fx:id="toastIcon" iconLiteral="fth-check-circle" iconSize="18" style="-fx-icon-color: #16A34A;" />
+        <Label fx:id="toastMessage" styleClass="activity-title" wrapText="true" />
+    </HBox>
+
+</StackPane>

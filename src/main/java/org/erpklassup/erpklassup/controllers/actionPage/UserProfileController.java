@@ -16,11 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.erpklassup.erpklassup.dao.UtilisateurDAO;
+import org.erpklassup.erpklassup.dto.AuditLigne;
+import org.erpklassup.erpklassup.dto.FiltreAudit;
 import org.erpklassup.erpklassup.models.Utilisateur;
-import org.erpklassup.erpklassup.service.AppExecutor;
-import org.erpklassup.erpklassup.service.PasswordService;
-import org.erpklassup.erpklassup.service.Security2FAService;
-import org.erpklassup.erpklassup.service.SessionManager;
+import org.erpklassup.erpklassup.service.*;
 import org.erpklassup.erpklassup.util.AlertUtil;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
@@ -28,6 +27,9 @@ import org.erpklassup.erpklassup.util.ToastNotification;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerCasseTitre;
+import static org.erpklassup.erpklassup.util.ValidationUtil.forcerMajuscules;
 
 public class UserProfileController implements Initializable {
 
@@ -92,12 +94,11 @@ public class UserProfileController implements Initializable {
     // ==========================================
     // ONGLET 3 : MES ACTIVITÉS
     // ==========================================
-    @FXML private TableView<?> activitesTable;
-    @FXML private TableColumn<?, ?> colDateActivite;
-    @FXML private TableColumn<?, ?> colActionActivite;
-    @FXML private TableColumn<?, ?> colDetailActivite;
-    @FXML private TableColumn<?, ?> colIpActivite;
-
+    @FXML private TableView<AuditLigne> activitesTable;
+    @FXML private TableColumn<AuditLigne, String> colDateActivite;
+    @FXML private TableColumn<AuditLigne, String> colActionActivite;
+    @FXML private TableColumn<AuditLigne, String> colDetailActivite;
+    @FXML private TableColumn<AuditLigne, String> colIpActivite;
     // ==========================================
     // MODAL CODES DE SECOURS
     // ==========================================
@@ -110,6 +111,7 @@ public class UserProfileController implements Initializable {
     // SERVICES ET ÉTAT
     // ==========================================
     private final UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
+    private final AuditService auditService = new AuditService();
     private final Security2FAService security2FAService = new Security2FAService();
 
     private Utilisateur utilisateurCourant;
@@ -135,6 +137,11 @@ public class UserProfileController implements Initializable {
         configurerEvenements();
         masquerElementsNonUtilises();
         Platform.runLater(this::appliquerClipArrondi);
+
+        forcerMajuscules(nomField);
+        forcerCasseTitre(prenomField);
+        configurerTableauActivites();
+        chargerHistorique();
     }
 
     private void masquerElementsNonUtilises() {
@@ -591,4 +598,129 @@ public class UserProfileController implements Initializable {
         }
         return nomComplet.substring(0, Math.min(2, nomComplet.length())).toUpperCase();
     }
+
+    /* ============================================================
+   ONGLET 3 — MES ACTIVITÉS (historique personnel)
+   ============================================================ */
+
+    /** Format d'affichage des dates dans l'historique. */
+    private static final java.time.format.DateTimeFormatter FORMAT_DATE =
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+
+    /**
+     * Charge l'historique des actions effectuées PAR l'utilisateur connecté.
+     *
+     * <p>Ne retourne que les actions dont il est l'<b>auteur</b> (idUtilisateur),
+     * pas celles faites sur lui par un administrateur.</p>
+     */
+    private void chargerHistorique() {
+        if (utilisateurCourant == null) {
+            if (activitesTable != null) {
+                activitesTable.setPlaceholder(
+                        new Label(i18n().t("user_profile.activity.empty")));
+            }
+            return;
+        }
+
+        String idEcole = SessionManager.getInstance().getIdEcoleCourante();
+        if (idEcole == null) {
+            if (activitesTable != null) {
+                activitesTable.setPlaceholder(
+                        new Label(i18n().t("user_profile.activity.error")));
+            }
+            return;
+        }
+
+        // Placeholder pendant le chargement
+        if (activitesTable != null) {
+            activitesTable.setPlaceholder(
+                    new Label(i18n().t("user_profile.activity.loading")));
+        }
+
+        // ✅ Filtre par AUTEUR (l'utilisateur voit SES actions)
+        FiltreAudit filtre = new FiltreAudit(
+                idEcole,
+                utilisateurCourant.getIdUtilisateur(),   // ← idUtilisateurAuteur
+                null,   // terme
+                null,   // dateDebut
+                null,   // dateFin
+                null    // categorie
+        );
+
+        auditService.rechercherAsync(
+                filtre,
+                resultats -> Platform.runLater(() -> appliquerResultatAudit(resultats)),
+                erreur -> Platform.runLater(() -> {
+                    System.err.println("❌ Erreur chargement historique : " + erreur.getMessage());
+                    if (activitesTable != null) {
+                        activitesTable.setPlaceholder(
+                                new Label(i18n().t("user_profile.activity.error")));
+                    }
+                })
+        );
+    }
+
+    /**
+     * Applique le résultat dans le tableau (sans pagination).
+     */
+    private void appliquerResultatAudit(List<AuditLigne> resultats) {
+        if (activitesTable == null) return;
+
+        if (resultats == null || resultats.isEmpty()) {
+            activitesTable.setItems(FXCollections.observableArrayList());
+            activitesTable.setPlaceholder(
+                    new Label(i18n().t("user_profile.activity.empty")));
+            return;
+        }
+
+        activitesTable.setItems(FXCollections.observableArrayList(resultats));
+    }
+
+    /* ============================================================
+   CONFIGURATION DU TABLEAU DES ACTIVITÉS
+   ============================================================ */
+    private void configurerTableauActivites() {
+        if (activitesTable == null) return;
+
+        // Colonne DATE
+        if (colDateActivite != null) {
+            colDateActivite.setCellValueFactory(data -> {
+                AuditLigne ligne = data.getValue();
+                String texte = (ligne.horodatage() != null)
+                        ? ligne.horodatage().format(FORMAT_DATE)
+                        : "";
+                return new javafx.beans.property.SimpleStringProperty(texte);
+            });
+        }
+
+        // Colonne ACTION
+        if (colActionActivite != null) {
+            colActionActivite.setCellValueFactory(data -> {
+                AuditLigne ligne = data.getValue();
+                return new javafx.beans.property.SimpleStringProperty(
+                        ligne.action() != null ? ligne.action() : "—");
+            });
+        }
+
+        // Colonne DÉTAILS
+        if (colDetailActivite != null) {
+            colDetailActivite.setCellValueFactory(data -> {
+                AuditLigne ligne = data.getValue();
+                return new javafx.beans.property.SimpleStringProperty(
+                        ligne.details() != null ? ligne.details() : "—");
+            });
+        }
+
+        // Colonne IP
+        if (colIpActivite != null) {
+            colIpActivite.setCellValueFactory(data -> {
+                AuditLigne ligne = data.getValue();
+                return new javafx.beans.property.SimpleStringProperty(
+                        ligne.adresseIp() != null ? ligne.adresseIp() : "—");
+            });
+        }
+    }
+
+
 }

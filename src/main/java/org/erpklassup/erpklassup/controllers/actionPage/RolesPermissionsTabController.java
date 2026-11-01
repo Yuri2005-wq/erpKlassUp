@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import org.erpklassup.erpklassup.dto.PermissionOption;
 import org.erpklassup.erpklassup.dto.RoleOption;
@@ -21,6 +22,9 @@ import java.util.*;
 
 public class RolesPermissionsTabController implements Initializable, VueDisposable {
 
+    /* ============================================================
+       CHAMPS FXML
+       ============================================================ */
     @FXML private ListView<RoleOption> listRoles;
     @FXML private Button btnNouveauRole;
     @FXML private Label labelRoleSelectionne;
@@ -32,6 +36,14 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
     @FXML private Button btnAnnulerPermissions;
     @FXML private Button btnEnregistrerPermissions;
 
+    /* ============================================================
+       CONSTANTES
+       ============================================================ */
+    private static final Duration PERIODE_REFRESH_ROLES = Duration.seconds(10);
+
+    /* ============================================================
+       SERVICES & ÉTAT
+       ============================================================ */
     private final RoleService service = new RoleService();
     private final AuditService auditService = new AuditService();
 
@@ -40,15 +52,27 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
     private final Runnable ecouteurI18n = this::rafraichirTextes;
 
     private RoleOption roleSelectionne;
+    private AutoRefreshService<List<RoleOption>> autoRefreshRoles;
+
     private boolean enChargement = false;
     private SessionManager session = SessionManager.getInstance();
     private String idEcoleCourante = session.getIdEcoleCourante();
     private String idUtilisateurConnecte;
 
+    /* ============================================================
+       RACCOURCI i18n
+       ============================================================ */
     private I18nManager i18n() {
         return I18nManager.getInstance();
     }
 
+    public Button getBtnNouveauRole() {
+        return btnNouveauRole;
+    }
+
+    /* ============================================================
+       INITIALISATION
+       ============================================================ */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         listRoles.setItems(FXCollections.observableArrayList());
@@ -57,7 +81,11 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
 
         listRoles.getSelectionModel().selectedItemProperty().addListener((obs, ancien, nouveau) -> {
             roleSelectionne = nouveau;
-            if (nouveau != null) chargerRole(nouveau); else activerPanneauDroit(false);
+            if (nouveau != null) {
+                chargerRole(nouveau);
+            } else {
+                activerPanneauDroit(false);
+            }
         });
 
         btnNouveauRole.setOnAction(e -> creerNouveauRole());
@@ -65,49 +93,65 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         btnSupprimerRole.setOnAction(e -> supprimerRoleSelectionne());
 
         btnEnregistrerPermissions.setOnAction(e -> enregistrerPermissions());
-        btnAnnulerPermissions.setOnAction(e -> { if (roleSelectionne != null) chargerRole(roleSelectionne); });
+        btnAnnulerPermissions.setOnAction(e -> {
+            if (roleSelectionne != null) chargerRole(roleSelectionne);
+        });
 
         SessionManager.getInstance().ecouterChangementsPermissions(ecouteurPermissions);
         appliquerControlesAcces();
 
-        // ✅ S'abonner aux changements de langue
+        // S'abonner aux changements de langue
         i18n().ecouterChangement(ecouteurI18n);
 
         chargerPermissionsDisponibles();
         rafraichirContexte();
     }
 
+    /* ============================================================
+       DISPOSE — Libération propre des ressources
+       ============================================================ */
     @Override
     public void disposer() {
+        // 1. Arrêter le rafraîchissement automatique (évite les fuites mémoire)
+        if (autoRefreshRoles != null) {
+            autoRefreshRoles.dispose();
+            autoRefreshRoles = null;
+        }
+        // 2. Se désabonner des événements globaux
         SessionManager.getInstance().arreterEcoute(ecouteurPermissions);
         i18n().arreterEcoute(ecouteurI18n);
     }
 
+    /* ============================================================
+       i18n
+       ============================================================ */
     private void rafraichirTextes() {
         // Le placeholder
         if (listRoles.getItems().isEmpty()) {
             listRoles.setPlaceholder(new Label(i18n().t("roles.empty")));
         }
-        // Les titres des modules (Accordion)
-        if (accordionModules != null) {
-            accordionModules.getPanes().forEach(p -> {
-                // Le titre vient des permissions BDD → pas traduisible ici
-            });
-        }
-        // Le label de sélection
+        // Le label de sélection (si aucun rôle sélectionné)
         if (roleSelectionne == null) {
             labelRoleSelectionne.setText(i18n().t("roles.select_hint"));
             labelRoleDescription.setText(i18n().t("roles.description_hint"));
         }
+        // Rafraîchir la liste (les cellules peuvent contenir du texte traduit)
+        listRoles.refresh();
     }
 
+    /* ============================================================
+       CONTRÔLES D'ACCÈS
+       ============================================================ */
     private void appliquerControlesAcces() {
         ControleAcces.appliquerAction(btnNouveauRole, "role.creer");
         ControleAcces.appliquerAction(btnRenommerRole, "role.renommer");
         ControleAcces.appliquerAction(btnSupprimerRole, "role.supprimer");
-        ControleAcces.appliquerAction(btnEnregistrerPermissions, "role.modifier");
+        ControleAcces.appliquerAction(btnEnregistrerPermissions, "user.creer");
     }
 
+    /* ============================================================
+       RAFRAÎCHISSEMENT DU CONTEXTE
+       ============================================================ */
     public void rafraichirContexte() {
         SessionManager session = SessionManager.getInstance();
         this.idEcoleCourante = session.getIdEcoleCourante();
@@ -122,8 +166,92 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         }
 
         chargerRoles();
+        demarrerRafraichissementAuto();
     }
 
+    /* ============================================================
+       AUTO-REFRESH DE LA LISTE DES RÔLES
+       ============================================================ */
+    /**
+     * Démarre le rafraîchissement automatique de la liste des rôles.
+     * Se déclenche toutes les 10 secondes pour détecter les changements
+     * effectués depuis un autre poste ou un autre onglet.
+     */
+    private void demarrerRafraichissementAuto() {
+        // Éviter de démarrer plusieurs fois le même service
+        if (autoRefreshRoles != null && autoRefreshRoles.isRunning()) {
+            autoRefreshRoles.restartNow();
+            return;
+        }
+
+        autoRefreshRoles = new AutoRefreshService<List<RoleOption>>(PERIODE_REFRESH_ROLES)
+                .loader(() -> service.listerRoles(idEcoleCourante))
+                .onSuccess(this::appliquerRefreshRoles)
+                .onFailure(err -> System.err.println("❌ Auto-refresh rôles : " + err.getMessage()))
+                .start();
+    }
+
+    /**
+     * Applique la liste des rôles rafraîchie en préservant la sélection courante.
+     */
+//    private void appliquerRefreshRoles(List<RoleOption> nouveauxRoles) {
+//        if (nouveauxRoles == null) return;
+//
+//        String idRoleSelectionneActuel = (roleSelectionne != null) ? roleSelectionne.idRole() : null;
+//
+//        // Mise à jour de la liste
+//        listRoles.setItems(FXCollections.observableArrayList(nouveauxRoles));
+//        listRoles.setPlaceholder(new Label(i18n().t("roles.empty")));
+//
+//        // Restaurer la sélection si le rôle existe toujours
+//        if (idRoleSelectionneActuel != null) {
+//            nouveauxRoles.stream()
+//                    .filter(r -> r.idRole().equals(idRoleSelectionneActuel))
+//                    .findFirst()
+//                    .ifPresentOrElse(
+//                            r -> listRoles.getSelectionModel().select(r),
+//                            () -> {
+//                                // Le rôle a été supprimé ailleurs : on désélectionne
+//                                roleSelectionne = null;
+//                                activerPanneauDroit(false);
+//                            }
+//                    );
+//        } else if (!nouveauxRoles.isEmpty()) {
+//            listRoles.getSelectionModel().selectFirst();
+//        }
+//    }
+
+    // APRÈS
+    private void appliquerRefreshRoles(List<RoleOption> nouveauxRoles) {
+        if (nouveauxRoles == null) return;
+
+        String idRoleSelectionneActuel = (roleSelectionne != null) ? roleSelectionne.idRole() : null;
+
+        // Fusion ciblée : les rôles inchangés (equals() vrai) ne sont pas touchés,
+        // donc la ligne sélectionnée n'est ni remplacée ni ré-émise → pas de
+        // rechargement intempestif du panneau droit.
+        FusionListeUtil.fusionner(listRoles.getItems(), nouveauxRoles, RoleOption::idRole);
+        listRoles.setPlaceholder(new Label(i18n().t("roles.empty")));
+
+        if (idRoleSelectionneActuel != null) {
+            boolean toujoursPresent = nouveauxRoles.stream()
+                    .anyMatch(r -> r.idRole().equals(idRoleSelectionneActuel));
+
+            if (!toujoursPresent) {
+                // Le rôle sélectionné a été supprimé ailleurs entre-temps
+                roleSelectionne = null;
+                activerPanneauDroit(false);
+            }
+            // sinon : rien à faire, la fusion a préservé la sélection telle quelle
+        } else if (!nouveauxRoles.isEmpty() && listRoles.getSelectionModel().isEmpty()) {
+            listRoles.getSelectionModel().selectFirst();
+        }
+    }
+
+
+    /* ============================================================
+       PANNEAU DROIT — Activation/Désactivation
+       ============================================================ */
     private void activerPanneauDroit(boolean actif) {
         accordionModules.setDisable(!actif);
         btnRenommerRole.setDisable(!actif);
@@ -136,12 +264,18 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         }
     }
 
+    /* ============================================================
+       CHARGEMENT DES PERMISSIONS DISPONIBLES (une seule fois)
+       ============================================================ */
     private void chargerPermissionsDisponibles() {
         service.listerPermissionsAsync(
                 permissions -> Platform.runLater(() -> construireAccordion(permissions)),
                 erreur -> Platform.runLater(erreur::printStackTrace));
     }
 
+    /* ============================================================
+       CHARGEMENT DES RÔLES
+       ============================================================ */
     private void chargerRoles() {
         service.listerRolesAsync(idEcoleCourante,
                 roles -> Platform.runLater(() -> {
@@ -154,6 +288,9 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                 erreur -> Platform.runLater(erreur::printStackTrace));
     }
 
+    /* ============================================================
+       CHARGEMENT DES PERMISSIONS D'UN RÔLE
+       ============================================================ */
     private void chargerRole(RoleOption role) {
         activerPanneauDroit(true);
         labelRoleSelectionne.setText(role.nomRole());
@@ -172,10 +309,14 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         labelModificationsNonEnregistrees.setText("");
     }
 
+    /* ============================================================
+       CONSTRUCTION DE L'ACCORDION DES PERMISSIONS
+       ============================================================ */
     private void construireAccordion(List<PermissionOption> permissions) {
         Map<String, List<PermissionOption>> parCategorie = new LinkedHashMap<>();
-        for (PermissionOption p : permissions)
+        for (PermissionOption p : permissions) {
             parCategorie.computeIfAbsent(p.categorie(), k -> new ArrayList<>()).add(p);
+        }
 
         accordionModules.getPanes().clear();
         casesParIdPermission.clear();
@@ -205,9 +346,12 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
             accordionModules.getPanes().add(pane);
         }
 
-        if (!accordionModules.getPanes().isEmpty())
+        if (!accordionModules.getPanes().isEmpty()) {
             accordionModules.setExpandedPane(accordionModules.getPanes().get(0));
-        if (roleSelectionne != null) chargerRole(roleSelectionne);
+        }
+        if (roleSelectionne != null) {
+            chargerRole(roleSelectionne);
+        }
     }
 
     private CheckBox creerCaseSelectionnerTout(List<CheckBox> cases) {
@@ -229,8 +373,12 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         labelModificationsNonEnregistrees.setText(i18n().t("roles.unsaved_changes"));
     }
 
+    /* ============================================================
+       ENREGISTREMENT DES PERMISSIONS
+       ============================================================ */
     private void enregistrerPermissions() {
         if (roleSelectionne == null) return;
+
         Set<String> idsCoches = new HashSet<>();
         casesParIdPermission.forEach((id, c) -> {
             if (c.isSelected()) idsCoches.add(id);
@@ -239,7 +387,11 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
         Stage stage = StageHelper.getStage(btnEnregistrerPermissions);
         btnEnregistrerPermissions.setDisable(true);
 
-        service.enregistrerPermissionsAsync(roleSelectionne.idRole(), idEcoleCourante, idsCoches, idUtilisateurConnecte,
+        service.enregistrerPermissionsAsync(
+                roleSelectionne.idRole(),
+                idEcoleCourante,
+                idsCoches,
+                idUtilisateurConnecte,
                 () -> Platform.runLater(() -> {
                     labelModificationsNonEnregistrees.setText(i18n().t("roles.saved"));
                     btnEnregistrerPermissions.setDisable(false);
@@ -259,6 +411,9 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                 }));
     }
 
+    /* ============================================================
+       CRÉATION D'UN NOUVEAU RÔLE
+       ============================================================ */
     private void creerNouveauRole() {
         String ecoleId = SessionManager.getInstance().getIdEcoleCourante();
 
@@ -278,10 +433,16 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                 396.8
         );
         if (controller != null) {
-            controller.initCreation(ecoleId, this::chargerRoles);
+            controller.initCreation(ecoleId, () -> {
+                chargerRoles();
+                if (autoRefreshRoles != null) autoRefreshRoles.restartNow();
+            });
         }
     }
 
+    /* ============================================================
+       RENOMMAGE D'UN RÔLE
+       ============================================================ */
     private void renommerRoleSelectionne() {
         if (roleSelectionne == null) return;
 
@@ -295,12 +456,19 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                 396.8
         );
         if (controller != null) {
-            controller.initEdition(idEcoleCourante, roleSelectionne, this::chargerRoles);
+            controller.initEdition(idEcoleCourante, roleSelectionne, () -> {
+                chargerRoles();
+                if (autoRefreshRoles != null) autoRefreshRoles.restartNow();
+            });
         }
     }
 
+    /* ============================================================
+       SUPPRESSION D'UN RÔLE
+       ============================================================ */
     private void supprimerRoleSelectionne() {
         if (roleSelectionne == null) return;
+
         Stage stage = StageHelper.getStage(btnSupprimerRole);
 
         boolean confirme = AlertUtil.afficherConfirmation(
@@ -308,6 +476,7 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                 i18n().t("roles.confirm_delete.message", roleSelectionne.nomRole()),
                 stage
         );
+
         if (confirme) {
             String nomRoleSupprime = roleSelectionne.nomRole();
 
@@ -317,6 +486,9 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
                         chargerRoles();
                         activerPanneauDroit(false);
 
+                        // Forcer le refresh immédiat pour resynchroniser la liste
+                        if (autoRefreshRoles != null) autoRefreshRoles.restartNow();
+
                         auditService.tracerActionAsync(
                                 "HABILITATIONS",
                                 "SUPPRESSION_ROLE",
@@ -325,7 +497,10 @@ public class RolesPermissionsTabController implements Initializable, VueDisposab
 
                         ToastNotification.succes(stage, i18n().t("roles.deleted", nomRoleSupprime));
                     }),
-                    erreur -> Platform.runLater(() -> ToastNotification.erreur(stage, i18n().t("roles.delete_error"))));
+                    erreur -> Platform.runLater(() -> {
+                        ToastNotification.erreur(stage, i18n().t("roles.delete_error"));
+                        System.err.println("❌ Suppression rôle : " + erreur.getMessage());
+                    }));
         }
     }
 }

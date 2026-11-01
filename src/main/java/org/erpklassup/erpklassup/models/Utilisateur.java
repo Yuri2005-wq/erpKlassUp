@@ -6,7 +6,6 @@ public class Utilisateur extends BaseEntity {
 
     private String idEcole;
     private String idGroupePrincipal;
-    // ❌ idRole ENLEVÉ ! (remplacé par UtilisateurRole)
     private String username;
     private String passwordHash;
     private String nom;

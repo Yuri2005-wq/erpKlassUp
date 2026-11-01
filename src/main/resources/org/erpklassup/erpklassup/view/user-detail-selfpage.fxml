@@ -210,27 +210,27 @@
                         </VBox>
 
                         <!-- Sessions actives -->
-                        <VBox spacing="15" styleClass="card">
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <FontIcon iconLiteral="fth-monitor" iconSize="18" styleClass="tile-icon" />
-                                <Label styleClass="card-title" text="%user_profile.sessions.title" />
-                                <Region HBox.hgrow="ALWAYS" />
-                                <Button fx:id="btnDeconnecterAutres" styleClass="btn-icon-light" text="%user_profile.sessions.disconnect_others">
-                                    <graphic><FontIcon iconLiteral="fth-log-out" iconSize="14" /></graphic>
-                                </Button>
-                            </HBox>
+<!--                        <VBox spacing="15" styleClass="card">-->
+<!--                            <HBox alignment="CENTER_LEFT" spacing="10">-->
+<!--                                <FontIcon iconLiteral="fth-monitor" iconSize="18" styleClass="tile-icon" />-->
+<!--                                <Label styleClass="card-title" text="%user_profile.sessions.title" />-->
+<!--                                <Region HBox.hgrow="ALWAYS" />-->
+<!--                                <Button fx:id="btnDeconnecterAutres" styleClass="btn-icon-light" text="%user_profile.sessions.disconnect_others">-->
+<!--                                    <graphic><FontIcon iconLiteral="fth-log-out" iconSize="14" /></graphic>-->
+<!--                                </Button>-->
+<!--                            </HBox>-->
 
-                            <TableView fx:id="sessionsTable" prefHeight="150" styleClass="custom-table">
-                                <columns>
-                                    <TableColumn fx:id="colAppareilSession" prefWidth="200" text="%user_profile.sessions.col.device" />
-                                    <TableColumn fx:id="colIpSession" prefWidth="150" text="%user_profile.sessions.col.ip" />
-                                    <TableColumn fx:id="colDateSession" prefWidth="180" text="%user_profile.sessions.col.last_activity" />
-                                </columns>
-                                <placeholder>
-                                    <Label styleClass="table-placeholder" text="%user_profile.sessions.empty" />
-                                </placeholder>
-                            </TableView>
-                        </VBox>
+<!--                            <TableView fx:id="sessionsTable" prefHeight="150" styleClass="custom-table">-->
+<!--                                <columns>-->
+<!--                                    <TableColumn fx:id="colAppareilSession" prefWidth="200" text="%user_profile.sessions.col.device" />-->
+<!--                                    <TableColumn fx:id="colIpSession" prefWidth="150" text="%user_profile.sessions.col.ip" />-->
+<!--                                    <TableColumn fx:id="colDateSession" prefWidth="180" text="%user_profile.sessions.col.last_activity" />-->
+<!--                                </columns>-->
+<!--                                <placeholder>-->
+<!--                                    <Label styleClass="table-placeholder" text="%user_profile.sessions.empty" />-->
+<!--                                </placeholder>-->
+<!--                            </TableView>-->
+<!--                        </VBox>-->
                     </VBox>
                 </content>
             </ScrollPane>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefHeight="720.0" prefWidth="780.0" spacing="0.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.module2.CreationMultipleClassesController">
+
+    <!-- ============================================================
+         EN-TÊTE
+         ============================================================ -->
+    <HBox alignment="CENTER_LEFT" spacing="14.0">
+        <padding>
+            <Insets bottom="18.0" left="28.0" right="28.0" top="24.0" />
+        </padding>
+        <children>
+            <FontIcon iconLiteral="fth-zap" iconSize="28" styleClass="icon-orange" />
+            <VBox spacing="3.0">
+                <children>
+                    <Label text="Création multiple de classes" textFill="#1E293B">
+                        <font><Font name="System Bold" size="18.0" /></font>
+                    </Label>
+                    <Label text="Générez plusieurs classes en une seule opération" textFill="#64748B">
+                        <font><Font size="12.0" /></font>
+                    </Label>
+                </children>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+        </children>
+    </HBox>
+
+    <Separator />
+
+    <!-- ============================================================
+         CONFIGURATION GLOBALE
+         ============================================================ -->
+    <HBox spacing="16.0" style="-fx-padding: 20 28 12 28;">
+        <children>
+
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                <children>
+                    <Label text="Année scolaire" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: #F8FAFC; -fx-background-radius: 8; -fx-padding: 8 12 8 12;">
+                        <children>
+                            <FontIcon iconLiteral="fth-calendar" iconSize="14" styleClass="icon-orange" />
+                            <Label fx:id="lblAnneeScolaire" text="—" textFill="#1E293B">
+                                <font><Font name="System Bold" size="12.5" /></font>
+                            </Label>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                <children>
+                    <Label text="Vacation par défaut *" textFill="#334155">
+                        <font><Font name="System Bold" size="12.0" /></font>
+                    </Label>
+                    <ComboBox fx:id="comboVacation" maxWidth="Infinity" styleClass="combo-box" />
+                </children>
+            </VBox>
+
+        </children>
+    </HBox>
+
+    <!-- ============================================================
+         TABLEAU DES NIVEAUX
+         ============================================================ -->
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="12.0" left="28.0" right="28.0" top="8.0" />
+        </padding>
+        <children>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <children>
+                    <FontIcon iconLiteral="fth-layers" iconSize="16" styleClass="icon-orange" />
+                    <Label text="Niveaux à générer" textFill="#334155">
+                        <font><Font name="System Bold" size="13.0" /></font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <CheckBox fx:id="chkSelectionnerTout" styleClass="remember-checkbox" text="Tout sélectionner">
+                        <font><Font size="12.0" /></font>
+                    </CheckBox>
+                </children>
+            </HBox>
+
+            <!-- En-têtes de colonnes -->
+            <HBox spacing="10.0" style="-fx-padding: 4 0 4 0;">
+                <children>
+                    <Label prefWidth="30" text="" />
+                    <Label prefWidth="160" text="NIVEAU" textFill="#94A3B8" HBox.hgrow="ALWAYS">
+                        <font><Font name="System Bold" size="11.0" /></font>
+                    </Label>
+                    <Label prefWidth="110" text="NB CLASSES" textFill="#94A3B8" />
+                    <Label prefWidth="110" text="CAPACITÉ" textFill="#94A3B8" />
+                    <Label prefWidth="90" text="PRÉFIXE" textFill="#94A3B8" />
+                </children>
+            </HBox>
+
+            <!-- Lignes dynamiques (1 par niveau) -->
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="conteneurNiveaux" spacing="8.0" style="-fx-padding: 2 8 2 0;" />
+                </content>
+            </ScrollPane>
+
+        </children>
+    </VBox>
+
+    <Separator />
+
+    <!-- ============================================================
+         APERÇU
+         ============================================================ -->
+    <HBox spacing="14.0" style="-fx-padding: 16 28 12 28;">
+        <children>
+            <FontIcon iconLiteral="fth-info" iconSize="18" styleClass="icon-orange" />
+            <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                <children>
+                    <Label fx:id="lblApercuResume" text="—" textFill="#16213A">
+                        <font><Font name="System Bold" size="13.0" /></font>
+                    </Label>
+                    <Label fx:id="lblApercuDetails" text="" textFill="#64748B" wrapText="true">
+                        <font><Font size="11.5" /></font>
+                    </Label>
+                </children>
+            </VBox>
+        </children>
+    </HBox>
+
+    <!-- ============================================================
+         ACTIONS
+         ============================================================ -->
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <padding>
+            <Insets bottom="24.0" left="28.0" right="28.0" top="8.0" />
+        </padding>
+        <children>
+            <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Button>
+            <Button fx:id="btnCreer" onAction="#handleCreer" styleClass="button-primary" text="Créer les classes">
+                <font><Font name="System Bold" size="13.0" /></font>
+                <graphic>
+                    <FontIcon iconLiteral="fth-save" iconSize="14" styleClass="icon-on-primary" />
+                </graphic>
+            </Button>
+        </children>
+    </HBox>
+
+</VBox>
