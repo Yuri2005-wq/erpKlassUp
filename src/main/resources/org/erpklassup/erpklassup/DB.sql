@@ -564,7 +564,7 @@ CREATE TABLE IF NOT EXISTS GradeSalarial (
     code VARCHAR(20) NOT NULL,
     libelle VARCHAR(100) NOT NULL,
     categorie VARCHAR(20) NULL,
-    echelon VARCHAR(10) NULL,
+    echelon VARCHAR(10) NULL, 
     salaireBaseReference DECIMAL(12,2) DEFAULT 0.00,
     version BIGINT DEFAULT 1,
     deleted_at TIMESTAMP(3) NULL DEFAULT NULL,
@@ -639,7 +639,7 @@ CREATE TABLE IF NOT EXISTS Personnel (
     INDEX idx_pers_filtre (typePersonnel, statutEmploi),
     CONSTRAINT chk_pers_enfants CHECK (nombreEnfants >= 0),
     CONSTRAINT chk_pers_dates CHECK (dateDepart IS NULL OR dateEmbauche IS NULL OR dateDepart >= dateEmbauche),
-    CONSTRAINT chk_pers_statut_emploi CHECK (statutEmploi IN ('ACTIF', 'SUSPENDU', 'SORTI')),
+    CONSTRAINT chk_pers_statut_emploi CHECK (statutEmploi IN ('Actif', 'Suspendu', 'Sorti')),
     CONSTRAINT chk_pers_paiement CHECK (modePaiement IS NULL OR modePaiement IN ('ESPECES', 'VIREMENT', 'MOBILE_MONEY', 'CHEQUE')),
     CONSTRAINT chk_pers_sexe CHECK (sexe IS NULL OR sexe IN ('M', 'F', 'MASCULIN', 'FEMININ', 'AUTRE')),
     CONSTRAINT chk_pers_type CHECK (typePersonnel IN ('ADMINISTRATIF', 'ENSEIGNANT', 'SUPPORT', 'DIRECTION', 'AUTRE')),
@@ -860,7 +860,7 @@ CREATE TABLE IF NOT EXISTS JourFerie (
 -- ==============================================================
 
 CREATE TABLE IF NOT EXISTS Classe (
-                                      idClasse VARCHAR(50) NOT NULL,
+    idClasse VARCHAR(50) NOT NULL,
     idEcole VARCHAR(50) NOT NULL,
     idNiveau VARCHAR(50) NOT NULL,
     idFiliere VARCHAR(50) NULL,

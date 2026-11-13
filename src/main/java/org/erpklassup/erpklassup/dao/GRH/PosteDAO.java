@@ -223,7 +223,7 @@ public class PosteDAO {
     }
 
     public int compterPersonnelRattache(String idPoste) {
-        String sql = "SELECT COUNT(*) FROM Personnel WHERE idPoste = ? AND deleted_at IS NULL";
+        String sql = "SELECT COUNT(*) FROM Personnel WHERE idPoste = ? AND statutEmploi = 'Actif' AND deleted_at IS NULL";
         try (Connection conn = Database.getConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, idPoste);

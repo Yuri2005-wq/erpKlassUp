@@ -266,6 +266,26 @@ public final class AvatarUtil {
         if (id == null) return PALETTE[0];
         return PALETTE[Math.abs(id.hashCode()) % PALETTE.length];
     }
+
+
+    public static Image chargerImageSecurisee(String photoPath) {
+        if (photoPath == null || photoPath.isBlank()) {
+            return null;
+        }
+        try {
+            if (photoPath.startsWith("http://") || photoPath.startsWith("https://") || photoPath.startsWith("file:")) {
+                return new Image(photoPath, true);
+            }
+            // Conversion explicite du chemin local Windows en URI valide
+            File file = new File(photoPath);
+            if (file.exists()) {
+                return new Image(file.toURI().toString(), true);
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur de chargement d'image : " + e.getMessage());
+        }
+        return null;
+    }
 }
 //package org.erpklassup.erpklassup.util;
 //

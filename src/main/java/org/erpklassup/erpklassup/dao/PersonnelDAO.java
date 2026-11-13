@@ -44,7 +44,7 @@ public class PersonnelDAO {
 
         String sql = """
             INSERT INTO Personnel (
-                idPersonnel, idEcole, idUtilisateur, idDepartement, idResponsable, idEchelon,
+                idPersonnel, idEcole, idUtilisateur, idDepartement, idResponsable,
                 matriculeInterne, nom, prenom, sexe, dateNaissance, lieuNaissance,
                 nationalite, situationMatrimoniale, nombreEnfants,
                 numeroCni, niu, numCnps,
@@ -60,7 +60,7 @@ public class PersonnelDAO {
                 ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?
+                ?, ?, ?, ?
             )
             """;
 
@@ -73,7 +73,6 @@ public class PersonnelDAO {
             setNullableString(ps, i++, p.getIdUtilisateur());
             setNullableString(ps, i++, p.getIdDepartement());
             setNullableString(ps, i++, p.getIdResponsable());
-            setNullableString(ps, i++, p.getIdEchelon());
 
             ps.setString(i++, p.getMatriculeInterne());
             ps.setString(i++, p.getNom());
@@ -263,8 +262,7 @@ public class PersonnelDAO {
     }
 
     public List<Personnel> findSansCompte(String idEcole) {
-        String sql = "SELECT * FROM Personnel WHERE idEcole = ? AND idUtilisateur IS NULL " +
-                "AND estActif = 1 AND deleted_at IS NULL ORDER BY nom, prenom";
+        String sql = "SELECT * FROM Personnel WHERE idEcole = ? AND idUtilisateur IS NULL AND statutEmploi = 'Actif' AND deleted_at IS NULL";
         List<Personnel> result = new ArrayList<>();
         try (Connection conn = Database.getConnexion();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -340,7 +338,7 @@ public class PersonnelDAO {
     public boolean update(Personnel p) {
         String sql = """
             UPDATE Personnel SET
-                idUtilisateur = ?, idDepartement = ?, idResponsable = ?, idEchelon = ?,
+                idUtilisateur = ?, idDepartement = ?, idResponsable = ?,
                 matriculeInterne = ?, nom = ?, prenom = ?, sexe = ?, dateNaissance = ?,
                 lieuNaissance = ?, nationalite = ?, situationMatrimoniale = ?, nombreEnfants = ?,
                 numeroCni = ?, niu = ?, numCnps = ?,
@@ -362,7 +360,6 @@ public class PersonnelDAO {
             setNullableString(ps, i++, p.getIdUtilisateur());
             setNullableString(ps, i++, p.getIdDepartement());
             setNullableString(ps, i++, p.getIdResponsable());
-            setNullableString(ps, i++, p.getIdEchelon());
 
             ps.setString(i++, p.getMatriculeInterne());
             ps.setString(i++, p.getNom());

@@ -83,7 +83,7 @@ public class HelloController implements Initializable {
     private Button currentActiveButton = null;
 
     /** Chemin de la page courante (pour rechargement i18n). */
-    private String cheminPageCourante = "/org/erpklassup/erpklassup/view/module2/parametreAcademique.fxml";
+    private String cheminPageCourante = "/org/erpklassup/erpklassup/view/GRH/TabRH.fxml";
 
     /** Écouteur i18n stocké (pour pouvoir se désabonner). */
     private final Runnable ecouteurI18n = this::onChangementLangue;
@@ -117,7 +117,7 @@ public class HelloController implements Initializable {
 
         I18nManager.getInstance().ecouterChangement(ecouteurI18n);
 
-        loadPage(cheminPageCourante, btnSettings);
+        loadPage(cheminPageCourante, btnPersonnel);
     }
 
     /* ============================================================

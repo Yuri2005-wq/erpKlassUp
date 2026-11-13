@@ -12,6 +12,7 @@ import java.time.LocalDate;
  * Ne pas mapper les colonnes générées (matriculeInterne_actif, idUtilisateur_actif,
  * numCnps_actif) : MySQL les calcule.
  */
+
 public class Personnel extends BaseEntity {
 
     // ===== Multi-tenant =====
@@ -21,10 +22,13 @@ public class Personnel extends BaseEntity {
     private String idUtilisateur;
     private String idDepartement;
     private String idResponsable;   // auto-référence : un employé peut être le chef d'un autre
-    private String idEchelon;
 
     // ===== Identification & état civil =====
     private String matriculeInterne;
+
+
+
+    private String matriculeFonctionPublique;
     private String nom;
     private String prenom;
     private String sexe;
@@ -101,10 +105,6 @@ public class Personnel extends BaseEntity {
 
     public String getIdResponsable() { return idResponsable; }
     public void setIdResponsable(String idResponsable) { this.idResponsable = idResponsable; }
-
-    public String getIdEchelon() { return idEchelon; }
-    public void setIdEchelon(String idEchelon) { this.idEchelon = idEchelon; }
-
     public String getMatriculeInterne() { return matriculeInterne; }
     public void setMatriculeInterne(String matriculeInterne) { this.matriculeInterne = matriculeInterne; }
 
@@ -207,6 +207,15 @@ public class Personnel extends BaseEntity {
     public boolean isEstActif() {
         return "ACTIF".equals(this.statutEmploi);
     }    public void setEstActif(boolean estActif) { this.estActif = estActif; }
+
+
+    public String getMatriculeFonctionPublique() {
+        return matriculeFonctionPublique;
+    }
+
+    public void setMatriculeFonctionPublique(String matriculeFonctionPublique) {
+        this.matriculeFonctionPublique = matriculeFonctionPublique;
+    }
 
     // ------------------------------------------------------------------
     // Helpers d'affichage

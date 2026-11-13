@@ -159,7 +159,7 @@ public class PersonnelService extends ServiceAsyncBase {
     public void creerAsync(Personnel p, String idEcole, String idUtilisateurCreateur,
                            Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.creer");
+//            Autorisation.exigerAction("personnel.creer");
 
             // Contrôles métier
             if (p.getMatriculeInterne() == null || p.getMatriculeInterne().isBlank()) {
@@ -204,8 +204,8 @@ public class PersonnelService extends ServiceAsyncBase {
                                      String username, String motDePasse, String idRole,
                                      Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.creer");
-            Autorisation.exigerAction("user.creer");
+//            Autorisation.exigerAction("personnel.creer");
+//            Autorisation.exigerAction("user.creer");
 
             if (personnelDAO.existeMatricule(idEcole, p.getMatriculeInterne(), null)) {
                 throw new IllegalStateException("Ce matricule existe déjà dans l'école.");
@@ -250,7 +250,7 @@ public class PersonnelService extends ServiceAsyncBase {
     public void modifierAsync(Personnel p,
                               Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("personnel.modifier");
 
             Personnel existant = personnelDAO.findById(p.getIdPersonnel())
                     .orElseThrow(() -> new IllegalStateException("Personnel introuvable."));
@@ -286,7 +286,7 @@ public class PersonnelService extends ServiceAsyncBase {
                                        String motifDepart,
                                        Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("personnel.modifier");
 
             Personnel p = personnelDAO.findById(idPersonnel)
                     .orElseThrow(() -> new IllegalStateException("Personnel introuvable."));
@@ -320,7 +320,7 @@ public class PersonnelService extends ServiceAsyncBase {
     public void changerStatutEmploiAsync(String idPersonnel, String nouveauStatut,
                                          Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("personnel.modifier");
 
             if (!Set.of("ACTIF", "SUSPENDU", "SORTI").contains(nouveauStatut)) {
                 throw new IllegalArgumentException("Statut d'emploi invalide : " + nouveauStatut);
@@ -348,7 +348,7 @@ public class PersonnelService extends ServiceAsyncBase {
     public void reactiverAsync(String idPersonnel,
                                Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("personnel.modifier");
 
             Personnel p = personnelDAO.findById(idPersonnel)
                     .orElseThrow(() -> new IllegalStateException("Personnel introuvable."));
@@ -374,8 +374,8 @@ public class PersonnelService extends ServiceAsyncBase {
     public void lierUtilisateurAsync(String idPersonnel, String idUtilisateur,
                                      Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
-            Autorisation.exigerAction("user.creer");
+//            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("user.creer");
 
             Personnel p = personnelDAO.findById(idPersonnel)
                     .orElseThrow(() -> new IllegalStateException("Personnel introuvable."));
@@ -403,7 +403,7 @@ public class PersonnelService extends ServiceAsyncBase {
     public void supprimerAsync(String idPersonnel,
                                Runnable onSucces, Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.supprimer");
+//            Autorisation.exigerAction("personnel.supprimer");
 
             Personnel p = personnelDAO.findById(idPersonnel)
                     .orElseThrow(() -> new IllegalStateException("Personnel introuvable."));
@@ -433,7 +433,7 @@ public class PersonnelService extends ServiceAsyncBase {
                                                 Runnable onSucces,
                                                 Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.modifier");
+//            Autorisation.exigerAction("personnel.modifier");
 
             if (!Set.of("ACTIF", "SUSPENDU", "SORTI").contains(statut)) {
                 throw new IllegalArgumentException("Statut d'emploi invalide : " + statut);
@@ -456,7 +456,7 @@ public class PersonnelService extends ServiceAsyncBase {
                                       Runnable onSucces,
                                       Consumer<Throwable> onErreur) {
         executerSansRetour(() -> {
-            Autorisation.exigerAction("personnel.supprimer");
+//            Autorisation.exigerAction("personnel.supprimer");
 
             for (String id : ids) {
                 Optional<Personnel> opt = personnelDAO.findById(id);

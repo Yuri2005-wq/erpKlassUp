@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
+<?import javafx.scene.control.CheckBox?>
 <StackPane fx:id="rootStack" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.PersonnelController">
 
     <VBox spacing="16" VBox.vgrow="ALWAYS">
@@ -53,6 +54,10 @@
                     <graphic><FontIcon iconLiteral="fth-list" iconSize="12" /></graphic>
                 </ToggleButton>
             </HBox>
+
+            <Button fx:id="btnActionsGroupees" styleClass="button-primary" text="Actions groupées">
+                <graphic><FontIcon iconLiteral="fth-layers" iconSize="14" /></graphic>
+            </Button>
 
             <!-- Action Création -->
             <Button fx:id="btnNouveauPersonnel" styleClass="button-primary" text="Créer un employé">
@@ -119,13 +124,18 @@
 
             <TableView fx:id="tablePersonnel" style="-fx-background-color: white;" styleClass="custom-table" VBox.vgrow="ALWAYS">
                 <columns>
+                    <TableColumn fx:id="colSelect" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" sortable="false">
+                        <graphic>
+                            <CheckBox fx:id="checkAllPersonnel" styleClass="remember-checkbox" />
+                        </graphic>
+                    </TableColumn>
                     <TableColumn fx:id="colEmploye" prefWidth="240" text="Employé" />
                     <TableColumn fx:id="colMatricule" prefWidth="120" text="Matricule" />
                     <TableColumn fx:id="colPoste" prefWidth="180" text="Poste / Fonction" />
-                    <TableColumn fx:id="colDepartement" prefWidth="160" text="Département" />
+<!--                    <TableColumn fx:id="colDepartement" prefWidth="160" text="Département" />-->
                     <TableColumn fx:id="colContact" prefWidth="180" text="Contact" />
                     <TableColumn fx:id="colStatut" prefWidth="110" text="Statut" />
-                    <TableColumn fx:id="colActions" prefWidth="100" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                    <TableColumn fx:id="colActions" prefWidth="100" sortable="false" style="-fx-alignment: CENTER;" text="Actions Rapides" />
                 </columns>
                 <placeholder>
                     <VBox alignment="CENTER" spacing="8">

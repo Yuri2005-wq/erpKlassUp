@@ -222,8 +222,8 @@ public class UtilisateursView implements Initializable, VueDisposable {
        CONTRÔLES D'ACCÈS
        ============================================================ */
     private void appliquerControlesAcces() {
-        ControleAcces.appliquerAction(btnAjouterUtilisateur, "user.creer");
-        ControleAcces.appliquerAction(btnActionsGroupees, "user.activer");
+//        ControleAcces.appliquerAction(btnAjouterUtilisateur, "user.creer");
+//        ControleAcces.appliquerAction(btnActionsGroupees, "user.activer");
         tableUtilisateurs.refresh();
     }
 

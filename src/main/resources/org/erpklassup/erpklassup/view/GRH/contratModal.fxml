@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="750.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.ContratModalController">
+
+    <padding>
+        <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+    </padding>
+
+    <children>
+
+        <!-- ===== En-tête ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <children>
+                <FontIcon fx:id="iconModal" iconLiteral="fth-file-text" iconSize="40" styleClass="icon-orange" />
+                <VBox spacing="4.0">
+                    <children>
+                        <Label fx:id="lblTitreModal" text="Nouveau contrat" textFill="#1E293B">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="lblSousTitreModal" text="Renseignez les informations du contrat" textFill="#64748B">
+                            <font>
+                                <Font size="13.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <Separator />
+
+        <!-- ===== Formulaire ===== -->
+        <VBox spacing="16.0">
+            <children>
+
+                <!-- LIGNE 1 : N° Contrat & Type -->
+                <GridPane hgap="14.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="N° Contrat *" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="34.0" spacing="10" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <FontIcon iconLiteral="fth-hash" iconSize="14" styleClass="icon-gray" />
+                        <TextField fx:id="txtNumeroContrat" promptText="Ex : CTR-2024-001" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <Label text="Type de contrat *" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboTypeContrat" maxWidth="Infinity" prefHeight="34.0" promptText="Sélectionner" styleClass="combo-box" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                </GridPane>
+
+                <!-- LIGNE 2 : Dates Début / Fin -->
+                <GridPane hgap="14.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="Date de début *" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <DatePicker fx:id="dateDebut" maxWidth="Infinity" prefHeight="34.0" promptText="jj/mm/aaaa" styleClass="date-picker-custom" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Date de fin" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <DatePicker fx:id="dateFin" maxWidth="Infinity" prefHeight="34.0" promptText="jj/mm/aaaa" styleClass="date-picker-custom" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                </GridPane>
+
+                <!-- LIGNE 3 : Signature / Période d'essai -->
+                <GridPane hgap="14.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="Date de signature" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <DatePicker fx:id="dateSignature" maxWidth="Infinity" prefHeight="34.0" promptText="jj/mm/aaaa" styleClass="date-picker-custom" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Fin période d'essai" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <DatePicker fx:id="datePeriodeEssaiFin" maxWidth="Infinity" prefHeight="34.0" promptText="jj/mm/aaaa" styleClass="date-picker-custom" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                </GridPane>
+
+                <Separator />
+                <Label text="Rémunération et horaires" style="-fx-font-weight: 800; -fx-text-fill: #16213A; -fx-font-size: 13px;" />
+
+                <!-- LIGNE 4 : Salaire & Taux Horaire -->
+                <GridPane hgap="14.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="Salaire de base *" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="34.0" spacing="10" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <FontIcon iconLiteral="fth-credit-card" iconSize="14" styleClass="icon-gray" />
+                        <TextField fx:id="txtSalaireBase" promptText="0.00" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <Label text="Taux horaire" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="34.0" spacing="10" styleClass="input" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                        <FontIcon iconLiteral="fth-clock" iconSize="14" styleClass="icon-gray" />
+                        <TextField fx:id="txtTauxHoraire" promptText="0.00" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS" />
+                    </HBox>
+                </GridPane>
+
+                <!-- LIGNE 5 : Volume Horaire & Statut -->
+                <GridPane hgap="14.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="Volume horaire (h/mois)" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="34.0" spacing="10" styleClass="input" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <FontIcon iconLiteral="fth-calendar" iconSize="14" styleClass="icon-gray" />
+                        <TextField fx:id="txtVolumeHoraire" promptText="0" style="-fx-background-color: transparent; -fx-padding: 0;" HBox.hgrow="ALWAYS" />
+                    </HBox>
+
+                    <Label text="Statut du contrat" style="-fx-font-weight: 700; -fx-text-fill: #334155; -fx-font-size: 12px;" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="comboStatut" maxWidth="Infinity" prefHeight="34.0" styleClass="combo-box" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                </GridPane>
+
+                <!-- Erreur globale -->
+                <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+            </children>
+        </VBox>
+
+        <!-- ===== Actions ===== -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <children>
+                <Button fx:id="btnAnnuler" onAction="#handleAnnuler" styleClass="btn-icon-light" text="Annuler">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+                <Button fx:id="btnEnregistrer" defaultButton="true" onAction="#handleEnregistrer" styleClass="button-primary" text="Enregistrer">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+        </HBox>
+
+    </children>
+</VBox>

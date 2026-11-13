@@ -5,9 +5,11 @@ package org.erpklassup.erpklassup.enums;
  * Correspond à la colonne Personnel.statutEmploi (contrainte CHECK en base).
  */
 public enum StatutEmploi {
-    ACTIF("Actif"),
-    SORTI("Sorti"),
-    INACTIF("Inactif"),;
+    ACTIF("actif"),
+    SORTI("sorti"),
+    INACTIF("inactif"),
+    SUSPENDU("suspendu"),
+    ;
 
     private final String libelle;
 

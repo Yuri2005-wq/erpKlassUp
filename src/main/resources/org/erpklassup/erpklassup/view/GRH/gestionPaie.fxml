@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<?import java.lang.String?>
+<VBox spacing="16" styleClass="root-pane" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.GestionPaieController">
+    <padding><Insets bottom="20" left="24" right="24" top="20" /></padding>
+
+    <!-- EN-TÊTE -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <FontIcon iconLiteral="fth-credit-card" iconSize="24" styleClass="icon-orange" />
+        <VBox spacing="2">
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #16213A;" text="Gestion de la Paie" />
+            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748B;" text="Générez, validez et payez les salaires de vos employés." />
+        </VBox>
+    </HBox>
+
+    <TabPane fx:id="tabPanePaie" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+            <!-- ONGLET 1 : PÉRIODES DE PAIE (Vue d'ensemble) -->
+            <Tab closable="false" text="Périodes de Paie">
+                <content>
+                    <VBox spacing="12">
+                        <padding><Insets top="14" /></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Button fx:id="btnNouvellePeriode" styleClass="button-primary" text="Générer une période">
+                                <graphic><FontIcon iconLiteral="fth-play" iconSize="14" /></graphic>
+                            </Button>
+                            <Region HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TableView fx:id="tablePeriodes" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colPeriodeMois" prefWidth="150" text="Période" />
+                                <TableColumn fx:id="colPeriodeStatut" prefWidth="150" text="Statut" />
+                                <TableColumn fx:id="colPeriodeNbBulletins" prefWidth="150" text="Nb Bulletins" />
+                                <TableColumn fx:id="colPeriodeTotalBrut" prefWidth="150" text="Total Brut" />
+                                <TableColumn fx:id="colPeriodeTotalNet" prefWidth="150" text="Total Net" />
+                                <TableColumn fx:id="colPeriodeActions" prefWidth="120" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- ONGLET 2 : BULLETINS DE PAIE (Détail) -->
+            <Tab closable="false" text="Bulletins de Paie">
+                <content>
+                    <VBox spacing="12">
+                        <padding><Insets top="14" /></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <ComboBox fx:id="filtrePeriodeBulletin" prefWidth="200" promptText="Filtrer par période" styleClass="combo-box" />
+                            <Region HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TableView fx:id="tableBulletins" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colBulEmp" prefWidth="200" text="Employé" />
+                                <TableColumn fx:id="colBulPoste" prefWidth="150" text="Poste" />
+                                <TableColumn fx:id="colBulBrut" prefWidth="120" text="Brut" />
+                                <TableColumn fx:id="colBulRetenues" prefWidth="120" text="Retenues" />
+                                <TableColumn fx:id="colBulNet" prefWidth="120" text="Net à payer" />
+                                <TableColumn fx:id="colBulStatut" prefWidth="120" text="Statut" />
+                                <TableColumn fx:id="colBulActions" prefWidth="100" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+
+            <!-- ONGLET 3 : LOTS DE PAIEMENT (Virements groupés) -->
+            <Tab closable="false" text="Lots de Paiement">
+                <content>
+                    <VBox spacing="12">
+                        <padding><Insets top="14" /></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Button fx:id="btnNouveauLot" styleClass="button-primary" text="Créer un lot de virement">
+                                <graphic><FontIcon iconLiteral="fth-plus" iconSize="14" /></graphic>
+                            </Button>
+                            <Region HBox.hgrow="ALWAYS" />
+                        </HBox>
+                        <TableView fx:id="tableLots" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colLotRef" prefWidth="150" text="Référence" />
+                                <TableColumn fx:id="colLotPeriode" prefWidth="120" text="Période" />
+                                <TableColumn fx:id="colLotMode" prefWidth="120" text="Mode" />
+                                <TableColumn fx:id="colLotMontant" prefWidth="150" text="Montant Total" />
+                                <TableColumn fx:id="colLotNb" prefWidth="100" text="Nb Bulletins" />
+                                <TableColumn fx:id="colLotStatut" prefWidth="120" text="Statut" />
+                                <TableColumn fx:id="colLotActions" prefWidth="100" sortable="false" style="-fx-alignment: CENTER;" text="Actions" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+        </tabs>
+        <styleClass>
+            <String fx:value="top-tab-pane" />
+            <String fx:value="tabs-arrondis-structure" />
+        </styleClass>
+    </TabPane>
+</VBox>
