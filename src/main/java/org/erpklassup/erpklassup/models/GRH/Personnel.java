@@ -21,6 +21,7 @@ public class Personnel extends BaseEntity {
     // ===== Liens =====
     private String idUtilisateur;
     private String idDepartement;
+    private String idPoste;
     private String idResponsable;   // auto-référence : un employé peut être le chef d'un autre
 
     // ===== Identification & état civil =====
@@ -234,4 +235,12 @@ public class Personnel extends BaseEntity {
 
     @Override
     public String toString() { return getNomComplet(); }
+
+    public String getIdPoste() {
+        return idPoste;
+    }
+
+    public void setIdPoste(String idPoste) {
+        this.idPoste = idPoste;
+    }
 }

@@ -588,4 +588,18 @@ public class UtilisateurDAO {
         }
         return 0;
     }
+
+    public boolean changerStatutActif(String idUtilisateur, boolean actif) {
+        String sql = "UPDATE Utilisateur SET estActif = ?, updated_at = NOW(3), version = version + 1 "
+                + "WHERE idUtilisateur = ? AND deleted_at IS NULL";
+        try (Connection conn = Database.getConnexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, actif);
+            ps.setString(2, idUtilisateur);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur changerStatutActif Utilisateur : " + e.getMessage());
+            return false;
+        }
+    }
 }

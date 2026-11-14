@@ -24,10 +24,10 @@ public final class AvatarUtil {
        ÉTATS DU PERSONNEL (couleur du contour + de la pastille)
        ============================================================ */
     public enum EtatAvatar {
-        ACTIF("#22C55E", "actif"),
+        ACTIF("#22C55E", "Actif"),
         EN_CONGE("#3B82F6", "En congé"),
-        SUSPENDU("#F59E0B", "suspendu"),
-        INACTIF("#94A3B8", "inactif"),
+        SUSPENDU("#F59E0B", "Suspendu"),
+        INACTIF("#94A3B8", "Inactif"),
         PARTI("#EF4444", "Parti");
 
         private final String couleur;
@@ -55,11 +55,26 @@ public final class AvatarUtil {
                     .replaceAll("[\\s\\-]+", "_");
 
             return switch (s) {
-                case "actif" -> ACTIF;
+                case "Actif" -> ACTIF;
                 case "EN_CONGE", "CONGE", "EN_CONGES" -> EN_CONGE;
-                case "suspendu", "suspension" -> SUSPENDU;
+                case "Suspendu", "suspension", "Inactif" -> SUSPENDU;
                 case "PARTI", "DEMISSIONNAIRE", "DEMISSION", "LICENCIE", "RETRAITE",
                      "TERMINE", "SORTI", "FIN_CONTRAT" -> PARTI;
+                default -> INACTIF;
+            };
+        }
+        public static EtatAvatar depuisCompte(String statut) {
+            if (statut == null || statut.isBlank()) return null;
+
+            String s = Normalizer.normalize(statut, Normalizer.Form.NFD)
+                    .replaceAll("\\p{M}", "")
+                    .trim()
+                    .toUpperCase();
+
+            return switch (s) {
+                case "ACTIF" -> ACTIF;
+                case "VERROUILLE", "DESACTIVE", "SUSPENDU" -> SUSPENDU;
+                case "INACTIF" -> INACTIF;
                 default -> INACTIF;
             };
         }
@@ -114,6 +129,61 @@ public final class AvatarUtil {
     /** Avec statut, taille par défaut (vue tableau). */
     public static StackPane creer(String cheminPhoto, String nom, String prenom, String idPourCouleur, String statut) {
         return creer(cheminPhoto, nom, prenom, idPourCouleur, TAILLE_DEFAUT, statut);
+    }
+
+    public static StackPane creer(String cheminPhoto, String nom, String prenom,
+                                  String idPourCouleur, String statutCompte, boolean estCompte) {
+        if (estCompte) {
+            EtatAvatar etat = EtatAvatar.depuisCompte(statutCompte);
+            return creerAvecEtat(cheminPhoto, nom, prenom, idPourCouleur, TAILLE_DEFAUT, etat);
+        }
+        return creer(cheminPhoto, nom, prenom, idPourCouleur, TAILLE_DEFAUT, statutCompte);
+    }
+
+
+
+
+
+
+
+
+    private static StackPane creerAvecEtat(String cheminPhoto, String nom, String prenom,
+                                           String idPourCouleur, double taille, EtatAvatar etat) {
+        StackPane conteneur = new StackPane();
+        conteneur.setPrefSize(taille, taille);
+        conteneur.setMaxSize(taille, taille);
+        conteneur.setMinSize(taille, taille);
+
+        double epaisseurContour = 0;
+        double diametrePhoto = taille;
+        if (etat != null) {
+            epaisseurContour = Math.max(CONTOUR_MIN, taille * RATIO_CONTOUR);
+            double espace = Math.max(ESPACE_MIN, taille * RATIO_ESPACE);
+            diametrePhoto = taille - 2 * (epaisseurContour + espace);
+        }
+
+        conteneur.getChildren().add(creerContenu(cheminPhoto, nom, prenom, idPourCouleur, diametrePhoto));
+
+        if (etat != null) {
+            Color couleur = Color.web(etat.couleur());
+            Circle contour = new Circle((taille - epaisseurContour) / 2.0);
+            contour.setFill(Color.TRANSPARENT);
+            contour.setStroke(couleur);
+            contour.setStrokeWidth(epaisseurContour);
+            contour.setMouseTransparent(true);
+
+            double d = Math.max(PASTILLE_MIN, taille * RATIO_PASTILLE);
+            double bordure = Math.max(1.5, d * 0.18);
+            Circle pastille = new Circle((d - bordure) / 2.0);
+            pastille.setFill(couleur);
+            pastille.setStroke(Color.WHITE);
+            pastille.setStrokeWidth(bordure);
+            StackPane.setAlignment(pastille, Pos.BOTTOM_RIGHT);
+
+            conteneur.getChildren().addAll(contour, pastille);
+            Tooltip.install(conteneur, new Tooltip(etat.libelle()));
+        }
+        return conteneur;
     }
 
     /** Avec statut : contour + pastille de la couleur de l'état. */

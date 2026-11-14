@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import static org.erpklassup.erpklassup.util.ValidationUtil.configurerToggleSwitch;
+
 public class PersonnelModalController implements Initializable, VueDisposable {
 
     @FXML private HBox bandeauMessage;
@@ -129,6 +131,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
         configurerEcouteursOrganigramme();
         SessionManager.getInstance().ecouterChangementsPermissions(ecouteurPermissions);
         Platform.runLater(() -> txtNom.requestFocus());
+        configurerToggleSwitch(tglCreerCompte);
     }
 
     @Override
@@ -220,7 +223,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
             comboStatutEmploi.setCellFactory(lv -> new ListCell<>() {
                 @Override protected void updateItem(StatutEmploi item, boolean empty) {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? null : item.name());
+                    setText(empty || item == null ? null : item.getLibelle());
                 }
             });
             comboStatutEmploi.setButtonCell(comboStatutEmploi.getCellFactory().call(null));
@@ -341,7 +344,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
                         comboPoste.setItems(FXCollections.observableArrayList(postes));
 
                         if (personnelEnEdition != null && personnelEnEdition.getPosteOuFonction() != null) {
-                            postes.stream().filter(post -> post.getIntitule() != null && post.getIntitule().equalsIgnoreCase(personnelEnEdition.getPosteOuFonction())).findFirst().ifPresent(comboPoste::setValue);
+                            postes.stream().filter(post -> post.getIdPoste() != null && post.getIntitule().equalsIgnoreCase(personnelEnEdition.getPosteOuFonction())).findFirst().ifPresent(comboPoste::setValue);
                         }
                     }
                 }), err -> {});
@@ -398,7 +401,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
             String matricule = txtMatricule != null && txtMatricule.getText() != null ? txtMatricule.getText().trim() : "";
             String mdpDefaut = (matricule + baseUser).toLowerCase().replaceAll("\\s+", "");
             if (mdpDefaut.isBlank()) mdpDefaut = UUID.randomUUID().toString().substring(0, 8);
-            if (txtUserPassword != null) txtUserPassword.setText(mdpDefaut);
+            if (txtUserPassword != null) txtUserPassword.setText(mdpDefaut); System.out.println(mdpDefaut);
             if (chkDoitModifierPasse != null) chkDoitModifierPasse.setSelected(true);
         } else {
             if (comboUtilisateur != null) comboUtilisateur.setDisable(false);
@@ -608,6 +611,11 @@ public class PersonnelModalController implements Initializable, VueDisposable {
         if (txtNom != null) personnel.setNom(txtNom.getText().trim());
         if (txtPrenom != null) personnel.setPrenom(txtPrenom.getText() != null ? txtPrenom.getText().trim() : null);
         if (txtPosteFonction != null) personnel.setPosteOuFonction(txtPosteFonction.getText().trim());
+        if (comboPoste != null && comboPoste.getValue() != null) {
+            personnel.setIdPoste(comboPoste.getValue().getIdPoste());
+        } else {
+            personnel.setIdPoste(null);
+        }
         if (txtEmail != null) personnel.setEmail(txtEmail.getText() != null ? txtEmail.getText().trim() : null);
         if (txtTelephone != null) personnel.setTelephone(txtTelephone.getText() != null ? txtTelephone.getText().trim() : null);
         if (comboTypePersonnel != null) personnel.setTypePersonnel(comboTypePersonnel.getValue());
@@ -625,7 +633,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
         if (txtMotifDepart != null) personnel.setMotifDepart(txtMotifDepart.getText());
         if (comboSexe != null && comboSexe.getValue() != null) personnel.setSexe(comboSexe.getValue().name());
         if (comboModePaiement != null) personnel.setModePaiement(comboModePaiement.getValue());
-        if (comboStatutEmploi != null && comboStatutEmploi.getValue() != null) personnel.setStatutEmploi(comboStatutEmploi.getValue().name());
+        if (comboStatutEmploi != null && comboStatutEmploi.getValue() != null) personnel.setStatutEmploi(comboStatutEmploi.getValue().getLibelle());
         if (comboUtilisateur != null && comboUtilisateur.getValue() != null) personnel.setIdUtilisateur(comboUtilisateur.getValue().getIdUtilisateur());
         if (fichierPhotoChoisi != null) personnel.setPhoto(fichierPhotoChoisi.getAbsolutePath());
     }
@@ -652,7 +660,7 @@ public class PersonnelModalController implements Initializable, VueDisposable {
             comboDepartement.getItems().stream().filter(d -> d.getIdDepartement().equals(p.getIdDepartement())).findFirst().ifPresent(comboDepartement::setValue);
         }
         if (comboPoste != null && p.getPosteOuFonction() != null && comboPoste.getItems() != null) {
-            comboPoste.getItems().stream().filter(post -> post.getIntitule() != null && post.getIntitule().equalsIgnoreCase(p.getPosteOuFonction())).findFirst().ifPresent(comboPoste::setValue);
+            comboPoste.getItems().stream().filter(post -> post.getIdPoste() != null && post.getIntitule().equalsIgnoreCase(p.getPosteOuFonction())).findFirst().ifPresent(comboPoste::setValue);
         }
         if (comboStatutEmploi != null && p.getStatutEmploi() != null) { try { comboStatutEmploi.setValue(StatutEmploi.valueOf(p.getStatutEmploi())); } catch (IllegalArgumentException ignored) {} }
         if (comboUtilisateur != null && p.getIdUtilisateur() != null && comboUtilisateur.getItems() != null) {
@@ -683,4 +691,6 @@ public class PersonnelModalController implements Initializable, VueDisposable {
     private void masquerMessage() {
         if (bandeauMessage != null) { bandeauMessage.setVisible(false); bandeauMessage.setManaged(false); }
     }
+
+
 }

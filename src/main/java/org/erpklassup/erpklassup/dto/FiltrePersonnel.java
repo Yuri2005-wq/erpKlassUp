@@ -10,6 +10,7 @@ import org.erpklassup.erpklassup.enums.StatutEmploi;
 public record FiltrePersonnel(
         String idEcole,
         String idDepartement,
+        String idPoste,       // NOUVEAU
         String typePersonnel,
         StatutEmploi statutEmploi,
         String terme,

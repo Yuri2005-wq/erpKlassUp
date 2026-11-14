@@ -282,9 +282,19 @@ public class UtilisateursView implements Initializable, VueDisposable {
                     setGraphic(null);
                     return;
                 }
+
+                // ✅ On récupère le statut brut du compte pour piloter la couleur de l'avatar
+                String statutCompte = ligne.statut() != null ? ligne.statut().name() : null;
+
                 conteneur.getChildren().setAll(
-                        AvatarUtil.creer(ligne.photoPath(), ligne.nom(), ligne.prenom(),
-                                ligne.idUtilisateur()),
+                        AvatarUtil.creer(
+                                ligne.photoPath(),
+                                ligne.nom(),
+                                ligne.prenom(),
+                                ligne.idUtilisateur(),
+                                statutCompte,
+                                true   // ← indique à AvatarUtil qu'il s'agit d'un compte utilisateur
+                        ),
                         texte
                 );
                 conteneur.setAlignment(Pos.CENTER_LEFT);

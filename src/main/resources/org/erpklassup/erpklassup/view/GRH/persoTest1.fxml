@@ -528,7 +528,7 @@
                                                             </Label>
                                                         </children>
                                                     </VBox>
-                                                    <ToggleButton fx:id="tglCreerCompte" onAction="#handleToggleCreerCompte" text="Activer" />
+                                                    <ToggleButton fx:id="tglCreerCompte" onAction="#handleToggleCreerCompte" />
                                                 </children>
                                             </HBox>
 

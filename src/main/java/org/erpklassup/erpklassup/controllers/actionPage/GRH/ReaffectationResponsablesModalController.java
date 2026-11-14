@@ -77,7 +77,7 @@ public class ReaffectationResponsablesModalController {
         if (idEcoleCourante == null) return;
 
         FiltrePersonnel filtre = new FiltrePersonnel(
-                idEcoleCourante, null, null, null, null, 1, Integer.MAX_VALUE
+                idEcoleCourante, null, null, null,null, null, 1, Integer.MAX_VALUE
         );
 
         personnelService.rechercherAsync(filtre,

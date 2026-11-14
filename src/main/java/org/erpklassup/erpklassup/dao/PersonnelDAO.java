@@ -44,7 +44,7 @@ public class PersonnelDAO {
 
         String sql = """
             INSERT INTO Personnel (
-                idPersonnel, idEcole, idUtilisateur, idDepartement, idResponsable,
+                idPersonnel, idEcole, idUtilisateur, idDepartement, idPoste,idResponsable,
                 matriculeInterne, nom, prenom, sexe, dateNaissance, lieuNaissance,
                 nationalite, situationMatrimoniale, nombreEnfants,
                 numeroCni, niu, numCnps,
@@ -60,7 +60,7 @@ public class PersonnelDAO {
                 ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?, ?
+                ?, ?, ?, ?, ?
             )
             """;
 
@@ -72,6 +72,7 @@ public class PersonnelDAO {
             ps.setString(i++, p.getIdEcole());
             setNullableString(ps, i++, p.getIdUtilisateur());
             setNullableString(ps, i++, p.getIdDepartement());
+            setNullableString(ps, i++, p.getIdPoste());
             setNullableString(ps, i++, p.getIdResponsable());
 
             ps.setString(i++, p.getMatriculeInterne());
@@ -338,7 +339,7 @@ public class PersonnelDAO {
     public boolean update(Personnel p) {
         String sql = """
             UPDATE Personnel SET
-                idUtilisateur = ?, idDepartement = ?, idResponsable = ?,
+                idUtilisateur = ?, idDepartement = ?, idPoste = ?, idResponsable = ?,
                 matriculeInterne = ?, nom = ?, prenom = ?, sexe = ?, dateNaissance = ?,
                 lieuNaissance = ?, nationalite = ?, situationMatrimoniale = ?, nombreEnfants = ?,
                 numeroCni = ?, niu = ?, numCnps = ?,
@@ -359,6 +360,7 @@ public class PersonnelDAO {
             int i = 1;
             setNullableString(ps, i++, p.getIdUtilisateur());
             setNullableString(ps, i++, p.getIdDepartement());
+            setNullableString(ps, i++, p.getIdPoste());
             setNullableString(ps, i++, p.getIdResponsable());
 
             ps.setString(i++, p.getMatriculeInterne());
@@ -443,6 +445,7 @@ public class PersonnelDAO {
         p.setIdEcole(rs.getString("idEcole"));
         p.setIdUtilisateur(rs.getString("idUtilisateur"));
         p.setIdDepartement(rs.getString("idDepartement"));
+        p.setIdPoste(rs.getString("idPoste"));
         p.setIdResponsable(rs.getString("idResponsable"));
 //        p.setIdEchelon(rs.getString("idEchelon"));
 
@@ -568,6 +571,10 @@ public class PersonnelDAO {
             clause.append(" AND p.idDepartement = ? ");
             parametres.add(filtre.idDepartement());
         }
+        if (filtre.idPoste() != null && !filtre.idPoste().isBlank()) {
+            clause.append(" AND p.idPoste = ? ");
+            parametres.add(filtre.idPoste());
+        }
         if (filtre.typePersonnel() != null && !filtre.typePersonnel().isBlank()) {
             clause.append(" AND p.typePersonnel = ? ");
             parametres.add(filtre.typePersonnel());
@@ -579,7 +586,7 @@ public class PersonnelDAO {
         if (filtre.terme() != null && !filtre.terme().isBlank()) {
             clause.append("""
              AND (p.nom LIKE ? OR p.prenom LIKE ? OR p.matriculeInterne LIKE ?
-                  OR p.email LIKE ? OR p.telephone LIKE ?)
+                  OR p.email LIKE ? OR p.telephone LIKE ? OR p.posteOuFonction LIKE ?)
             """);
             String motif = "%" + filtre.terme().trim() + "%";
             for (int i = 0; i < 5; i++) parametres.add(motif);
@@ -702,7 +709,7 @@ public class PersonnelDAO {
         if (prenom != null && !prenom.isBlank()) init.append(Character.toUpperCase(prenom.charAt(0)));
 
         return new PersonnelLigne(
-                rs.getString("idPersonnel"),         // 1  idPersonnel
+                rs.getString("idPersonnel"),// 1  idPersonnel
                 rs.getString("matriculeInterne"),    // 2  matricule
                 nom,                                 // 3  nom          ← AJOUTÉ
                 prenom,                              // 4  prenom       ← AJOUTÉ

@@ -278,6 +278,7 @@ public class PersonnelService extends ServiceAsyncBase {
             if (p.getIdUtilisateur() != null) {
                 rafraichisseur.rafraichirPourUtilisateur(p.getIdUtilisateur());
             }
+            synchroniserEtatCompte(p);
         }, onSucces, onErreur);
     }
 
@@ -365,6 +366,7 @@ public class PersonnelService extends ServiceAsyncBase {
             if (p.getIdUtilisateur() != null) {
                 rafraichisseur.rafraichirPourUtilisateur(p.getIdUtilisateur());
             }
+            synchroniserEtatCompte(p);
         }, onSucces, onErreur);
     }
 
@@ -435,17 +437,19 @@ public class PersonnelService extends ServiceAsyncBase {
         executerSansRetour(() -> {
 //            Autorisation.exigerAction("personnel.modifier");
 
-            if (!Set.of("ACTIF", "SUSPENDU", "SORTI").contains(statut)) {
+            if (!Set.of("Actif", "Suspend", "Sorti").contains(statut)) {
                 throw new IllegalArgumentException("Statut d'emploi invalide : " + statut);
             }
 
             for (String id : ids) {
                 personnelDAO.findById(id).ifPresent(p -> {
                     p.setStatutEmploi(statut);
-                    if ("SORTI".equals(statut)) p.setEstActif(false);
+                    if ("Sorti".equals(statut)) p.setEstActif(false);
                     personnelDAO.update(p);
                     if (p.getIdUtilisateur() != null) {
                         rafraichisseur.rafraichirPourUtilisateur(p.getIdUtilisateur());
+                        synchroniserEtatCompte(p);
+
                     }
                 });
             }
@@ -518,5 +522,18 @@ public class PersonnelService extends ServiceAsyncBase {
     public void chargerSansCompteObservable(String idEcole) {
         // méthode utilitaire synchrone utilisée par certains écrans (legacy)
         FXCollections.observableArrayList(personnelDAO.findSansCompte(idEcole));
+    }
+
+    private void synchroniserEtatCompte(Personnel p) {
+        if (p == null || p.getIdUtilisateur() == null || p.getIdUtilisateur().isBlank()) {
+            return;
+        }
+        boolean doitEtreActif = "Actif".equalsIgnoreCase(p.getStatutEmploi());
+        try {
+            utilisateurDAO.changerStatutActif(p.getIdUtilisateur(), doitEtreActif);
+        } catch (Exception e) {
+            System.err.println("⚠️ Impossible de synchroniser le compte utilisateur "
+                    + p.getIdUtilisateur() + " : " + e.getMessage());
+        }
     }
 }

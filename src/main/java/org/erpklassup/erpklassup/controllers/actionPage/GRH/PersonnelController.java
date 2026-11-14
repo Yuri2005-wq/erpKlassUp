@@ -282,8 +282,8 @@ public class PersonnelController implements Initializable, VueDisposable {
                 String st = p.statutEmploi();
                 Label badge = new Label(st);
                 badge.getStyleClass().addAll("event-tag", switch (st) {
-                    case "actif" -> "tag-green";
-                    case "suspendu" -> "tag-orange";
+                    case "Actif" -> "tag-green";
+                    case "Suspendu", "Inactif" -> "tag-orange";
                     default -> "tag-red";
                 });
                 setGraphic(badge);
@@ -569,6 +569,7 @@ public class PersonnelController implements Initializable, VueDisposable {
                 idEcoleCourante,
                 idDept,
                 null,
+                null,
                 statut,
                 searchPersonnelField.getText(),
                 1,
@@ -589,6 +590,7 @@ public class PersonnelController implements Initializable, VueDisposable {
         FiltrePersonnel filtre = new FiltrePersonnel(
                 idEcoleCourante,
                 idDept,
+                null,
                 null,
                 statut,
                 searchPersonnelField.getText(),
