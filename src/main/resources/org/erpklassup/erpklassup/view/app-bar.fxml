@@ -105,9 +105,8 @@
                 <!-- 5. Bloc Profil Utilisateur Connecté -->
                 <HBox fx:id="userProfilBox" alignment="CENTER_LEFT" onMouseClicked="#handleOuvrirProfil" prefHeight="50.0" prefWidth="173.0" spacing="10" style="-fx-padding: 6 12; -fx-background-radius: 8; -fx-cursor: hand;">
 
-                    <StackPane style="-fx-min-width: 36; -fx-min-height: 36;                       -fx-max-width: 36; -fx-max-height: 36;                       -fx-background-color: #F5A524;                       -fx-background-radius: 50%;">
-                        <Label fx:id="avatarLabelAppBar" style="-fx-text-fill: #16213A; -fx-font-weight: bold; -fx-font-size: 13px;" text="AD" />
-                    </StackPane>
+                    <!-- ✅ Avatar dynamique rempli par le contrôleur via AvatarUtil -->
+                    <StackPane fx:id="avatarContainerAppBar" />
 
                     <VBox spacing="2">
                         <Label fx:id="nomUtilisateurAppBar" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" text="Admin System" />

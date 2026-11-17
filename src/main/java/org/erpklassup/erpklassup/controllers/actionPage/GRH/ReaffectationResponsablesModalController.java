@@ -70,29 +70,53 @@ public class ReaffectationResponsablesModalController {
         this.onModificationsEnregistrees = onEnregistre;
 
         chargerPersonnel();
-        chargerDepartements();
     }
+
 
     private void chargerPersonnel() {
         if (idEcoleCourante == null) return;
 
         FiltrePersonnel filtre = new FiltrePersonnel(
-                idEcoleCourante, null, null, null,null, null, 1, Integer.MAX_VALUE
+                idEcoleCourante, null, null, null, null, null, 1, Integer.MAX_VALUE
         );
 
         personnelService.rechercherAsync(filtre,
                 resultat -> Platform.runLater(() -> {
                     listePersonnel.setAll(resultat.elements());
-                    // Configurer les ComboBox du transfert rapide
                     configurerCellulesComboBox(comboAncienResponsable);
                     configurerCellulesComboBox(comboNouveauResponsable);
 
                     comboAncienResponsable.setItems(listePersonnel);
                     comboNouveauResponsable.setItems(listePersonnel);
+
+                    // ✅ Recharge les départements une fois que le personnel est prêt
+                    //    pour éviter que les cellules ne soient rendues avant d'avoir la liste
+                    chargerDepartements();
                 }),
                 err -> System.err.println("❌ Erreur chargement personnel modale : " + err.getMessage())
         );
     }
+
+//    private void chargerPersonnel() {
+//        if (idEcoleCourante == null) return;
+//
+//        FiltrePersonnel filtre = new FiltrePersonnel(
+//                idEcoleCourante, null, null, null,null, null, 1, Integer.MAX_VALUE
+//        );
+//
+//        personnelService.rechercherAsync(filtre,
+//                resultat -> Platform.runLater(() -> {
+//                    listePersonnel.setAll(resultat.elements());
+//                    // Configurer les ComboBox du transfert rapide
+//                    configurerCellulesComboBox(comboAncienResponsable);
+//                    configurerCellulesComboBox(comboNouveauResponsable);
+//
+//                    comboAncienResponsable.setItems(listePersonnel);
+//                    comboNouveauResponsable.setItems(listePersonnel);
+//                }),
+//                err -> System.err.println("❌ Erreur chargement personnel modale : " + err.getMessage())
+//        );
+//    }
 
     private void chargerDepartements() {
         if (idEcoleCourante == null) return;
@@ -117,12 +141,12 @@ public class ReaffectationResponsablesModalController {
         combo.setButtonCell(combo.getCellFactory().call(null));
     }
 
+
     private void configurerTable() {
         tableResponsables.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         colDeptLibelle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLibelle()));
 
-        // Nom du responsable actuel (résolu via l'ID)
         colDeptResponsableActuel.setCellValueFactory(d -> {
             String idResp = d.getValue().getIdResponsable();
             if (idResp == null || idResp.isBlank()) return new SimpleStringProperty("Non assigné");
@@ -135,7 +159,6 @@ public class ReaffectationResponsablesModalController {
             return new SimpleStringProperty(nom);
         });
 
-        // Colonne interactive pour changer le responsable en 1 clic
         colChangerResponsable.setCellValueFactory(d -> new SimpleObjectProperty<>());
         colChangerResponsable.setCellFactory(col -> new TableCell<>() {
             private final ComboBox<PersonnelLigne> comboChef = new ComboBox<>();
@@ -144,10 +167,13 @@ public class ReaffectationResponsablesModalController {
                 comboChef.setMaxWidth(Double.MAX_VALUE);
                 configurerCellulesComboBox(comboChef);
 
-                comboChef.valueProperty().addListener((obs, anc, nouv) -> {
+                // ✅ setOnAction : ne se déclenche QUE sur une action utilisateur
+                comboChef.setOnAction(e -> {
                     Departement dept = getTableView().getItems().get(getIndex());
                     if (dept != null) {
-                        String nouveauId = (nouv != null) ? nouv.idPersonnel() : null;
+                        String nouveauId = (comboChef.getValue() != null)
+                                ? comboChef.getValue().idPersonnel()
+                                : null;
                         modificationsMap.put(dept.getIdDepartement(), nouveauId);
                         mettreAJourCompteur();
                     }
@@ -159,30 +185,99 @@ public class ReaffectationResponsablesModalController {
                 super.updateItem(item, empty);
                 if (empty || getIndex() >= getTableView().getItems().size()) {
                     setGraphic(null);
-                } else {
-                    Departement dept = getTableView().getItems().get(getIndex());
-                    comboChef.setItems(listePersonnel);
-
-                    // Pré-sélectionner le responsable actuel ou modifié
-                    if (dept != null) {
-                        String idActuel = modificationsMap.containsKey(dept.getIdDepartement())
-                                ? modificationsMap.get(dept.getIdDepartement())
-                                : dept.getIdResponsable();
-
-                        if (idActuel != null) {
-                            listePersonnel.stream()
-                                    .filter(p -> p.idPersonnel().equals(idActuel))
-                                    .findFirst()
-                                    .ifPresent(comboChef::setValue);
-                        } else {
-                            comboChef.getSelectionModel().clearSelection();
-                        }
-                    }
-                    setGraphic(comboChef);
+                    return;
                 }
+
+                Departement dept = getTableView().getItems().get(getIndex());
+
+                // ✅ On (re)fixe les items à chaque rendu au cas où la liste a changé
+                comboChef.setItems(listePersonnel);
+
+                if (dept != null) {
+                    String idActuel = modificationsMap.containsKey(dept.getIdDepartement())
+                            ? modificationsMap.get(dept.getIdDepartement())
+                            : dept.getIdResponsable();
+
+                    if (idActuel != null) {
+                        listePersonnel.stream()
+                                .filter(p -> p.idPersonnel().equals(idActuel))
+                                .findFirst()
+                                .ifPresent(comboChef::setValue);
+                    } else {
+                        comboChef.getSelectionModel().clearSelection();
+                    }
+                }
+                setGraphic(comboChef);
             }
         });
     }
+
+//    private void configurerTable() {
+//        tableResponsables.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//
+//        colDeptLibelle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLibelle()));
+//
+//        // Nom du responsable actuel (résolu via l'ID)
+//        colDeptResponsableActuel.setCellValueFactory(d -> {
+//            String idResp = d.getValue().getIdResponsable();
+//            if (idResp == null || idResp.isBlank()) return new SimpleStringProperty("Non assigné");
+//
+//            String nom = listePersonnel.stream()
+//                    .filter(p -> p.idPersonnel().equals(idResp))
+//                    .map(PersonnelLigne::nomComplet)
+//                    .findFirst()
+//                    .orElse("Inconnu");
+//            return new SimpleStringProperty(nom);
+//        });
+//
+//        // Colonne interactive pour changer le responsable en 1 clic
+//        colChangerResponsable.setCellValueFactory(d -> new SimpleObjectProperty<>());
+//        colChangerResponsable.setCellFactory(col -> new TableCell<>() {
+//            private final ComboBox<PersonnelLigne> comboChef = new ComboBox<>();
+//
+//            {
+//                comboChef.setMaxWidth(Double.MAX_VALUE);
+//                configurerCellulesComboBox(comboChef);
+//
+//                comboChef.valueProperty().addListener((obs, anc, nouv) -> {
+//                    Departement dept = getTableView().getItems().get(getIndex());
+//                    if (dept != null) {
+//                        String nouveauId = (nouv != null) ? nouv.idPersonnel() : null;
+//                        modificationsMap.put(dept.getIdDepartement(), nouveauId);
+//                        mettreAJourCompteur();
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            protected void updateItem(PersonnelLigne item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (empty || getIndex() >= getTableView().getItems().size()) {
+//                    setGraphic(null);
+//                } else {
+//                    Departement dept = getTableView().getItems().get(getIndex());
+//                    comboChef.setItems(listePersonnel);
+//
+//                    // Pré-sélectionner le responsable actuel ou modifié
+//                    if (dept != null) {
+//                        String idActuel = modificationsMap.containsKey(dept.getIdDepartement())
+//                                ? modificationsMap.get(dept.getIdDepartement())
+//                                : dept.getIdResponsable();
+//
+//                        if (idActuel != null) {
+//                            listePersonnel.stream()
+//                                    .filter(p -> p.idPersonnel().equals(idActuel))
+//                                    .findFirst()
+//                                    .ifPresent(comboChef::setValue);
+//                        } else {
+//                            comboChef.getSelectionModel().clearSelection();
+//                        }
+//                    }
+//                    setGraphic(comboChef);
+//                }
+//            }
+//        });
+//    }
 
     /* ============================================================
        ACTIONS MÉTIER

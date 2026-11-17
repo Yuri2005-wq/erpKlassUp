@@ -141,6 +141,20 @@ public final class AvatarUtil {
     }
 
 
+    /**
+     * Crée un avatar avec une taille personnalisée.
+     * Si estCompte = true, le statut est interprété comme un StatutCompte
+     * (ACTIF / VERROUILLE / INACTIF) → couleurs adaptées.
+     * Sinon, le statut est interprété comme un StatutEmploi RH.
+     */
+    public static StackPane creer(String cheminPhoto, String nom, String prenom,
+                                  String idPourCouleur, double taille,
+                                  String statutCompte, boolean estCompte) {
+        EtatAvatar etat = estCompte
+                ? EtatAvatar.depuisCompte(statutCompte)
+                : EtatAvatar.depuis(statutCompte);
+        return creerAvecEtat(cheminPhoto, nom, prenom, idPourCouleur, taille, etat);
+    }
 
 
 

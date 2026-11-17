@@ -139,83 +139,31 @@ public class AuditService extends ServiceAsyncBase {
     public List<AuditLigne> rechercher(FiltreAudit filtre) {
         return dao.rechercher(filtre);
     }
+
+    /**
+     * Trace une action d'audit de manière SYNCHRONE (bloquante).
+     * À utiliser dans les hooks de fermeture (fermeture d'app, déconnexion critique...),
+     * où l'asynchrone est interdit car le pool peut être fermé avant la fin.
+     */
+    public void tracerActionSync(String categorie, String action, String details) {
+        SessionManager sm = session();
+        if (!sm.estConnecte()) {
+            return;
+        }
+
+        Utilisateur user = sm.getUtilisateurCourant();
+        String idEcole = sm.getIdEcoleCourante();
+        String idUser = user.getIdUtilisateur();
+        String nomAuteur = user.getNomComplet();
+
+        String adresseIp = obtenirAdresseIpLocale();
+        String appareil = obtenirInfoAppareil();
+
+        try {
+            dao.inserer(idEcole, idUser, nomAuteur, categorie, action, details, adresseIp, appareil);
+        } catch (Exception e) {
+            System.err.println("❌ Impossible de tracer l'audit (sync) : " + e.getMessage());
+        }
+    }
 }
 
-//package org.erpklassup.erpklassup.service;
-//
-//import org.erpklassup.erpklassup.dao.LogsAuditDAO;
-//import org.erpklassup.erpklassup.dto.AuditLigne;
-//import org.erpklassup.erpklassup.dto.FiltreAudit;
-//import org.erpklassup.erpklassup.models.Utilisateur;
-//
-//import java.util.List;
-//import java.util.function.Consumer;
-//
-//public class AuditService extends ServiceAsyncBase {
-//
-//    private final LogsAuditDAO dao;
-//    private final SessionManager sessionManager;
-//
-//    public AuditService() {
-//        this(new LogsAuditDAO());
-//    }
-//
-//    public AuditService(LogsAuditDAO dao) {
-//        this.dao = dao;
-//        this.sessionManager = SessionManager.getInstance();
-//    }
-//
-//    /**
-//     * Enregistre une action d'audit de manière asynchrone (non bloquante pour l'UI).
-//     *
-//     * @param categorie La catégorie fonctionnelle (ex: "ELEVE", "PAYEMENT")
-//     * @param action    Le type d'action effectuée (ex: "CREATION", "SUPPRESSION")
-//     * @param details   La description détaillée de l'opération
-//     */
-//    public void tracerActionAsync(String categorie, String action, String details) {
-//        if (!sessionManager.estConnecte()) {
-//            return;
-//        }
-//
-//        Utilisateur user = sessionManager.getUtilisateurCourant();
-//        String idEcole = sessionManager.getIdEcoleCourante();
-//        String idUser = user.getIdUtilisateur();
-//        String nomAuteur = user.getNomComplet();
-//
-//        String adresseIp = "127.0.0.1";
-//        String appareil = "Appareil (" + System.getProperty("os.name") + ")";
-//
-//        // ✅ Correction : On retourne null dans le Callable et on remplace la lambda inutilisée par un Runnable vide
-//        executer(
-//                () -> {
-//                    dao.inserer(idEcole, idUser, nomAuteur, categorie, action, details, adresseIp, appareil);
-//                    return null;
-//                },
-//                inutilise -> {},
-//                erreur -> System.err.println("Échec du traçage d'audit : " + erreur.getMessage())
-//        );
-//    }
-//
-//    /**
-//     * Recherche asynchrone des lignes d'audit selon les filtres spécifiés.
-//     */
-//    public void rechercherAsync(FiltreAudit filtre, Consumer<List<AuditLigne>> onSucces, Consumer<Throwable> onErreur) {
-//        long jeton = nouvelleRequete();
-//        executer(
-//                () -> dao.rechercher(filtre),
-//                resultat -> { if (estRequeteActuelle(jeton)) onSucces.accept(resultat); },
-//                erreur -> { if (estRequeteActuelle(jeton)) onErreur.accept(erreur); }
-//        );
-//    }
-//
-//    /**
-//     * Récupère la liste distincte des catégories d'audit disponibles pour une école.
-//     */
-//    public void listerCategoriesAsync(String idEcole, Consumer<List<String>> onSucces, Consumer<Throwable> onErreur) {
-//        executer(
-//                () -> dao.listerCategoriesDistinctes(idEcole),
-//                onSucces,
-//                onErreur
-//        );
-//    }
-//}

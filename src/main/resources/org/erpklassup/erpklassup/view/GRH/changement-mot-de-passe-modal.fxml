@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefWidth="480.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.erpklassup.erpklassup.controllers.actionPage.GRH.ChangementMotDePasseModalController">
+
+    <padding><Insets bottom="28.0" left="32.0" right="32.0" top="28.0" /></padding>
+
+    <children>
+
+        <!-- En-tête -->
+        <HBox alignment="CENTER_LEFT" spacing="14.0">
+            <FontIcon iconLiteral="fth-lock" iconSize="36" styleClass="icon-orange" />
+            <VBox spacing="4.0">
+                <Label text="Changement de mot de passe requis" textFill="#1E293B">
+                    <font><Font name="System Bold" size="18.0" /></font>
+                </Label>
+                <Label text="Pour des raisons de sécurité, vous devez changer votre mot de passe avant de continuer." textFill="#64748B" wrapText="true">
+                    <font><Font size="12.0" /></font>
+                </Label>
+            </VBox>
+        </HBox>
+
+        <Separator />
+
+        <!-- Formulaire -->
+        <VBox spacing="16.0">
+
+            <!-- ✅ Ancien mot de passe avec bascule œil -->
+            <VBox spacing="6.0">
+                <Label text="Mot de passe actuel *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <StackPane>
+                    <PasswordField fx:id="txtAncienMdp" promptText="Saisissez votre mot de passe actuel" styleClass="input" />
+                    <TextField fx:id="txtAncienMdpVisible" managed="false" promptText="Saisissez votre mot de passe actuel" styleClass="input" visible="false" />
+                    <Button fx:id="btnToggleAncien" onAction="#handleToggleAncien" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0 10 0 0;" StackPane.alignment="CENTER_RIGHT">
+                        <graphic><FontIcon fx:id="iconAncien" iconLiteral="fth-eye" iconSize="16" styleClass="icon-gray" /></graphic>
+                    </Button>
+                </StackPane>
+            </VBox>
+
+            <!-- ✅ Nouveau mot de passe avec bascule œil -->
+            <VBox spacing="6.0">
+                <Label text="Nouveau mot de passe *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <StackPane>
+                    <PasswordField fx:id="txtNouveauMdp" promptText="Minimum 8 caractères, 1 majuscule, 1 chiffre" styleClass="input" />
+                    <TextField fx:id="txtNouveauMdpVisible" managed="false" promptText="Minimum 8 caractères, 1 majuscule, 1 chiffre" styleClass="input" visible="false" />
+                    <Button fx:id="btnToggleNouveau" onAction="#handleToggleNouveau" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0 10 0 0;" StackPane.alignment="CENTER_RIGHT">
+                        <graphic><FontIcon fx:id="iconNouveau" iconLiteral="fth-eye" iconSize="16" styleClass="icon-gray" /></graphic>
+                    </Button>
+                </StackPane>
+            </VBox>
+
+            <!-- ✅ Confirmation avec bascule œil -->
+            <VBox spacing="6.0">
+                <Label text="Confirmer le nouveau mot de passe *" textFill="#334155">
+                    <font><Font name="System Bold" size="12.0" /></font>
+                </Label>
+                <StackPane>
+                    <PasswordField fx:id="txtConfirmMdp" promptText="Ressaisissez le nouveau mot de passe" styleClass="input" />
+                    <TextField fx:id="txtConfirmMdpVisible" managed="false" promptText="Ressaisissez le nouveau mot de passe" styleClass="input" visible="false" />
+                    <Button fx:id="btnToggleConfirm" onAction="#handleToggleConfirm" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0 10 0 0;" StackPane.alignment="CENTER_RIGHT">
+                        <graphic><FontIcon fx:id="iconConfirm" iconLiteral="fth-eye" iconSize="16" styleClass="icon-gray" /></graphic>
+                    </Button>
+                </StackPane>
+            </VBox>
+
+            <Label fx:id="errGlobal" managed="false" styleClass="error-label" visible="false" wrapText="true" />
+
+        </VBox>
+
+        <!-- Actions -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Button fx:id="btnValider" defaultButton="true" onAction="#handleValider" styleClass="button-primary" text="Changer et continuer">
+                <graphic><FontIcon iconLiteral="fth-save" iconSize="14" /></graphic>
+            </Button>
+        </HBox>
+
+    </children>
+</VBox>

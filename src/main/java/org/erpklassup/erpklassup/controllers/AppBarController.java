@@ -12,20 +12,20 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import org.erpklassup.erpklassup.controllers.actionPage.UserProfileController;
+import org.erpklassup.erpklassup.dao.PersonnelDAO;
 import org.erpklassup.erpklassup.dao.UtilisateurRoleDAO;
+import org.erpklassup.erpklassup.models.GRH.Personnel;
 import org.erpklassup.erpklassup.models.Role;
 import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.models.module2.AnneeScolaire;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.service.module2.AnneeScolaireService;
-import org.erpklassup.erpklassup.util.BreadcrumbManager;
-import org.erpklassup.erpklassup.util.I18nManager;
-import org.erpklassup.erpklassup.util.ModalUtil;
-import org.erpklassup.erpklassup.util.ToastNotification;
+import org.erpklassup.erpklassup.util.*;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -42,7 +42,7 @@ public class AppBarController implements Initializable {
        ============================================================ */
     @FXML private HBox      appBar;
     @FXML private HBox      userProfilBox;
-    @FXML private Label     avatarLabelAppBar;
+    @FXML private StackPane     avatarContainerAppBar  ;
     @FXML private Label     nomUtilisateurAppBar;
     @FXML private Label     roleUtilisateurAppBar;
     @FXML private Label     lblDate;
@@ -89,6 +89,8 @@ public class AppBarController implements Initializable {
 
         // Dans AppBarController.java
         SessionManager.getInstance().ecouterChangementAnnee(() -> Platform.runLater(this::chargerAnneeActiveBadge));
+
+
 
         if (userProfilBox != null) {
             userProfilBox.setOnMouseClicked(e -> ouvrirPopupProfil());
@@ -253,6 +255,26 @@ public class AppBarController implements Initializable {
         ouvrirPopupProfil();
     }
 
+//    private void chargerUtilisateurConnecte() {
+//        Utilisateur user = SessionManager.getInstance().getUtilisateurCourant();
+//        if (user == null) {
+//            if (nomUtilisateurAppBar != null)
+//                nomUtilisateurAppBar.setText(I18nManager.getInstance().t("app.not_connected"));
+//            if (roleUtilisateurAppBar != null)
+//                roleUtilisateurAppBar.setText("—");
+//            if (avatarLabelAppBar != null)
+//                avatarLabelAppBar.setText("?");
+//            return;
+//        }
+//
+//        if (nomUtilisateurAppBar != null)
+//            nomUtilisateurAppBar.setText(user.getNomComplet());
+//        if (avatarLabelAppBar != null)
+//            avatarLabelAppBar.setText(calculerInitiales(user));
+//
+//        chargerRoleEnArrierePlan(user.getIdUtilisateur());
+//    }
+
     private void chargerUtilisateurConnecte() {
         Utilisateur user = SessionManager.getInstance().getUtilisateurCourant();
         if (user == null) {
@@ -260,15 +282,20 @@ public class AppBarController implements Initializable {
                 nomUtilisateurAppBar.setText(I18nManager.getInstance().t("app.not_connected"));
             if (roleUtilisateurAppBar != null)
                 roleUtilisateurAppBar.setText("—");
-            if (avatarLabelAppBar != null)
-                avatarLabelAppBar.setText("?");
+            // Avatar par défaut "?"
+            if (avatarContainerAppBar != null) {
+                avatarContainerAppBar.getChildren().setAll(
+                        AvatarUtil.creer(null, "?", "", "default")
+                );
+            }
             return;
         }
 
         if (nomUtilisateurAppBar != null)
             nomUtilisateurAppBar.setText(user.getNomComplet());
-        if (avatarLabelAppBar != null)
-            avatarLabelAppBar.setText(calculerInitiales(user));
+
+        // ✅ Avatar dynamique via AvatarUtil (photo si dispo, sinon initiales)
+        afficherAvatarUtilisateur(user);
 
         chargerRoleEnArrierePlan(user.getIdUtilisateur());
     }
@@ -402,5 +429,60 @@ public class AppBarController implements Initializable {
     private Stage getStage() {
         if (appBar == null || appBar.getScene() == null) return null;
         return (Stage) appBar.getScene().getWindow();
+    }
+
+    /**
+     * Construit l'avatar de l'utilisateur connecté via AvatarUtil.
+     * - Si une photo est disponible (via Personnel lié), elle est affichée.
+     * - Sinon, les initiales colorées sont générées.
+     * - Le contour et la pastille reflètent le statut du compte.
+     */
+    private void afficherAvatarUtilisateur(Utilisateur user) {
+        if (avatarContainerAppBar == null || user == null) return;
+
+        // 1. Récupérer le chemin photo depuis le Personnel lié (via DAO ou SessionManager)
+        String photoPath = trouverPhotoPersonnel(user.getIdUtilisateur());
+
+        // 2. Déterminer le statut pour le contour/pastille
+        String statutCompte = determinerStatutCompte(user);
+
+        // 3. Construire l'avatar avec AvatarUtil (taille 36 pour l'AppBar)
+        StackPane avatar = AvatarUtil.creer(
+                photoPath,
+                user.getNom(),
+                user.getPrenom(),
+                user.getIdUtilisateur(),
+                36,           // taille adaptée à la barre
+                statutCompte,
+                true          // estCompte = true → mapping StatutCompte
+        );
+
+        avatarContainerAppBar.getChildren().setAll(avatar);
+    }
+
+    /**
+     * Récupère le chemin de la photo du Personnel lié à cet utilisateur.
+     * Retourne null si aucun Personnel n'est lié ou si la photo est absente.
+     */
+    private String trouverPhotoPersonnel(String idUtilisateur) {
+        try {
+            return new PersonnelDAO()
+                    .findByUtilisateurId(idUtilisateur)
+                    .map(Personnel::getPhoto)
+                    .orElse(null);
+        } catch (Exception e) {
+            System.err.println("⚠️ Impossible de récupérer la photo du personnel : " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Détermine le statut du compte pour piloter le contour + pastille de l'avatar.
+     * Mapping : ACTIF → vert, VERROUILLE → orange, INACTIF → gris.
+     */
+    private String determinerStatutCompte(Utilisateur user) {
+        if (user.isCompteVerrouille()) return "VERROUILLE";
+        if (!user.isEstActif()) return "INACTIF";
+        return "ACTIF";
     }
 }

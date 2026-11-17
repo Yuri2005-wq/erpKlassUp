@@ -346,6 +346,8 @@ public class UtilisateurDAO {
         user.setTelephone2FA(rs.getString("telephone2FA"));
         user.setDeuxFacteursActive(rs.getBoolean("deuxFacteursActive"));
         user.setDoitConfigurer2FA(rs.getBoolean("doitConfigurer2FA"));
+        user.setDoitChangerMotDePasse(rs.getBoolean("doitChangerMotDePasse"));
+
         user.setTypeUtilisateur(rs.getString("typeUtilisateur"));
         user.setCompteVerrouille(rs.getBoolean("compteVerrouille"));
         user.setNombreTentativesEchec(rs.getInt("nombreTentativesEchec"));

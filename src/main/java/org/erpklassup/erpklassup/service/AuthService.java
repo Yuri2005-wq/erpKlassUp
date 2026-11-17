@@ -39,152 +39,6 @@ public class AuthService {
         return auditService;
     }
 
-//    public ResultatConnexion seConnecter(Stage stage, String username, String motDePasse, String code2FA, String idEcole, String ipAdresse, String userAgent, String nomApp) {
-//
-//        Optional<Utilisateur> userOpt = utilisateurDAO.findByUsername(username, idEcole);
-//
-//        // 1. Utilisateur non trouvé
-//        if (userOpt.isEmpty()) {
-//            enregistrerSecurite(username, ipAdresse, userAgent, false, "UTILISATEUR_INEXISTANT",
-//                    "AUTHENTIFICATION", "ECHEC_CONNEXION", "Tentative avec un identifiant inconnu : " + username);
-//
-//            afficherToast(stage, () -> ToastNotification.erreur(stage, "Identifiant ou mot de passe incorrect"));
-//            return new ResultatConnexion(false, "Identifiant ou mot de passe incorrect");
-//        }
-//
-//        Utilisateur user = userOpt.get();
-//
-//        // 2. Compte désactivé
-//        if (!user.isEstActif()) {
-//            enregistrerSecurite(username, ipAdresse, userAgent, false, "COMPTE_DESACTIVE",
-//                    "AUTHENTIFICATION", "ECHEC_CONNEXION", "Connexion refusée — Compte désactivé : " + username);
-//
-//            afficherToast(stage, () -> ToastNotification.avertissement(stage, "Ce compte a été désactivé"));
-//            return new ResultatConnexion(false, "Ce compte est désactivé");
-//        }
-//
-//        // 3. Compte verrouillé
-//        if (user.isCompteVerrouille()) {
-//            if (user.getVerrouilleJusqua() != null && user.getVerrouilleJusqua().isAfter(LocalDateTime.now())) {
-//                enregistrerSecurite(username, ipAdresse, userAgent, false, "COMPTE_VERROUILLE",
-//                        "AUTHENTIFICATION", "ECHEC_CONNEXION", "Connexion refusée — Compte verrouillé : " + username);
-//
-//                afficherToast(stage, () -> ToastNotification.erreur(stage, "Compte verrouillé. Réessayez plus tard."));
-//                return new ResultatConnexion(false, "Compte verrouillé. Réessayez plus tard.");
-//            } else {
-//                utilisateurDAO.deverrouillerCompte(user.getIdUtilisateur());
-//                user.setCompteVerrouille(false);
-//            }
-//        }
-//
-//        // 4. Mot de passe incorrect
-//        if (!PasswordService.verifier(motDePasse, user.getPasswordHash())) {
-//            utilisateurDAO.incrementerTentativesEchec(user.getIdUtilisateur());
-//            int tentativesEchouees = user.getNombreTentativesEchec() + 1;
-//
-//            if (tentativesEchouees >= MAX_TENTATIVES) {
-//                utilisateurDAO.verrouillerCompte(user.getIdUtilisateur(), DUREE_VERROUILLAGE_MINUTES);
-//
-//                enregistrerSecurite(username, ipAdresse, userAgent, false, "SEUIL_ECHECS_ATTEINT",
-//                        "AUTHENTIFICATION", "COMPTE_VERROUILLE", "Compte verrouillé après " + MAX_TENTATIVES + " échecs : " + username);
-//
-//                afficherToast(stage, () -> ToastNotification.erreur(stage, "Compte verrouillé après trop d'échecs"));
-//                return new ResultatConnexion(false, "Compte verrouillé");
-//            } else {
-//                int restantes = MAX_TENTATIVES - tentativesEchouees;
-//
-//                enregistrerSecurite(username, ipAdresse, userAgent, false, "MOT_DE_PASSE_INCORRECT",
-//                        "AUTHENTIFICATION", "ECHEC_CONNEXION", "Mot de passe erroné pour " + username + " (" + restantes + " essai(s) restant(s))");
-//
-//                afficherToast(stage, () -> ToastNotification.avertissement(stage, "Mot de passe incorrect. " + restantes + " tentative(s) restante(s)"));
-//                return new ResultatConnexion(false, "Identifiant ou mot de passe incorrect");
-//            }
-//        }
-//
-//        // Mot de passe correct : Réinitialisation du compteur d'échecs
-//        utilisateurDAO.reinitialiserTentativesEchec(user.getIdUtilisateur());
-//
-//        if (user.isDoitConfigurer2FA() && !user.isDeuxFacteursActive()) {
-//            enregistrerSecurite(username, ipAdresse, userAgent, true, null,
-//                    "AUTHENTIFICATION", "SETUP_2FA_REQUIS",
-//                    "Configuration 2FA obligatoire pour " + user.getNomComplet());
-//
-//            afficherToast(stage, () -> ToastNotification.info(stage,
-//                    "Vous devez configurer la 2FA avant de continuer."));
-//
-//            return ResultatConnexion.requiertSetup2FA(user,
-//                    "Configuration 2FA obligatoire");
-//        }
-//
-//        // 5. Validation du Double Facteur (2FA)
-//        if (user.isDeuxFacteursActive()) {
-//            if (code2FA == null || code2FA.isBlank()) {
-//                enregistrerSecurite(username, ipAdresse, userAgent, true, null,
-//                        "AUTHENTIFICATION", "ATTENTE_2FA", "Mot de passe valide, en attente du code 2FA pour " + user.getNomComplet());
-//
-//                afficherToast(stage, () -> ToastNotification.info(stage, "Veuillez saisir votre code d'authentification."));
-//
-//                // Retourne un statut indiquant au LoginController d'afficher le champ 2FA
-//                return ResultatConnexion.requiert2FA("Authentification 2FA requise");
-//            }
-//
-//            // Vérification du code via TotpUtil
-//            boolean codeValide = TotpUtil.verifierCode(user.getSecret2FA(), code2FA);
-//
-//            // Fallback : test via code de secours si le TOTP échoue
-//            if (!codeValide) {
-//                codeValide = utilisateurDAO.validerEtConsommerCodeSecours(user.getIdUtilisateur(), code2FA);
-//            }
-//
-//            if (!codeValide) {
-//                enregistrerSecurite(username, ipAdresse, userAgent, false, "CODE_2FA_INCORRECT",
-//                        "AUTHENTIFICATION", "ECHEC_CONNEXION", "Code 2FA invalide fourni pour " + username);
-//
-//                afficherToast(stage, () -> ToastNotification.erreur(stage, "Code 2FA invalide ou expiré"));
-//                return ResultatConnexion.requiert2FA("Code de vérification incorrect");
-//            }
-//        }
-//
-//        // 6. Succès final : Enregistrement Audit
-//
-//        // 7. Chargement des permissions effectives
-//        Set<String> permissionsEffectives = permissionDAO.findPermissionsEffectivesPourUtilisateur(user.getIdUtilisateur());
-//
-//        // 8. Enregistrement de la session BDD
-//        String idSession = UUID.randomUUID().toString();
-//        String refreshTokenHash = UUID.randomUUID().toString();
-//        String familleToken = UUID.randomUUID().toString();
-//
-//        sessionUtilisateurDAO.creerSession(
-//                idSession,
-//                user.getIdUtilisateur(),
-//                idEcole,
-//                refreshTokenHash,
-//                familleToken,
-//                ipAdresse,
-//                userAgent,
-//                nomApp
-//        );
-//
-//        // 9. Démarrage de la session mémoire
-//        sessionManager.demarrerSession(idSession, user, permissionsEffectives);
-//        sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
-//
-//        // 10. Toast Notification de succès
-//        enregistrerSecurite(username, ipAdresse, userAgent, true, null,
-//                "AUTHENTIFICATION", "CONNEXION", "Connexion réussie pour " + user.getNomComplet());
-//
-//        afficherToast(stage, () -> ToastNotification.succes(stage, "Bienvenue " + user.getPrenom() + " !"));
-//
-//        return new ResultatConnexion(true, "Connexion réussie", user, permissionsEffectives);
-//    }
-//
-//    // Surcharge pour conserver la compatibilité sans code 2FA
-//    public ResultatConnexion seConnecter(Stage stage, String username, String motDePasse, String idEcole, String ipAdresse, String userAgent, String nomApp) {
-//        return seConnecter(stage, username, motDePasse, "", idEcole, ipAdresse, userAgent, nomApp);
-//    }
-
-
     public ResultatConnexion seConnecter(Stage stage, String username, String motDePasse, String code2FA,
                                          String idEcole, String ipAdresse, String userAgent, String nomApp) {
 
@@ -336,6 +190,9 @@ public class AuthService {
 
         // Démarrage de la session mémoire
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
+        sessionManager.setMotDePasseTemporaire(user.isDoitChangerMotDePasse());  // ✅ AJOUT
+
+
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
         I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
         chargerAnneeActive(idEcole);
@@ -516,6 +373,14 @@ public class AuthService {
         );
 
         sessionManager.demarrerSession(idSession, user, permissionsEffectives);
+//        sessionManager.setMotDePasseTemporaire(user.isDoitChangerMotDePasse());  // ✅ AJOUT
+
+        System.out.println("🔍 [AuthService] user.isDoitChangerMotDePasse() = " + user.isDoitChangerMotDePasse());
+        sessionManager.setMotDePasseTemporaire(user.isDoitChangerMotDePasse());
+        System.out.println("🔍 [AuthService] motDePasseTemporaire après set = " + sessionManager.isMotDePasseTemporaire());
+
+        sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
+
         sessionManager.remplacerMappingActions(actionPermissionDAO.chargerMapping());
         I18nManager.getInstance().appliquerLangueUtilisateur(user.getLanguePreference());
         chargerAnneeActive(idEcole);

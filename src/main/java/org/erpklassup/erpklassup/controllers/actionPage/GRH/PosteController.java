@@ -223,8 +223,9 @@ public class PosteController implements Initializable, VueDisposable {
 
                 FontIcon iconDelete = new FontIcon("fth-trash-2");
                 iconDelete.setIconSize(14);
+                iconDelete.getStyleClass().add("icon-red");
                 btnSupprimer.setGraphic(iconDelete);
-                btnSupprimer.getStyleClass().addAll("btn-icon-light", "btn-danger-icon", "icon-red");
+                btnSupprimer.getStyleClass().addAll("btn-icon-light");
                 btnSupprimer.setTooltip(new Tooltip("Supprimer"));
 
                 btnVoir.setOnAction(e -> {

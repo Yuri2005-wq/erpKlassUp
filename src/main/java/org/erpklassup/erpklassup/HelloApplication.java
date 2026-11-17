@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.erpklassup.erpklassup.dao.SessionUtilisateurDAO;
+import org.erpklassup.erpklassup.service.AuditService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.sync.SyncBootstrap;
 import org.erpklassup.erpklassup.util.AlertUtil;
@@ -42,7 +43,7 @@ public class HelloApplication extends Application {
 
 
         Scene scene = new Scene(fxmlContent, 1000, 600);
-        stage.setTitle("KlassUp");
+        stage.setTitle("KlassUp - Connexion");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.getIcons().add(new Image(HelloApplication.class.getResourceAsStream("logo.png")));
@@ -65,17 +66,42 @@ public class HelloApplication extends Application {
 
             if (confirmation) {
                 SessionManager sessionManager = SessionManager.getInstance();
+
                 if (sessionManager.estConnecte()) {
                     String idSession = sessionManager.getIdSessionCourante();
+                    String idUtilisateur = sessionManager.getIdUtilisateurCourant();
+                    String nomUtilisateur = sessionManager.getUtilisateurCourant() != null
+                            ? sessionManager.getUtilisateurCourant().getNomComplet()
+                            : "Inconnu";
+
+                    // ✅ 1. Audit SYNCHRONE, AVANT toute fermeture
+                    try {
+                        new AuditService().tracerActionSync(
+                                "SYSTEME",
+                                "DECONNEXION_APPLICATION",
+                                "Fermeture de l'application par " + nomUtilisateur + " (" + idUtilisateur + ")"
+                        );
+                    } catch (Exception e) {
+                        System.err.println("⚠️ Audit fermeture non enregistré : " + e.getMessage());
+                    }
+
+                    // ✅ 2. Invalider la session (synchrone aussi, idéalement)
                     if (idSession != null) {
-                        new SessionUtilisateurDAO().InvaliderSession(idSession, "CLOSE_APP");
+                        try {
+                            new SessionUtilisateurDAO().InvaliderSession(idSession, "CLOSE_APP");
+                        } catch (Exception e) {
+                            System.err.println("⚠️ Session non invalidée : " + e.getMessage());
+                        }
                     }
                 }
+
+                // ✅ 3. Fermer le pool EN DERNIER
                 Database.fermerPool();
                 SyncBootstrap.shutdown();
             } else {
                 event.consume();
             }
+
         });
     }
 

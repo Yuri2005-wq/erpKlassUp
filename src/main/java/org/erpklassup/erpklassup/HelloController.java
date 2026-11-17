@@ -13,12 +13,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import org.erpklassup.erpklassup.controllers.actionPage.GRH.ChangementMotDePasseModalController;
 import org.erpklassup.erpklassup.dao.SessionUtilisateurDAO;
 import org.erpklassup.erpklassup.service.AppExecutor;
 import org.erpklassup.erpklassup.service.AuditService;
@@ -32,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
+import static org.erpklassup.erpklassup.util.StageHelper.getStage;
 
 public class HelloController implements Initializable {
 
@@ -98,6 +102,8 @@ public class HelloController implements Initializable {
         AppExecutor.get().submit(() ->
                 new SessionUtilisateurDAO().nettoyerSessionsObsoletes(30)
         );
+
+        Platform.runLater(this::verifierMotDePasseTemporaire);
 
         Platform.runLater(() -> {
             if (contentArea.getScene() != null && contentArea.getScene().getWindow() != null) {
@@ -420,8 +426,14 @@ public class HelloController implements Initializable {
     }
 
     @FXML void handleEcole(ActionEvent e) {
-        loadPage("/org/erpklassup/erpklassup/view/ecoleView.fxml",
-                btnSettings, "Paramètres");
+        ModalUtil.ouvrirModal(
+                HelloController.class,
+                "/org/erpklassup/erpklassup/view/ecoleView.fxml",
+                "Configuration de l'école",
+                btnSettings.getScene().getWindow(),
+                1120,
+                740
+        );
     }
 
     @FXML void handleUtilisateurs(ActionEvent e) {
@@ -510,4 +522,47 @@ public class HelloController implements Initializable {
             currentActiveButton = activeButton;
         }
     }
+
+    private void verifierMotDePasseTemporaire() {
+        SessionManager sm = SessionManager.getInstance();
+
+        System.out.println("🔍 [HelloController] estConnecte = " + sm.estConnecte());
+        System.out.println("🔍 [HelloController] isMotDePasseTemporaire = " + sm.isMotDePasseTemporaire());
+
+        if (!sm.estConnecte()) return;
+        if (!sm.isMotDePasseTemporaire()) return;
+
+
+        // ✅ Récupération de la Window directement depuis contentArea (Node)
+        if (contentArea == null || contentArea.getScene() == null) {
+            System.err.println("⚠️ contentArea non prête pour ouvrir la modale");
+            return;
+        }
+        javafx.stage.Window window = contentArea.getScene().getWindow();
+        if (window == null) return;
+
+        String fxmlPath = "/org/erpklassup/erpklassup/view/GRH/changement-mot-de-passe-modal.fxml";
+
+        ChangementMotDePasseModalController ctrl = ModalUtil.ouvrirModal(
+                getClass(),
+                fxmlPath,
+                "Changement de mot de passe obligatoire",
+                window,                    // ✅ Window, pas Stage
+                480, 520
+        );
+
+        if (ctrl != null) {
+            ctrl.initData(
+                    SessionManager.getInstance().getUtilisateurCourant(),
+                    () -> {
+                        SessionManager.getInstance().setMotDePasseTemporaire(false);
+                        ToastNotification.succes(
+                                (Stage) window,        // ✅ Window
+                                "Vous pouvez maintenant utiliser l'application normalement."
+                        );
+                    }
+            );
+        }
+    }
+
 }

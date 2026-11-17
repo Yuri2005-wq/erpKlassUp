@@ -142,8 +142,12 @@ public class EcoleController implements Initializable {
     }
 
 
-    @FXML  void handleAnnuler(){
-
+    @FXML
+    private void handleAnnuler() {
+        Stage stage = getStage();
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     private void afficherModeCreation() {
@@ -354,6 +358,8 @@ public class EcoleController implements Initializable {
     }
 
     private Stage getStage() {
-        return (Stage) txtNomEcole.getScene().getWindow();
+        return txtNomEcole != null && txtNomEcole.getScene() != null
+                ? (Stage) txtNomEcole.getScene().getWindow()
+                : null;
     }
 }
