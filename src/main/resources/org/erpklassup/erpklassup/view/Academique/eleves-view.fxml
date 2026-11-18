@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox spacing="18" styleClass="page-root" stylesheets="@../../style.css"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.Academique.ElevesController">
+    <padding>
+        <Insets bottom="22" left="24" right="24" top="22"/>
+    </padding>
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <VBox spacing="4">
+                <Label styleClass="page-title" text="Gestion des élèves"/>
+                <Label styleClass="page-subtitle" text="Consultez et gérez les dossiers des élèves de l'école."/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleActualiser" styleClass="btn-secondary" text="Actualiser">
+                <graphic><FontIcon iconLiteral="fth-refresh-cw"/></graphic>
+            </Button>
+            <Button onAction="#handleNouvelEleve" styleClass="btn-primary" text="Nouvel élève">
+                <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
+            </Button>
+        </HBox>
+
+        <HBox spacing="12">
+            <VBox spacing="5" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label styleClass="footer-info" text="Total élèves"/>
+                <Label fx:id="totalLabel" styleClass="stat-value" text="0"/>
+            </VBox>
+            <VBox spacing="5" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label styleClass="footer-info" text="Avec compte"/>
+                <Label fx:id="comptesLabel" styleClass="stat-value" text="0"/>
+            </VBox>
+            <VBox spacing="5" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label styleClass="footer-info" text="Sans compte"/>
+                <Label fx:id="sansCompteLabel" styleClass="stat-value" text="0"/>
+            </VBox>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <TextField fx:id="rechercheField" HBox.hgrow="ALWAYS"
+                       promptText="Rechercher par nom, prénom ou matricule…"
+                       styleClass="search-field"/>
+            <ToggleButton fx:id="btnVueListe" onAction="#handleVueListe" text="Liste">
+                <toggleGroup><ToggleGroup fx:id="groupeVue"/></toggleGroup>
+            </ToggleButton>
+            <ToggleButton fx:id="btnVueKanban" onAction="#handleVueKanban" text="Kanban"
+                          toggleGroup="$groupeVue"/>
+            <Button fx:id="btnModifier" disable="true" onAction="#handleModifier"
+                    styleClass="btn-secondary" text="Modifier"/>
+            <Button fx:id="btnSupprimer" disable="true" onAction="#handleSupprimer"
+                    styleClass="btn-danger" text="Supprimer"/>
+        </HBox>
+
+        <StackPane VBox.vgrow="ALWAYS">
+            <VBox fx:id="vueListe" spacing="8">
+                <TableView fx:id="tableEleves" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMatricule" prefWidth="125" text="Matricule"/>
+                        <TableColumn fx:id="colNom" prefWidth="190" text="Nom complet"/>
+                        <TableColumn fx:id="colSexe" prefWidth="95" text="Sexe"/>
+                        <TableColumn fx:id="colDateNaissance" prefWidth="125" text="Date de naissance"/>
+                        <TableColumn fx:id="colTuteur" prefWidth="170" text="Tuteur"/>
+                        <TableColumn fx:id="colTelephone" prefWidth="145" text="Téléphone tuteur"/>
+                        <TableColumn fx:id="colCompte" prefWidth="120" text="Compte"/>
+                    </columns>
+                    <placeholder><Label text="Aucun élève trouvé."/></placeholder>
+                </TableView>
+                <Label styleClass="footer-info" text="Double-cliquez sur une ligne pour modifier le dossier."/>
+            </VBox>
+
+            <VBox fx:id="vueKanban" managed="false" spacing="12" visible="false">
+                <HBox spacing="14" VBox.vgrow="ALWAYS">
+                    <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="card-title" text="Comptes liés"/>
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                            <content><FlowPane fx:id="kanbanAvecCompte" hgap="12" vgap="12"/></content>
+                        </ScrollPane>
+                    </VBox>
+                    <VBox spacing="10" styleClass="card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="card-title" text="Sans compte"/>
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                            <content><FlowPane fx:id="kanbanSansCompte" hgap="12" vgap="12"/></content>
+                        </ScrollPane>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </children>
+</VBox>

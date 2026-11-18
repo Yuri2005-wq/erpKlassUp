@@ -1,4 +1,6 @@
-package org.erpklassup.erpklassup.models;
+package org.erpklassup.erpklassup.models.Academique;
+
+import org.erpklassup.erpklassup.models.BaseEntity;
 
 import java.time.LocalDate;
 

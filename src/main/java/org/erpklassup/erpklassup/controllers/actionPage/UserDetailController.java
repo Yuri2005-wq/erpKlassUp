@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
@@ -31,6 +32,7 @@ import org.erpklassup.erpklassup.service.RoleService;
 import org.erpklassup.erpklassup.service.SessionManager;
 import org.erpklassup.erpklassup.service.UtilisateurService;
 import org.erpklassup.erpklassup.util.AlertUtil;
+import org.erpklassup.erpklassup.util.AvatarUtil;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
@@ -46,7 +48,7 @@ import static org.erpklassup.erpklassup.util.ValidationUtil.forcerMajuscules;
 public class UserDetailController implements Initializable {
 
     // ===== HEADER =====
-    @FXML private Label avatarLabel;
+    @FXML private StackPane avatarContainer;
     @FXML private Label nomCompletLabel;
     @FXML private Label usernameLabel;
     @FXML private Label badgeStatut;
@@ -365,9 +367,15 @@ private void handleActiver2FA() {
         nomCompletLabel.setText(utilisateurCourant.nomComplet());
         usernameLabel.setText("@" + utilisateurCourant.username());
 
-        String initiales = (nom.isEmpty() ? "" : nom.substring(0, 1))
-                + (prenom.isEmpty() ? "" : prenom.substring(0, 1));
-        avatarLabel.setText(initiales.toUpperCase());
+        avatarContainer.getChildren().setAll(AvatarUtil.creer(
+                utilisateurCourant.photoPath(),
+                nom,
+                prenom,
+                utilisateurCourant.idUtilisateur(),
+                56,
+                utilisateurCourant.statut().name(),
+                true
+        ));
 
         boolean estActif = utilisateurCourant.statut() != null
                 && utilisateurCourant.statut().getLibelle().equalsIgnoreCase("Actif");

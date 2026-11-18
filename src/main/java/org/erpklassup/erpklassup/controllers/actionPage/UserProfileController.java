@@ -15,12 +15,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.erpklassup.erpklassup.dao.PersonnelDAO;
 import org.erpklassup.erpklassup.dao.UtilisateurDAO;
 import org.erpklassup.erpklassup.dto.AuditLigne;
 import org.erpklassup.erpklassup.dto.FiltreAudit;
 import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.service.*;
 import org.erpklassup.erpklassup.util.AlertUtil;
+import org.erpklassup.erpklassup.util.AvatarUtil;
 import org.erpklassup.erpklassup.util.I18nManager;
 import org.erpklassup.erpklassup.util.ToastNotification;
 
@@ -36,7 +38,7 @@ public class UserProfileController implements Initializable {
     // ==========================================
     // EN-TÊTE PROFIL
     // ==========================================
-    @FXML private Label avatarLabel;
+    @FXML private StackPane avatarContainer;
     @FXML private Label nomCompletLabel;
     @FXML private Label usernameLabel;
     @FXML private Label badgeStatut;
@@ -219,7 +221,22 @@ public class UserProfileController implements Initializable {
 
         nomCompletLabel.setText(utilisateurCourant.getNomComplet());
         usernameLabel.setText("@" + utilisateurCourant.getUsername());
-        avatarLabel.setText(obtenirInitiales(utilisateurCourant.getNomComplet()));
+        String statutCompte = utilisateurCourant.isCompteVerrouille()
+                ? "VERROUILLE"
+                : utilisateurCourant.isEstActif() ? "ACTIF" : "INACTIF";
+        String photoPath = new PersonnelDAO()
+                .findByUtilisateurId(utilisateurCourant.getIdUtilisateur())
+                .map(personnel -> personnel.getPhoto())
+                .orElse(null);
+        avatarContainer.getChildren().setAll(AvatarUtil.creer(
+                photoPath,
+                utilisateurCourant.getNom(),
+                utilisateurCourant.getPrenom(),
+                utilisateurCourant.getIdUtilisateur(),
+                56,
+                statutCompte,
+                true
+        ));
 
         nomField.setText(utilisateurCourant.getNom());
         prenomField.setText(utilisateurCourant.getPrenom());
@@ -588,15 +605,6 @@ public class UserProfileController implements Initializable {
     private Stage getStage() {
         if (nomCompletLabel == null || nomCompletLabel.getScene() == null) return null;
         return (Stage) nomCompletLabel.getScene().getWindow();
-    }
-
-    private String obtenirInitiales(String nomComplet) {
-        if (nomComplet == null || nomComplet.isBlank()) return "U";
-        String[] parts = nomComplet.trim().split("\\s+");
-        if (parts.length >= 2) {
-            return (String.valueOf(parts[0].charAt(0)) + parts[1].charAt(0)).toUpperCase();
-        }
-        return nomComplet.substring(0, Math.min(2, nomComplet.length())).toUpperCase();
     }
 
     /* ============================================================

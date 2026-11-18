@@ -1,7 +1,7 @@
 package org.erpklassup.erpklassup.dao;
 
 import org.erpklassup.erpklassup.Database;
-import org.erpklassup.erpklassup.models.Eleve;
+import org.erpklassup.erpklassup.models.Academique.Eleve;
 import org.erpklassup.erpklassup.models.Parent;
 import org.erpklassup.erpklassup.models.ParentEleve;
 

@@ -400,7 +400,7 @@ public class HelloController implements Initializable {
        ============================================================ */
     @FXML void handleDashboardHome(ActionEvent e)       { loadPage("/org/erpklassup/erpklassup/view/Dashboard.fxml",           btnDashboard); }
     @FXML void handleNouvelleInscription(ActionEvent e) { loadPage("/org/erpklassup/erpklassup/view/nouvelle-inscription.fxml", btnStudents); }
-    @FXML void handleListeEleves(ActionEvent e)         { loadPage("/org/erpklassup/erpklassup/view/AccueilParametre.fxml",    btnStudents); }
+    @FXML void handleListeEleves(ActionEvent e)         { loadPage("/org/erpklassup/erpklassup/view/Academique/eleves-view.fxml", btnStudents); }
     @FXML void handleReinscriptions(ActionEvent e)      { loadPage("/org/erpklassup/erpklassup/view/reinscriptions.fxml",      btnStudents); }
     @FXML void handleDossiersEleves(ActionEvent e)      { loadPage("/org/erpklassup/erpklassup/view/dossiers-eleves.fxml",     btnStudents); }
     @FXML void handleFeuilleAppel(ActionEvent e)        { loadPage("/org/erpklassup/erpklassup/view/feuille-appel.fxml",       btnPresences); }

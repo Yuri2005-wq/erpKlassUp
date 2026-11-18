@@ -3,6 +3,7 @@ package org.erpklassup.erpklassup.service;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.erpklassup.erpklassup.dao.*;
+import org.erpklassup.erpklassup.dao.Academique.EleveDAO;
 import org.erpklassup.erpklassup.dto.*;
 import org.erpklassup.erpklassup.models.Utilisateur;
 import org.erpklassup.erpklassup.models.UtilisateurPermission;
@@ -353,7 +354,7 @@ public class UtilisateurService extends ServiceAsyncBase {
 //import javafx.collections.FXCollections;
 //import javafx.collections.ObservableList;
 //import javafx.concurrent.Task;
-//import org.erpklassup.erpklassup.dao.EleveDAO;
+//import org.erpklassup.erpklassup.dao.Academique.EleveDAO;
 //import org.erpklassup.erpklassup.dao.ParentDAO;
 //import org.erpklassup.erpklassup.dao.PersonnelDAO;
 //import org.erpklassup.erpklassup.dao.RoleDAO;

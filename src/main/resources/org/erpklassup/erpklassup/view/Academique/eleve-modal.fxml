@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox prefHeight="760" prefWidth="920" spacing="0" style="-fx-background-color: #F4F6FA;"
+      stylesheets="@../../style.css"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.erpklassup.erpklassup.controllers.actionPage.Academique.ModalEleveController">
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="14"
+              style="-fx-background-color: #16213A; -fx-padding: 18 24;">
+            <StackPane fx:id="avatarPreview"/>
+            <VBox spacing="4">
+                <Label fx:id="titreLabel" style="-fx-text-fill: white; -fx-font-size: 19px; -fx-font-weight: bold;"
+                       text="Nouveau dossier élève"/>
+                <Label styleClass="page-subtitle" text="Informations scolaires et contacts du responsable"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="18" styleClass="content-area">
+                    <padding><Insets bottom="22" left="24" right="24" top="22"/></padding>
+                    <VBox spacing="12" styleClass="card">
+                        <Label styleClass="card-title" text="Identité de l'élève"/>
+                        <GridPane hgap="14" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                            </columnConstraints>
+                            <Label styleClass="field-label" text="Matricule *" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <TextField fx:id="matriculeField" promptText="Ex. ELV-2026-001" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label styleClass="field-label" text="Sexe *" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <ComboBox fx:id="sexeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                            <Label styleClass="field-label" text="Nom *" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                            <TextField fx:id="nomField" promptText="Nom de famille" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                            <Label styleClass="field-label" text="Prénom *" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                            <TextField fx:id="prenomField" promptText="Prénom(s)" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                            <Label styleClass="field-label" text="Date de naissance" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                            <DatePicker fx:id="dateNaissancePicker" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                            <Label styleClass="field-label" text="Lieu de naissance" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                            <TextField fx:id="lieuNaissanceField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+                            <Label styleClass="field-label" text="Nationalité" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                            <TextField fx:id="nationaliteField" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                            <Label styleClass="field-label" text="Adresse" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                            <TextField fx:id="adresseField" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+
+                            <Label styleClass="field-label" text="Photo" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+                            <HBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="9">
+                                <TextField fx:id="photoPathField" HBox.hgrow="ALWAYS" promptText="Chemin de la photo"/>
+                                <Button onAction="#handleChoisirPhoto" text="Parcourir"/>
+                            </HBox>
+                            <Label styleClass="field-label" text="Compte utilisateur (ID, facultatif)" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+                            <TextField fx:id="compteField" GridPane.columnIndex="1" GridPane.rowIndex="9"
+                                       promptText="Identifiant du compte lié"/>
+                        </GridPane>
+                    </VBox>
+
+                    <VBox spacing="12" styleClass="card">
+                        <Label styleClass="card-title" text="Responsable / tuteur"/>
+                        <GridPane hgap="14" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                            </columnConstraints>
+                            <Label styleClass="field-label" text="Nom du tuteur" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <TextField fx:id="nomTuteurField" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label styleClass="field-label" text="Téléphone du tuteur" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <TextField fx:id="telephoneTuteurField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                            <Label styleClass="field-label" text="E-mail du tuteur" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                            <TextField fx:id="emailTuteurField" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        </GridPane>
+                    </VBox>
+
+                    <VBox spacing="10" styleClass="card">
+                        <Label styleClass="card-title" text="Informations médicales"/>
+                        <TextArea fx:id="antecedentsField" prefRowCount="4" promptText="Antécédents ou informations utiles (facultatif)"
+                                  wrapText="true"/>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <Separator/>
+        <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-background-color: white; -fx-padding: 14 24;">
+            <Button onAction="#handleAnnuler" styleClass="btn-secondary" text="Annuler"/>
+            <Button fx:id="enregistrerButton" onAction="#handleEnregistrer" styleClass="btn-primary"
+                    text="Enregistrer"/>
+        </HBox>
+    </children>
+</VBox>
